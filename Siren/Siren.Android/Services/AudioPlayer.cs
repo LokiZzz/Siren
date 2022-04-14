@@ -128,14 +128,31 @@ namespace Siren.Droid.Services
             IsPlaying = false;
         }
 
-        public Task<List<string>> GetAvailiableAudioDevicesAsync()
+        public async Task<List<string>> GetAvailiableAudioDevicesAsync()
         {
-            throw new NotImplementedException();
+            return await Task.Run(() =>
+            {
+                AudioManager manager = (AudioManager)Android.App.Application.Context.GetSystemService(Context.AudioService);
+                AudioDeviceInfo[] devices = manager.GetDevices(GetDevicesTargets.Outputs);
+
+                return devices.Select(x => $"{x.ProductName}: {x.Type}").ToList();
+            });
         }
 
-        public Task SetAudioDeviceAsync(string deviceName)
+        public async Task SetAudioDeviceAsync(string deviceName)
         {
-            throw new NotImplementedException();
+            await Task.Run(() =>
+            {
+                AudioManager manager = (AudioManager)Android.App.Application.Context.GetSystemService(Context.AudioService);
+                AudioDeviceInfo[] devices = manager.GetDevices(GetDevicesTargets.Outputs);
+
+                string productName = deviceName.Split(": ")[0];
+                string type = deviceName.Split(": ")[1];
+
+                AudioDeviceInfo device = devices.FirstOrDefault(x => x.ProductName.Equals(productName) && x.Type.ToString().Equals(type));
+
+                _player.SetPreferredDevice(device);
+            });
         }
 
         public void Dispose()

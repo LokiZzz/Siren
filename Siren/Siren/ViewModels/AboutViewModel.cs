@@ -52,6 +52,12 @@ namespace Siren.ViewModels
         public ICommand SeekCommand { get; }
         public ICommand StopSeekCommand { get; }
 
+        private TimeSpan _duration;
+        public TimeSpan Duration
+        {
+            get => _duration;
+            set => SetProperty(ref _duration, value);
+        }
 
         private TimeSpan _time;
         public TimeSpan Time
@@ -83,6 +89,7 @@ namespace Siren.ViewModels
             FileResult result = await FilePicker.PickAsync(PickOptions.Default);
             await Player.LoadAsync(result.FullPath);
             TrackDurationSeconds = Math.Round(Player.Duration.TotalSeconds, 0);
+            Duration = TimeSpan.FromSeconds(TrackDurationSeconds);
         }
 
         private void Play() => Player.PlayPause();
