@@ -2,41 +2,33 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Input;
 using Xamarin.Forms;
 
 namespace Siren.ViewModels
 {
-    public class NewItemViewModel : BaseViewModel
+    public class AddOrEditSettingViewModel : BaseViewModel
     {
         private string text;
-        private string description;
 
-        public NewItemViewModel()
+        public AddOrEditSettingViewModel()
         {
             SaveCommand = new Command(OnSave, ValidateSave);
             CancelCommand = new Command(OnCancel);
-            this.PropertyChanged +=
-                (_, __) => SaveCommand.ChangeCanExecute();
+            this.PropertyChanged += (_, __) => SaveCommand.ChangeCanExecute();
         }
 
         private bool ValidateSave()
         {
-            return !String.IsNullOrWhiteSpace(text)
-                && !String.IsNullOrWhiteSpace(description);
+            return !String.IsNullOrWhiteSpace(_name);
         }
 
-        public string Text
+        private string _name;
+        public string Name
         {
-            get => text;
-            set => SetProperty(ref text, value);
+            get => _name;
+            set => SetProperty(ref _name, value);
         }
 
-        public string Description
-        {
-            get => description;
-            set => SetProperty(ref description, value);
-        }
 
         public Command SaveCommand { get; }
         public Command CancelCommand { get; }
@@ -49,14 +41,9 @@ namespace Siren.ViewModels
 
         private async void OnSave()
         {
-            Item newItem = new Item()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Text = Text,
-                Description = Description
-            };
+            Setting newSetting = new Setting { Name = Name };
 
-            await DataStore.AddItemAsync(newItem);
+            //await DataStore.AddItemAsync(newItem);
 
             // This will pop the current page off the navigation stack
             await Shell.Current.GoToAsync("..");

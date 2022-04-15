@@ -12,21 +12,15 @@ using Xamarin.Forms.Xaml;
 
 namespace Siren.Views
 {
-    public partial class ItemsPage : ContentPage
+    public partial class SettingsPage : ContentPage
     {
-        ItemsViewModel _viewModel;
+        SettingsViewModel _viewModel;
 
-        public ItemsPage()
+        public SettingsPage()
         {
             InitializeComponent();
 
-            BindingContext = _viewModel = new ItemsViewModel();
-        }
-
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            _viewModel.OnAppearing();
+            BindingContext = _viewModel = new SettingsViewModel();
         }
     }
 }

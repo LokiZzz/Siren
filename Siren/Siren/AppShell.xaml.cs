@@ -1,4 +1,5 @@
-﻿using Siren.ViewModels;
+﻿using Siren.Services;
+using Siren.ViewModels;
 using Siren.Views;
 using System;
 using System.Collections.Generic;
@@ -6,18 +7,16 @@ using Xamarin.Forms;
 
 namespace Siren
 {
-    public partial class AppShell : Xamarin.Forms.Shell
+    public partial class AppShell : Shell
     {
         public AppShell()
         {
             InitializeComponent();
-            Routing.RegisterRoute(nameof(ItemDetailPage), typeof(ItemDetailPage));
-            Routing.RegisterRoute(nameof(NewItemPage), typeof(NewItemPage));
-        }
+            //Routing.RegisterRoute(nameof(ItemDetailPage), typeof(ItemDetailPage));
+            //Routing.RegisterRoute(nameof(NewItemPage), typeof(NewItemPage));
 
-        private async void OnMenuItemClicked(object sender, EventArgs e)
-        {
-            await Shell.Current.GoToAsync("//LoginPage");
+            Routing.RegisterRoute(nameof(AddOrEditSettingPage), typeof(AddOrEditSettingPage));
+            DependencyService.RegisterSingleton(new SceneManager());
         }
     }
 }

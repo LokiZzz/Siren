@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Siren.Views.MainPage"
+             xmlns:vm="clr-namespace:Siren.ViewModels"
+             Title="{Binding Title}">
+
+    <ContentPage.BindingContext>
+        <vm:MainViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="auto,*,*" ColumnDefinitions="*,4*" HorizontalOptions="Fill" VerticalOptions="Fill" ColumnSpacing="0" RowSpacing="0">
+
+        <Grid Grid.RowSpan="3" Grid.Column="0" BackgroundColor="#372554">
+            <CollectionView ItemsSource="{Binding Settings}">
+                <CollectionView.Header>
+                    <Button Text="+" Command="{Binding AddSettingCommand}"/>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Button Text="{Binding Name}"/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <Grid Grid.Row="0" Grid.Column="1" BackgroundColor="#52528C">
+            <Rectangle BackgroundColor="#9AC6C5" Margin="30" WidthRequest="300" HeightRequest="100"/>
+        </Grid>
+
+        <Grid Grid.Row="1" Grid.Column="1" BackgroundColor="#231123">
+            <Rectangle BackgroundColor="#9AC6C5" Margin="30" WidthRequest="300" HeightRequest="100"/>
+
+        </Grid>
+
+        <Grid Grid.Row="2" Grid.Column="1" BackgroundColor="#B3B7EE">
+            <Rectangle BackgroundColor="#9AC6C5" Margin="30" WidthRequest="300" HeightRequest="100"/>
+
+        </Grid>
+
+        <!--<Grid Grid.Row="0" ColumnDefinitions="auto,*,auto">
+            <Label Grid.Column="0" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Duration, StringFormat='{0:mm}:{0:ss}'}"/>
+            <Slider Grid.Column="1" Maximum="{Binding TrackDurationSeconds}" Minimum="0" Value="{Binding Position}" 
+                    DragStartedCommand="{Binding SeekCommand}" DragCompletedCommand="{Binding StopSeekCommand}"
+                    MinimumTrackColor="GreenYellow" MaximumTrackColor="Gray" ThumbColor="Red"
+                     VerticalOptions="Center"/>
+            <Label Grid.Column="2" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Time, StringFormat='{0:mm}:{0:ss}'}"/>
+        </Grid>
+        
+        <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center">
+            <Button Text="Open" Command="{Binding OpenCommand}"/>
+            <Button Text="Play / Pause" Command="{Binding PlayCommand}"/>
+            <Button Text="Stop" Command="{Binding StopCommand}"/>
+        </StackLayout>-->
+        
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Siren.Views.SettingsPage"
+             Title="{Binding Title}"
+             xmlns:local="clr-namespace:Siren.ViewModels"  
+             xmlns:model="clr-namespace:Siren.Models"  
+             x:Name="BrowseItemsPage">
+
+    <Grid RowDefinitions="*,*,*" VerticalOptions="Center" HorizontalOptions="Center">
+        
+        <Grid Grid.Row="0" RowDefinitions="*,*" ColumnDefinitions="*,auto">
+            <Label Grid.Row="0" Grid.ColumnSpan="2" Text="Path to music:"/>
+            <Entry WidthRequest="200" Grid.Row="1" Grid.Column="0" Text="{Binding MusicPath}"/>
+            <Button Grid.Row="1" Grid.Column="1" Text="Browse" Command="{Binding ChooseMusicPathCommand}"/>
+        </Grid>
+
+        <Grid Grid.Row="1" RowDefinitions="*,*" ColumnDefinitions="*,auto">
+            <Label Grid.Row="0" Grid.ColumnSpan="2" Text="Path to elements:"/>
+            <Entry WidthRequest="200" Grid.Row="1" Grid.Column="0" Text="{Binding ElementsPath}"/>
+            <Button Grid.Row="1" Grid.Column="1" Text="Browse" Command="{Binding ChooseElementsPathCommand}"/>
+        </Grid>
+
+        <Grid Grid.Row="2" RowDefinitions="*,*" ColumnDefinitions="*,auto">
+            <Label Grid.Row="0" Grid.ColumnSpan="2" Text="Path to effects:"/>
+            <Entry WidthRequest="200" Grid.Row="1" Grid.Column="0" Text="{Binding EffectsPath}"/>
+            <Button Grid.Row="1" Grid.Column="1" Text="Browse" Command="{Binding ChooseEffectsPathCommand}"/>
+        </Grid>
+
+    </Grid>
+</ContentPage>

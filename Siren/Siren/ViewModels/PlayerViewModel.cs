@@ -1,5 +1,7 @@
 ﻿using Siren.Services;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Essentials;
@@ -7,14 +9,12 @@ using Xamarin.Forms;
 
 namespace Siren.ViewModels
 {
-    public class AboutViewModel : BaseViewModel
+    public class PlayerViewModel : BaseViewModel
     {
         public IAudioPlayer Player { get; }
 
-        public AboutViewModel()
+        public PlayerViewModel()
         {
-            Title = "About";
-
             OpenCommand = new Command(async () => await Open());
             PlayCommand = new Command(Play);
             StopCommand = new Command(Stop);
