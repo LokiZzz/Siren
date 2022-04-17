@@ -2,16 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Xamarin.Forms;
 
 namespace Siren.Services
 {
-    public interface ISceneManager
-    {
-        List<Setting> Settings { get; set; }
-    }
-
     public class SceneManager
     {
-        public List<Setting> Settings { get; set; } = new List<Setting>();
+        public List<Setting> Settings { get; private set; } = new List<Setting>();
+
+        public void AddSetting(Setting setting)
+        {
+            Settings.Add(setting);
+
+            MessagingCenter.Send(this, SceneManagerMessages.SettingAdded);
+        }
+    }
+
+    public static class SceneManagerMessages
+    {
+        public static string SettingAdded = nameof(SettingAdded);
     }
 }

@@ -12,9 +12,14 @@ namespace Siren
         public App()
         {
             InitializeComponent();
+            RegisterServices();
 
-            //DependencyService.Register<MockDataStore>();
             MainPage = new AppShell();
+        }
+
+        private static void RegisterServices()
+        {
+            DependencyService.RegisterSingleton(new SceneManager());
         }
 
         protected override void OnStart()

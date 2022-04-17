@@ -11,14 +11,19 @@
 
     <Grid RowDefinitions="auto,*,*" ColumnDefinitions="*,4*" HorizontalOptions="Fill" VerticalOptions="Fill" ColumnSpacing="0" RowSpacing="0">
 
-        <Grid Grid.RowSpan="3" Grid.Column="0" BackgroundColor="#372554">
-            <CollectionView ItemsSource="{Binding Settings}">
+        <Grid Grid.RowSpan="3" Grid.Column="0" BackgroundColor="White">
+            <CollectionView ItemsSource="{Binding Settings}"
+                            SelectionMode="Single">
                 <CollectionView.Header>
                     <Button Text="+" Command="{Binding AddSettingCommand}"/>
                 </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Button Text="{Binding Name}"/>
+                        <Grid Padding="10">
+                            <Frame BackgroundColor="YellowGreen">
+                                <Label Text="{Binding Name}"/>
+                            </Frame>
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

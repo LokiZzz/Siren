@@ -12,11 +12,8 @@ namespace Siren
         public AppShell()
         {
             InitializeComponent();
-            //Routing.RegisterRoute(nameof(ItemDetailPage), typeof(ItemDetailPage));
-            //Routing.RegisterRoute(nameof(NewItemPage), typeof(NewItemPage));
 
             Routing.RegisterRoute(nameof(AddOrEditSettingPage), typeof(AddOrEditSettingPage));
-            DependencyService.RegisterSingleton(new SceneManager());
         }
     }
 }

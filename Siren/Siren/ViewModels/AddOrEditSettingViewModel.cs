@@ -1,4 +1,5 @@
 ﻿using Siren.Models;
+using Siren.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,19 +9,19 @@ namespace Siren.ViewModels
 {
     public class AddOrEditSettingViewModel : BaseViewModel
     {
-        private string text;
+        private SceneManager SceneManager { get; }
 
         public AddOrEditSettingViewModel()
         {
+            SceneManager = DependencyService.Resolve<SceneManager>();
+
             SaveCommand = new Command(OnSave, ValidateSave);
             CancelCommand = new Command(OnCancel);
             this.PropertyChanged += (_, __) => SaveCommand.ChangeCanExecute();
         }
 
-        private bool ValidateSave()
-        {
-            return !String.IsNullOrWhiteSpace(_name);
-        }
+        public Command SaveCommand { get; }
+        public Command CancelCommand { get; }
 
         private string _name;
         public string Name
@@ -29,23 +30,21 @@ namespace Siren.ViewModels
             set => SetProperty(ref _name, value);
         }
 
-
-        public Command SaveCommand { get; }
-        public Command CancelCommand { get; }
+        private bool ValidateSave()
+        {
+            return !String.IsNullOrWhiteSpace(_name);
+        }
 
         private async void OnCancel()
         {
-            // This will pop the current page off the navigation stack
             await Shell.Current.GoToAsync("..");
         }
 
         private async void OnSave()
         {
             Setting newSetting = new Setting { Name = Name };
+            SceneManager.AddSetting(newSetting);
 
-            //await DataStore.AddItemAsync(newItem);
-
-            // This will pop the current page off the navigation stack
             await Shell.Current.GoToAsync("..");
         }
     }
