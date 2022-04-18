@@ -8,6 +8,7 @@ namespace Siren.Services
 {
     public class SceneManager
     {
+        public Setting SelectedSetting { get; set; }
         public List<Setting> Settings { get; private set; } = new List<Setting>();
 
         public void AddSetting(Setting setting)
@@ -15,6 +16,11 @@ namespace Siren.Services
             Settings.Add(setting);
 
             MessagingCenter.Send(this, SceneManagerMessages.SettingAdded);
+        }
+
+        public void AddScene(Scene scene)
+        {
+            SelectedSetting.Scenes.Add(scene);
         }
     }
 

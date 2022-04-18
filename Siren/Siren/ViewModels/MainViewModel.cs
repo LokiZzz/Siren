@@ -13,22 +13,49 @@ namespace Siren.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
+        private SceneManager SceneManager { get; }
+
         public MainViewModel()
         {
             InitializeMessagingCenter();
+            InitializeCommands();
+            InitializeAudioEnvironment();
 
-            AddSettingCommand = new Command(async () => await AddSetting());
+            SceneManager = DependencyService.Get<SceneManager>();
         }
 
-        public Command AddSettingCommand { get; }
+        public Command AddSettingCommand { get; set; }
+        public Command AddSceneCommand { get; set; }
+
+        private Setting _selectedSetting;
+        public Setting SelectedSetting
+        {
+            get 
+            {
+                return SceneManager.SelectedSetting;
+            }
+            set
+            {
+                SceneManager.SelectedSetting = value;
+                SetProperty(ref _selectedSetting, value);
+            }
+        }
 
         public ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
 
+        private void InitializeAudioEnvironment()
+        {
+            if (SceneManager?.Settings != null)
+            {
+                Settings = new ObservableCollection<Setting>(SceneManager.Settings);
+            }
+        }
+
         private void UpdateSettings(SceneManager manager)
         {
-            foreach(Setting setting in manager.Settings)
+            foreach (Setting setting in manager.Settings)
             {
-                if(!Settings.Any(x => x.Name == setting.Name))
+                if (!Settings.Any(x => x.Name == setting.Name))
                 {
                     Settings.Add(setting);
                 }
@@ -40,9 +67,20 @@ namespace Siren.ViewModels
             await Shell.Current.GoToAsync(nameof(AddOrEditSettingPage));
         }
 
+        private async Task AddScene()
+        {
+            await Shell.Current.GoToAsync(nameof(AddOrEditScenePage));
+        }
+
         private void InitializeMessagingCenter()
         {
             MessagingCenter.Subscribe<SceneManager>(this, SceneManagerMessages.SettingAdded, UpdateSettings);
+        }
+
+        private void InitializeCommands()
+        {
+            AddSettingCommand = new Command(async () => await AddSetting());
+            AddSceneCommand = new Command(async () => await AddScene());
         }
     }
 }

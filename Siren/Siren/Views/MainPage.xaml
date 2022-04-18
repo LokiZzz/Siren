@@ -13,6 +13,7 @@
 
         <Grid Grid.RowSpan="3" Grid.Column="0" BackgroundColor="White">
             <CollectionView ItemsSource="{Binding Settings}"
+                            SelectedItem="{Binding SelectedSetting}"
                             SelectionMode="Single">
                 <CollectionView.Header>
                     <Button Text="+" Command="{Binding AddSettingCommand}"/>
@@ -30,7 +31,21 @@
         </Grid>
 
         <Grid Grid.Row="0" Grid.Column="1" BackgroundColor="#52528C">
-            <Rectangle BackgroundColor="#9AC6C5" Margin="30" WidthRequest="300" HeightRequest="100"/>
+            <CollectionView ItemsSource="{Binding Scenes}"
+                            SelectionMode="Single">
+                <CollectionView.Header>
+                    <Button Text="+" Command="{Binding AddSceneCommand}"/>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10">
+                            <Frame BackgroundColor="FloralWhite">
+                                <Label Text="{Binding Name}"/>
+                            </Frame>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
 
         <Grid Grid.Row="1" Grid.Column="1" BackgroundColor="#231123">
