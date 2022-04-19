@@ -11,13 +11,14 @@
 
     <Grid RowDefinitions="auto,*,*" ColumnDefinitions="*,4*" HorizontalOptions="Fill" VerticalOptions="Fill" ColumnSpacing="0" RowSpacing="0">
 
-        <Grid Grid.RowSpan="3" Grid.Column="0" BackgroundColor="White">
-            <CollectionView ItemsSource="{Binding Settings}"
+        <Grid Grid.RowSpan="3" Grid.Column="0" RowDefinitions="auto,*">
+
+            <Button Grid.Row="0" Text="+" Command="{Binding AddSettingCommand}"/>
+
+            <CollectionView Grid.Row="1" 
+                            ItemsSource="{Binding Settings}"
                             SelectedItem="{Binding SelectedSetting}"
                             SelectionMode="Single">
-                <CollectionView.Header>
-                    <Button Text="+" Command="{Binding AddSettingCommand}"/>
-                </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="10">
@@ -30,12 +31,15 @@
             </CollectionView>
         </Grid>
 
-        <Grid Grid.Row="0" Grid.Column="1" BackgroundColor="#52528C">
-            <CollectionView ItemsSource="{Binding Scenes}"
-                            SelectionMode="Single">
-                <CollectionView.Header>
-                    <Button Text="+" Command="{Binding AddSceneCommand}"/>
-                </CollectionView.Header>
+        <Grid Grid.Row="0" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="#52528C">
+
+            <Button Grid.Row="0" Text="+" Command="{Binding AddSceneCommand}"/>
+
+            <CollectionView Grid.Row="1" 
+                            ItemsSource="{Binding SelectedSetting.Scenes}"
+                            SelectedItem="{Binding SelectedScene}"
+                            SelectionMode="Single"
+                            ItemsLayout="HorizontalGrid, 2">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="10">

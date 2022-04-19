@@ -43,11 +43,25 @@ namespace Siren.ViewModels
 
         public ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
 
+        private Scene _selectedScene;
+        public Scene SelectedScene
+        {
+            get
+            {
+                return _selectedScene;
+            }
+            set
+            {
+                SetProperty(ref _selectedScene, value);
+            }
+        }
+
         private void InitializeAudioEnvironment()
         {
             if (SceneManager?.Settings != null)
             {
                 Settings = new ObservableCollection<Setting>(SceneManager.Settings);
+                SelectedSetting = Settings.Any() ? Settings.First() : null;
             }
         }
 
@@ -58,6 +72,12 @@ namespace Siren.ViewModels
                 if (!Settings.Any(x => x.Name == setting.Name))
                 {
                     Settings.Add(setting);
+                    SelectedSetting = setting;
+                    //Delete this:
+                    for (int i = 0; i < 48; i++)
+                    {
+                        SelectedSetting.Scenes.Add(new Scene { Name = $"Scene {i}" });
+                    }
                 }
             }
         }
