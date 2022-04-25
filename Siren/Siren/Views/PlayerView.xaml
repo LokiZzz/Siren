@@ -16,30 +16,41 @@
         </Style>
     </ContentView.Resources>
 
-    <Grid Margin="5" RowDefinitions="120" ColumnDefinitions="300">
-        <Grid BackgroundColor="{StaticResource Light}" Padding="10">
+    <Grid Margin="5" RowDefinitions="180" ColumnDefinitions="300">
+        <Grid BackgroundColor="{StaticResource Light}" Padding="10" RowDefinitions="auto,auto,auto,auto">
+            
+            <Label Grid.Row="0" TextColor="{StaticResource TextColor}" Text="{Binding Name}"/>
 
-            <Grid Grid.Row="0" ColumnDefinitions="auto,*,auto" HorizontalOptions="Fill" VerticalOptions="Center">
-                <Label Grid.Column="0" VerticalOptions="Center" VerticalTextAlignment="Center" Margin="0,0,15,0" Text="{Binding Time, StringFormat='{0:mm}:{0:ss}'}"/>
+            <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="auto,*,auto" HorizontalOptions="Fill" VerticalOptions="Center">
+                <Label TextColor="{StaticResource TextColor}" Grid.Column="0" VerticalOptions="Center" VerticalTextAlignment="Center" Margin="0,0,15,0" Text="{Binding Time, StringFormat='{0:mm}:{0:ss}'}"/>
                 <Slider Grid.Column="1" 
-                    Maximum="{Binding TrackDurationSeconds}" 
-                    Minimum="0" 
-                    Value="{Binding Position}" 
-                    DragStartedCommand="{Binding SeekCommand}" 
-                    DragCompletedCommand="{Binding StopSeekCommand}"
-                    MinimumTrackColor="GreenYellow" 
-                    MaximumTrackColor="Gray" 
-                    ThumbColor="Red"
-                    VerticalOptions="Center"/>
-                <Label Grid.Column="2" VerticalOptions="Center" VerticalTextAlignment="Center" Margin="15,0,0,0" Text="{Binding Duration, StringFormat='{0:mm}:{0:ss}'}"/>
+                        Maximum="{Binding TrackDurationSeconds}" 
+                        Minimum="0" 
+                        Value="{Binding Position}" 
+                        DragStartedCommand="{Binding SeekCommand}" 
+                        DragCompletedCommand="{Binding StopSeekCommand}"
+                        MinimumTrackColor="GreenYellow" 
+                        MaximumTrackColor="Gray" 
+                        ThumbColor="Red"
+                        VerticalOptions="Center"/>
+                <Label TextColor="{StaticResource TextColor}" Grid.Column="2" VerticalOptions="Center" VerticalTextAlignment="Center" Margin="15,0,0,0" Text="{Binding Duration, StringFormat='{0:mm}:{0:ss}'}"/>
             </Grid>
 
-            <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
+            <StackLayout Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
                 <Button Style="{StaticResource PlayerControlButton}" Text="{x:Static icons:FAFont.FolderOpen}" Command="{Binding OpenCommand}"/>
                 <Button Style="{StaticResource PlayerControlButton}" Text="{x:Static icons:FAFont.CirclePlay}" Command="{Binding PlayCommand}"/>
                 <Button Style="{StaticResource PlayerControlButton}" Text="{x:Static icons:FAFont.CircleStop}" Command="{Binding StopCommand}"/>
             </StackLayout>
 
+            <Slider Grid.Row="3"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Fill"
+                    Minimum="0"
+                    Maximum="100"
+                    Value="{Binding Volume}"
+                    MinimumTrackColor="Orange" 
+                    MaximumTrackColor="Gray" 
+                    ThumbColor="Orange"/>
         </Grid>
     </Grid>
 </ContentView>

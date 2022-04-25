@@ -7,6 +7,8 @@
     -->
     <Application.Resources>
         <ResourceDictionary>
+            <Color x:Key="TextColor">#FFFFFF</Color>
+
             <Color x:Key="VeryDark">#202225</Color>
             <Color x:Key="Dark">#2f3136</Color>
             <Color x:Key="Medium">#36393f</Color>
@@ -16,7 +18,7 @@
             <Color x:Key="WeakPrimary">#77FF6978</Color>
 
             <Style TargetType="Button">
-                <Setter Property="TextColor" Value="White"></Setter>
+                <Setter Property="TextColor" Value="{StaticResource TextColor}"></Setter>
                 <Setter Property="VisualStateManager.VisualStateGroups">
                     <VisualStateGroupList>
                         <VisualStateGroup x:Name="CommonStates">

@@ -1,5 +1,4 @@
-﻿using Siren.Models;
-using Siren.Services;
+﻿using Siren.Services;
 using Siren.Views;
 using System;
 using System.Collections.Generic;
@@ -7,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Xml.Linq;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
@@ -75,18 +75,14 @@ namespace Siren.ViewModels
 
         private async Task AddElements()
         {
-            //List<Task> loadingWork = new List<Task>();
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
             foreach(FileResult element in result)
             {
-                PlayerViewModel player = new PlayerViewModel();
-                //loadingWork.Add(player.Load(element.FullPath));
+                PlayerViewModel player = new PlayerViewModel { Loop = true };
                 await player.Load(element.FullPath);
-                Elements.Add(player);
+                SelectedSetting.Elements.Add(player);
             }
-
-            //Task.WaitAll(loadingWork.ToArray());
         }
 
         private async Task AddEffects()
@@ -112,6 +108,8 @@ namespace Siren.ViewModels
         public Command AddElementsCommand { get; set; }
         public Command AddEffectsCommand { get; set; }
 
+        public ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
+
         private Setting _selectedSetting;
         public Setting SelectedSetting
         {
@@ -126,15 +124,11 @@ namespace Siren.ViewModels
             }
         }
 
-        public ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
-
         private Scene _selectedScene;
         public Scene SelectedScene
         {
             get => _selectedScene;
             set => SetProperty(ref _selectedScene, value);
         }
-
-        public ObservableCollection<PlayerViewModel> Elements { get; set; } = new ObservableCollection<PlayerViewModel>();
     }
 }

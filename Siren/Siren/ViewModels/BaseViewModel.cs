@@ -1,5 +1,4 @@
-﻿using Siren.Models;
-using Siren.Services;
+﻿using Siren.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

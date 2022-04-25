@@ -1,6 +1,8 @@
 ﻿using Siren.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -27,12 +29,9 @@ namespace Siren.ViewModels
 
         public async Task Load(string path)
         {
-            await Player.LoadAsync(path);
+            FilePath = path;
 
-            if(Player.Duration.TotalSeconds <= 0)
-            {
-                string stop = "";
-            }
+            await Player.LoadAsync(path);
 
             TrackDurationSeconds = Math.Round(Player.Duration.TotalSeconds, 0);
             Duration = TimeSpan.FromSeconds(TrackDurationSeconds);
@@ -97,15 +96,45 @@ namespace Siren.ViewModels
             }
         }
 
+        public double Volume
+        {
+            get => Player.Volume * 100;
+            set => Player.Volume = value / 100;
+        }
+
+        public bool Loop
+        {
+            get => Player.Loop;
+            set => Player.Loop = value;
+        }
+
+        private string _filePath;
+        public string FilePath
+        {
+            get => _filePath;
+            set => SetProperty(ref _filePath, value);
+        }
+
+        public string Name =>  Path.GetFileNameWithoutExtension(FilePath);
+
         private async Task Open()
         {
             FileResult result = await FilePicker.PickAsync(PickOptions.Default);
 
-            await Load(result.FullPath);
+            if (result != null)
+            {
+                await Load(result.FullPath);
+            }
         }
 
-        private void Play() => Player.PlayPause();
+        private void Play()
+        {
+            Player.PlayPause();
+        }
 
-        private void Stop() => Player.Stop();
+        private void Stop()
+        {
+            Player.Stop();
+        }
     }
 }

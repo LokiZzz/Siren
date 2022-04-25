@@ -1,5 +1,4 @@
-﻿using Siren.Models;
-using Siren.ViewModels;
+﻿using Siren.ViewModels;
 using Siren.Views;
 using System;
 using System.Collections.Generic;

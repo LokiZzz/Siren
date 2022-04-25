@@ -47,8 +47,7 @@
         <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="{StaticResource Medium}">
             <Button Grid.Row="0" Text="Add Elements" Command="{Binding AddElementsCommand}"/>
             <ScrollView Grid.Row="1">
-
-                <FlexLayout BindableLayout.ItemsSource="{Binding Elements}" 
+                <FlexLayout BindableLayout.ItemsSource="{Binding SelectedSetting.Elements}" 
                             Wrap="Wrap" 
                             Direction="Row" 
                             JustifyContent="Start"
