@@ -4,7 +4,8 @@
              x:Class="Siren.Views.MainPage"
              xmlns:vm="clr-namespace:Siren.ViewModels" 
              xmlns:views="clr-namespace:Siren.Views"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             BackgroundColor="{StaticResource VeryDark}">
 
     <ContentPage.BindingContext>
         <vm:MainViewModel />
@@ -16,7 +17,7 @@
 
         <Button Grid.Row="0" Grid.Column="1" Text="Add Scene" Command="{Binding AddSceneCommand}"/>
 
-        <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" RowDefinitions="auto,*">
+        <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" RowDefinitions="auto,*" BackgroundColor="{StaticResource Dark}">
             <CollectionView Grid.Row="0" 
                             ItemsSource="{Binding Settings}"
                             SelectedItem="{Binding SelectedSetting}"
@@ -29,7 +30,7 @@
             </CollectionView>
         </Grid>
 
-        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="#52528C" HeightRequest="100">
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="auto,*" HeightRequest="100" BackgroundColor="{StaticResource Medium}">
             <CollectionView Grid.Row="0" 
                             ItemsSource="{Binding SelectedSetting.Scenes}"
                             SelectedItem="{Binding SelectedScene}"
@@ -43,22 +44,29 @@
             </CollectionView>
         </Grid>
 
-        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="#231123">
+        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="{StaticResource Medium}">
             <Button Grid.Row="0" Text="Add Elements" Command="{Binding AddElementsCommand}"/>
-            <FlexLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Elements}">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate>
-                        <views:PlayerView/>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </FlexLayout>
+            <ScrollView Grid.Row="1">
+
+                <FlexLayout BindableLayout.ItemsSource="{Binding Elements}" 
+                            Wrap="Wrap" 
+                            Direction="Row" 
+                            JustifyContent="Start"
+                            AlignContent="Start"
+                            AlignItems="Start"
+                            Padding="5">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <views:PlayerView/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+            </ScrollView>
         </Grid>
 
-        <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="#B3B7EE">
-            <Button Grid.Row="0" Text="Add Elements" Command="{Binding AddEffectsCommand}"/>
-
+        <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="{StaticResource Medium}">
+            <Button Grid.Row="0" Text="Add Effects" Command="{Binding AddEffectsCommand}"/>
         </Grid>
-        
     </Grid>
 
 </ContentPage>

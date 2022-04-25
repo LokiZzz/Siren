@@ -7,7 +7,14 @@
     -->
     <Application.Resources>
         <ResourceDictionary>
-            <Color x:Key="Primary">#FF6978</Color>
+            <Color x:Key="VeryDark">#202225</Color>
+            <Color x:Key="Dark">#2f3136</Color>
+            <Color x:Key="Medium">#36393f</Color>
+            <Color x:Key="Light">#40444b</Color>
+
+            <Color x:Key="Primary">#B3B7EE</Color>
+            <Color x:Key="WeakPrimary">#77FF6978</Color>
+
             <Style TargetType="Button">
                 <Setter Property="TextColor" Value="White"></Setter>
                 <Setter Property="VisualStateManager.VisualStateGroups">
@@ -20,7 +27,7 @@
                             </VisualState>
                             <VisualState x:Name="Disabled">
                                 <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="#332196F3" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource WeakPrimary}" />
                                 </VisualState.Setters>
                             </VisualState>
                         </VisualStateGroup>

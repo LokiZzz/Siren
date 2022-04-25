@@ -81,6 +81,11 @@ namespace Siren.UWP.Services
             MediaSource source = MediaSource.CreateFromStorageFile(file);
             await source.OpenAsync();
             _player.Source = source;
+
+            while(Duration <= TimeSpan.FromMilliseconds(0))
+            {
+                await Task.Delay(2);
+            }
         }
 
         public void PlayPause()

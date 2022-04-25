@@ -28,6 +28,12 @@ namespace Siren.ViewModels
         public async Task Load(string path)
         {
             await Player.LoadAsync(path);
+
+            if(Player.Duration.TotalSeconds <= 0)
+            {
+                string stop = "";
+            }
+
             TrackDurationSeconds = Math.Round(Player.Duration.TotalSeconds, 0);
             Duration = TimeSpan.FromSeconds(TrackDurationSeconds);
         }

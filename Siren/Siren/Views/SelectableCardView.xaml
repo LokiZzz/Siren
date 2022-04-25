@@ -4,8 +4,8 @@
              x:Class="Siren.Views.SelectableCardView">
     
     <Grid Padding="10" RowDefinitions="80" ColumnDefinitions="300">
-        <Frame BackgroundColor="YellowGreen">
-            <Label Text="{Binding Name}"/>
+        <Frame BackgroundColor="{StaticResource Light}">
+            <Label Text="{Binding Name}" TextColor="White"/>
         </Frame>
     </Grid>
     

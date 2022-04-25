@@ -1,21 +1,45 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Siren.Views.PlayerView">
-    <Grid>
-        <Grid Grid.Row="0" ColumnDefinitions="auto,*,auto">
-            <Label Grid.Column="0" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Duration, StringFormat='{0:mm}:{0:ss}'}"/>
-            <Slider Grid.Column="1" Maximum="{Binding TrackDurationSeconds}" Minimum="0" Value="{Binding Position}" 
-                    DragStartedCommand="{Binding SeekCommand}" DragCompletedCommand="{Binding StopSeekCommand}"
-                    MinimumTrackColor="GreenYellow" MaximumTrackColor="Gray" ThumbColor="Red"
-                        VerticalOptions="Center"/>
-            <Label Grid.Column="2" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Time, StringFormat='{0:mm}:{0:ss}'}"/>
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             x:Class="Siren.Views.PlayerView"
+             xmlns:viewmodels="clr-namespace:Siren.ViewModels" 
+             x:DataType="viewmodels:PlayerViewModel"
+             xmlns:icons="clr-namespace:Siren.Assets">
+
+    <ContentView.Resources>
+        <Style x:Key="PlayerControlButton" TargetType="Button">
+            <Setter Property="HeightRequest" Value="50"/>
+            <Setter Property="WidthRequest" Value="50"/>
+            <Setter Property="CornerRadius" Value="25"/>
+            <Setter Property="FontFamily" Value="FA"/>
+            <Setter Property="FontSize" Value="26"/>
+        </Style>
+    </ContentView.Resources>
+
+    <Grid Margin="5" RowDefinitions="120" ColumnDefinitions="300">
+        <Grid BackgroundColor="{StaticResource Light}" Padding="10">
+
+            <Grid Grid.Row="0" ColumnDefinitions="auto,*,auto" HorizontalOptions="Fill" VerticalOptions="Center">
+                <Label Grid.Column="0" VerticalOptions="Center" VerticalTextAlignment="Center" Margin="0,0,15,0" Text="{Binding Time, StringFormat='{0:mm}:{0:ss}'}"/>
+                <Slider Grid.Column="1" 
+                    Maximum="{Binding TrackDurationSeconds}" 
+                    Minimum="0" 
+                    Value="{Binding Position}" 
+                    DragStartedCommand="{Binding SeekCommand}" 
+                    DragCompletedCommand="{Binding StopSeekCommand}"
+                    MinimumTrackColor="GreenYellow" 
+                    MaximumTrackColor="Gray" 
+                    ThumbColor="Red"
+                    VerticalOptions="Center"/>
+                <Label Grid.Column="2" VerticalOptions="Center" VerticalTextAlignment="Center" Margin="15,0,0,0" Text="{Binding Duration, StringFormat='{0:mm}:{0:ss}'}"/>
+            </Grid>
+
+            <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
+                <Button Style="{StaticResource PlayerControlButton}" Text="{x:Static icons:FAFont.FolderOpen}" Command="{Binding OpenCommand}"/>
+                <Button Style="{StaticResource PlayerControlButton}" Text="{x:Static icons:FAFont.CirclePlay}" Command="{Binding PlayCommand}"/>
+                <Button Style="{StaticResource PlayerControlButton}" Text="{x:Static icons:FAFont.CircleStop}" Command="{Binding StopCommand}"/>
+            </StackLayout>
+
         </Grid>
-        
-        <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center">
-            <Button Text="Open" Command="{Binding OpenCommand}"/>
-            <Button Text="Play / Pause" Command="{Binding PlayCommand}"/>
-                <Button Text="Stop" Command="{Binding StopCommand}"/>
-        </StackLayout>
     </Grid>
 </ContentView>
