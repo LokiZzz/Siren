@@ -2,80 +2,62 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Siren.Views.MainPage"
-             xmlns:vm="clr-namespace:Siren.ViewModels"
+             xmlns:vm="clr-namespace:Siren.ViewModels" 
+             xmlns:views="clr-namespace:Siren.Views"
              Title="{Binding Title}">
 
     <ContentPage.BindingContext>
         <vm:MainViewModel />
     </ContentPage.BindingContext>
 
-    <Grid RowDefinitions="auto,*,*" ColumnDefinitions="*,4*" HorizontalOptions="Fill" VerticalOptions="Fill" ColumnSpacing="0" RowSpacing="0">
+    <Grid RowDefinitions="auto,auto,*,*" ColumnDefinitions="320,*" ColumnSpacing="0" RowSpacing="0">
 
-        <Grid Grid.RowSpan="3" Grid.Column="0" RowDefinitions="auto,*">
+        <Button Grid.Row="0" Grid.Column="0" Text="Add Setting" Command="{Binding AddSettingCommand}"/>
 
-            <Button Grid.Row="0" Text="+" Command="{Binding AddSettingCommand}"/>
+        <Button Grid.Row="0" Grid.Column="1" Text="Add Scene" Command="{Binding AddSceneCommand}"/>
 
-            <CollectionView Grid.Row="1" 
+        <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" RowDefinitions="auto,*">
+            <CollectionView Grid.Row="0" 
                             ItemsSource="{Binding Settings}"
                             SelectedItem="{Binding SelectedSetting}"
                             SelectionMode="Single">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Padding="10">
-                            <Frame BackgroundColor="YellowGreen">
-                                <Label Text="{Binding Name}"/>
-                            </Frame>
-                        </Grid>
+                        <views:SelectableCardView/>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
 
-        <Grid Grid.Row="0" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="#52528C">
-
-            <Button Grid.Row="0" Text="+" Command="{Binding AddSceneCommand}"/>
-
-            <CollectionView Grid.Row="1" 
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="#52528C" HeightRequest="100">
+            <CollectionView Grid.Row="0" 
                             ItemsSource="{Binding SelectedSetting.Scenes}"
                             SelectedItem="{Binding SelectedScene}"
                             SelectionMode="Single"
-                            ItemsLayout="HorizontalGrid, 2">
+                            ItemsLayout="HorizontalList">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Padding="10">
-                            <Frame BackgroundColor="FloralWhite">
-                                <Label Text="{Binding Name}"/>
-                            </Frame>
-                        </Grid>
+                        <views:SelectableCardView/>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
 
-        <Grid Grid.Row="1" Grid.Column="1" BackgroundColor="#231123">
-            <Rectangle BackgroundColor="#9AC6C5" Margin="30" WidthRequest="300" HeightRequest="100"/>
-
+        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="#231123">
+            <Button Grid.Row="0" Text="Add Elements" Command="{Binding AddElementsCommand}"/>
+            <FlexLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Elements}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <views:PlayerView/>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
         </Grid>
 
-        <Grid Grid.Row="2" Grid.Column="1" BackgroundColor="#B3B7EE">
-            <Rectangle BackgroundColor="#9AC6C5" Margin="30" WidthRequest="300" HeightRequest="100"/>
+        <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="#B3B7EE">
+            <Button Grid.Row="0" Text="Add Elements" Command="{Binding AddEffectsCommand}"/>
 
         </Grid>
-
-        <!--<Grid Grid.Row="0" ColumnDefinitions="auto,*,auto">
-            <Label Grid.Column="0" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Duration, StringFormat='{0:mm}:{0:ss}'}"/>
-            <Slider Grid.Column="1" Maximum="{Binding TrackDurationSeconds}" Minimum="0" Value="{Binding Position}" 
-                    DragStartedCommand="{Binding SeekCommand}" DragCompletedCommand="{Binding StopSeekCommand}"
-                    MinimumTrackColor="GreenYellow" MaximumTrackColor="Gray" ThumbColor="Red"
-                     VerticalOptions="Center"/>
-            <Label Grid.Column="2" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Time, StringFormat='{0:mm}:{0:ss}'}"/>
-        </Grid>
-        
-        <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center">
-            <Button Text="Open" Command="{Binding OpenCommand}"/>
-            <Button Text="Play / Pause" Command="{Binding PlayCommand}"/>
-            <Button Text="Stop" Command="{Binding StopCommand}"/>
-        </StackLayout>-->
         
     </Grid>
 

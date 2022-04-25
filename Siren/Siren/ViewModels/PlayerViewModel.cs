@@ -21,8 +21,15 @@ namespace Siren.ViewModels
             SeekCommand = new Command(Seek);
             StopSeekCommand = new Command(StopSeek);
 
-            Player = DependencyService.Get<IAudioPlayer>();
+            Player = DependencyService.Get<IAudioPlayer>(DependencyFetchTarget.NewInstance);
             Player.OnPositionChanged += OnPositionChanged;
+        }
+
+        public async Task Load(string path)
+        {
+            await Player.LoadAsync(path);
+            TrackDurationSeconds = Math.Round(Player.Duration.TotalSeconds, 0);
+            Duration = TimeSpan.FromSeconds(TrackDurationSeconds);
         }
 
         private bool _isSeeking = false;
@@ -87,9 +94,8 @@ namespace Siren.ViewModels
         private async Task Open()
         {
             FileResult result = await FilePicker.PickAsync(PickOptions.Default);
-            await Player.LoadAsync(result.FullPath);
-            TrackDurationSeconds = Math.Round(Player.Duration.TotalSeconds, 0);
-            Duration = TimeSpan.FromSeconds(TrackDurationSeconds);
+
+            await Load(result.FullPath);
         }
 
         private void Play() => Player.PlayPause();

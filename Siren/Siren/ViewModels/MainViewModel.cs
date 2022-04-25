@@ -2,6 +2,7 @@
 using Siren.Services;
 using Siren.Views;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,37 +23,22 @@ namespace Siren.ViewModels
             InitializeAudioEnvironment();
 
             SceneManager = DependencyService.Get<SceneManager>();
-        }
 
-        public Command AddSettingCommand { get; set; }
-        public Command AddSceneCommand { get; set; }
-
-        private Setting _selectedSetting;
-        public Setting SelectedSetting
-        {
-            get 
+            var setting = new Setting { Name = "Tavern" };
+            Settings.Add(setting);
+            SelectedSetting = setting;
+            //Delete this:
+            for (int i = 0; i < 7; i++)
             {
-                return SceneManager.SelectedSetting;
+                SelectedSetting.Scenes.Add(new Scene { Name = $"Scene of the selected setting here {i}" });
             }
-            set
+            var setting2 = new Setting { Name = "Ship" };
+            Settings.Add(setting2);
+            SelectedSetting = setting2;
+            //Delete this:
+            for (int i = 0; i < 7; i++)
             {
-                SceneManager.SelectedSetting = value;
-                SetProperty(ref _selectedSetting, value);
-            }
-        }
-
-        public ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
-
-        private Scene _selectedScene;
-        public Scene SelectedScene
-        {
-            get
-            {
-                return _selectedScene;
-            }
-            set
-            {
-                SetProperty(ref _selectedScene, value);
+                SelectedSetting.Scenes.Add(new Scene { Name = $"Scene of the selected setting here {i}" });
             }
         }
 
@@ -73,11 +59,6 @@ namespace Siren.ViewModels
                 {
                     Settings.Add(setting);
                     SelectedSetting = setting;
-                    //Delete this:
-                    for (int i = 0; i < 48; i++)
-                    {
-                        SelectedSetting.Scenes.Add(new Scene { Name = $"Scene {i}" });
-                    }
                 }
             }
         }
@@ -92,6 +73,27 @@ namespace Siren.ViewModels
             await Shell.Current.GoToAsync(nameof(AddOrEditScenePage));
         }
 
+        private async Task AddElements()
+        {
+            //List<Task> loadingWork = new List<Task>();
+            IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
+
+            foreach(FileResult element in result)
+            {
+                PlayerViewModel player = new PlayerViewModel();
+                //loadingWork.Add(player.Load(element.FullPath));
+                await player.Load(element.FullPath);
+                Elements.Add(player);
+            }
+
+            //Task.WaitAll(loadingWork.ToArray());
+        }
+
+        private async Task AddEffects()
+        {
+            
+        }
+
         private void InitializeMessagingCenter()
         {
             MessagingCenter.Subscribe<SceneManager>(this, SceneManagerMessages.SettingAdded, UpdateSettings);
@@ -101,6 +103,38 @@ namespace Siren.ViewModels
         {
             AddSettingCommand = new Command(async () => await AddSetting());
             AddSceneCommand = new Command(async () => await AddScene());
+            AddElementsCommand = new Command(async () => await AddElements());
+            AddEffectsCommand = new Command(async () => await AddEffects());
         }
+
+        public Command AddSettingCommand { get; set; }
+        public Command AddSceneCommand { get; set; }
+        public Command AddElementsCommand { get; set; }
+        public Command AddEffectsCommand { get; set; }
+
+        private Setting _selectedSetting;
+        public Setting SelectedSetting
+        {
+            get
+            {
+                return SceneManager.SelectedSetting;
+            }
+            set
+            {
+                SceneManager.SelectedSetting = value;
+                SetProperty(ref _selectedSetting, value);
+            }
+        }
+
+        public ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
+
+        private Scene _selectedScene;
+        public Scene SelectedScene
+        {
+            get => _selectedScene;
+            set => SetProperty(ref _selectedScene, value);
+        }
+
+        public ObservableCollection<PlayerViewModel> Elements { get; set; } = new ObservableCollection<PlayerViewModel>();
     }
 }

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Siren.Views.SelectableCardView">
+    
+    <Grid Padding="10" RowDefinitions="80" ColumnDefinitions="300">
+        <Frame BackgroundColor="YellowGreen">
+            <Label Text="{Binding Name}"/>
+        </Frame>
+    </Grid>
+    
+</ContentView>

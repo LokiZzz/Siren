@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Siren.Views.PlayerView">
+    <Grid>
+        <Grid Grid.Row="0" ColumnDefinitions="auto,*,auto">
+            <Label Grid.Column="0" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Duration, StringFormat='{0:mm}:{0:ss}'}"/>
+            <Slider Grid.Column="1" Maximum="{Binding TrackDurationSeconds}" Minimum="0" Value="{Binding Position}" 
+                    DragStartedCommand="{Binding SeekCommand}" DragCompletedCommand="{Binding StopSeekCommand}"
+                    MinimumTrackColor="GreenYellow" MaximumTrackColor="Gray" ThumbColor="Red"
+                        VerticalOptions="Center"/>
+            <Label Grid.Column="2" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Time, StringFormat='{0:mm}:{0:ss}'}"/>
+        </Grid>
+        
+        <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center">
+            <Button Text="Open" Command="{Binding OpenCommand}"/>
+            <Button Text="Play / Pause" Command="{Binding PlayCommand}"/>
+                <Button Text="Stop" Command="{Binding StopCommand}"/>
+        </StackLayout>
+    </Grid>
+</ContentView>
