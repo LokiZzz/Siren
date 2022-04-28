@@ -37,6 +37,11 @@ namespace Siren.ViewModels
             Duration = TimeSpan.FromSeconds(TrackDurationSeconds);
         }
 
+        public void Dispose()
+        {
+            Player.Dispose();
+        }
+
         private bool _isSeeking = false;
 
         private void Seek()
@@ -93,13 +98,30 @@ namespace Siren.ViewModels
             {
                 SetProperty(ref _position, value);
                 Time = TimeSpan.FromSeconds(value);
+                PositionPercent = Position / TrackDurationSeconds;
             }
+        }
+
+        private double _positionPercent;
+        public double PositionPercent
+        {
+            get => _positionPercent;
+            set => SetProperty(ref _positionPercent, value);
         }
 
         public double Volume
         {
             get => Player.Volume * 100;
-            set => Player.Volume = value / 100;
+            set
+            {
+                Player.Volume = value / 100;
+                OnPropertyChanged(nameof(Volume));
+            }
+        }
+
+        public bool IsPlaying
+        {
+            get => Player.IsPlaying;
         }
 
         public bool Loop
@@ -130,11 +152,13 @@ namespace Siren.ViewModels
         private void Play()
         {
             Player.PlayPause();
+            OnPropertyChanged(nameof(IsPlaying));
         }
 
         private void Stop()
         {
             Player.Stop();
+            OnPropertyChanged(nameof(IsPlaying));
         }
     }
 }

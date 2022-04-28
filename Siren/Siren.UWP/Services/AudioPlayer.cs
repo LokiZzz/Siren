@@ -75,12 +75,13 @@ namespace Siren.UWP.Services
 
         public TimeSpan FadeOut { get; set; }
 
+        private MediaSource _source = null;
         public async Task LoadAsync(string path)
         {
             StorageFile file = await StorageFile.GetFileFromPathAsync(path);
-            MediaSource source = MediaSource.CreateFromStorageFile(file);
-            await source.OpenAsync();
-            _player.Source = source;
+            _source = MediaSource.CreateFromStorageFile(file);
+            await _source.OpenAsync();
+            _player.Source = _source;
 
             while(Duration <= TimeSpan.FromMilliseconds(0))
             {
@@ -124,6 +125,11 @@ namespace Siren.UWP.Services
         public void Dispose()
         {
             _player.Dispose();
+
+            if(_source != null)
+            {
+                _source.Dispose();
+            }
         }
     }
 }

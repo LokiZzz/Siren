@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:icons="clr-namespace:Siren.Assets"
+             x:Class="Siren.Views.SceneCardView">
+
+    <ContentView.Resources>
+        <Style x:Key="SceneButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="FA"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+    </ContentView.Resources>
+
+    <Grid Padding="10" RowDefinitions="80" ColumnDefinitions="300">
+        <Grid.Triggers>
+            <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                <Setter Property="BackgroundColor" Value="Pink" />
+            </DataTrigger>
+        </Grid.Triggers>
+        
+        <Frame BackgroundColor="{StaticResource Light}" Padding="10">
+            <Grid RowDefinitions="*,auto" ColumnDefinitions="*,*">
+                <Label Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Name}" TextColor="White"/>
+                <!--<Button Style="{StaticResource SceneButton}" Grid.Row="1" Grid.Column="0" Text="{x:Static icons:FAFont.FloppyDisk}"/>
+                <Button Style="{StaticResource SceneButton}" Grid.Row="1" Grid.Column="1" Text="{x:Static icons:FAFont.CirclePlay}"/>-->
+            </Grid>
+        </Frame>
+    </Grid>
+    
+</ContentView>

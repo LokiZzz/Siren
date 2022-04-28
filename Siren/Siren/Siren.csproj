@@ -27,6 +27,15 @@
     <Compile Update="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\ElementPlayerView.xaml.cs">
+      <DependentUpon>ElementPlayerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SceneCardView.xaml.cs">
+      <DependentUpon>SceneCardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SettingCardView.xaml.cs">
+      <DependentUpon>SettingCardView.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
@@ -42,7 +51,7 @@
     <EmbeddedResource Update="Views\PlayerView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\SelectableCardView.xaml">
+    <EmbeddedResource Update="Views\SettingCardView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

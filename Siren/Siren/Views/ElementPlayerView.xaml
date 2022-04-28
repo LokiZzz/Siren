@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             x:Class="Siren.Views.ElementPlayerView"
+             xmlns:viewmodels="clr-namespace:Siren.ViewModels" 
+             x:DataType="viewmodels:PlayerViewModel"
+             xmlns:icons="clr-namespace:Siren.Assets">
+
+    <ContentView.Resources>
+        <Style x:Key="PlayerControlButton" TargetType="Button">
+            <Setter Property="HeightRequest" Value="50"/>
+            <Setter Property="WidthRequest" Value="50"/>
+            <Setter Property="CornerRadius" Value="25"/>
+            <Setter Property="FontFamily" Value="FA"/>
+            <Setter Property="FontSize" Value="26"/>
+        </Style>
+    </ContentView.Resources>
+
+    <Grid Margin="5" RowDefinitions="85" ColumnDefinitions="300">
+        <Grid BackgroundColor="{StaticResource Light}" 
+              Padding="10" 
+              RowSpacing="0"
+              ColumnSpacing="0"
+              RowDefinitions="auto,auto,*" 
+              ColumnDefinitions="auto,*,auto">
+
+            <Grid Grid.Row="0" Grid.ColumnSpan="2">
+                <ProgressBar Grid.Row="0" 
+                             Grid.ColumnSpan="2" 
+                             Progress="{Binding PositionPercent}" 
+                             ProgressColor="GreenYellow" 
+                             BackgroundColor="Gray"
+                             Margin="0,0,0,10"/>
+            </Grid>
+
+            <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent">
+                <Button VerticalOptions="Start"
+                        Style="{StaticResource PlayerControlButton}" 
+                        Text="{x:Static icons:FAFont.CirclePlay}" 
+                        Command="{Binding PlayCommand}"
+                        BackgroundColor="LightGreen"
+                        Margin="0,0,10,0">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
+                            <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
+                            <Setter Property="BackgroundColor" Value="Pink"/>
+                            <Setter Property="Command" Value="{Binding StopCommand}"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </Grid>
+
+            <Label Grid.Row="1" Grid.Column="1" Margin="0" Padding="0"
+                   TextColor="{StaticResource TextColor}" 
+                   Text="{Binding Name}"
+                   VerticalOptions="Center" 
+                   VerticalTextAlignment="Center"
+                   LineBreakMode="TailTruncation"
+                   BackgroundColor="Transparent"/>
+
+            <Grid Grid.Row="2" Grid.Column="1" Padding="0" Margin="0"  BackgroundColor="Transparent">
+                <Slider VerticalOptions="Start" 
+                        HorizontalOptions="Fill"
+                        Minimum="0"
+                        Maximum="100"
+                        Value="{Binding Volume}"
+                        MinimumTrackColor="Orange" 
+                        MaximumTrackColor="Gray" 
+                        ThumbColor="Orange"/>
+            </Grid>
+
+            <Button Grid.RowSpan="3" Grid.Column="2" Margin="10,0,0,0"
+                    CornerRadius="3"
+                    FontSize="18"
+                    FontFamily="FA"
+                    Text="{x:Static icons:FAFont.CircleXmark}" 
+                    Command="{Binding BindingContext.DeleteElementCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
+                    CommandParameter="{Binding Name}"
+                    BackgroundColor="HotPink"/>
+
+        </Grid>
+    </Grid>
+</ContentView>

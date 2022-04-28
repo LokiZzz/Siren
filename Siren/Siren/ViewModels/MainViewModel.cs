@@ -25,21 +25,21 @@ namespace Siren.ViewModels
             SceneManager = DependencyService.Get<SceneManager>();
 
             var setting = new Setting { Name = "Tavern" };
-            Settings.Add(setting);
-            SelectedSetting = setting;
             //Delete this:
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 4; i++)
             {
-                SelectedSetting.Scenes.Add(new Scene { Name = $"Scene of the selected setting here {i}" });
+                setting.Scenes.Add(new Scene { Name = $"Really fun scene in the Tavern #{i}" });
             }
             var setting2 = new Setting { Name = "Ship" };
-            Settings.Add(setting2);
-            SelectedSetting = setting2;
             //Delete this:
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 4; i++)
             {
-                SelectedSetting.Scenes.Add(new Scene { Name = $"Scene of the selected setting here {i}" });
+                setting2.Scenes.Add(new Scene { Name = $"Action pirate style scene #{i}" });
             }
+
+            Settings.Add(setting);
+            Settings.Add(setting2);
+            SelectedSetting = setting;
         }
 
         private void InitializeAudioEnvironment()
@@ -90,6 +90,59 @@ namespace Siren.ViewModels
             
         }
 
+        private void SelectSetting(string name)
+        {
+            SelectedSetting = Settings.FirstOrDefault(x => x.Name.Equals(name));
+        }
+
+        private void SelectScene(string name)
+        {
+            SelectedScene = SelectedSetting.Scenes.FirstOrDefault(x => x.Name.Equals(name));
+
+            foreach(PlayerViewModel element in SelectedSetting.Elements)
+            {
+                TrackSetup existingElement = SelectedScene.Elements
+                    .FirstOrDefault(x => x.Path.Equals(element.FilePath));
+
+                if (existingElement != null)
+                {
+                    if(!element.IsPlaying)
+                    {
+                        element.PlayCommand.Execute(null);
+                    }
+                    element.Volume = existingElement.Volume;
+                }
+                else
+                {
+                    if (element.IsPlaying)
+                    {
+                        element.StopCommand.Execute(null);
+                    }
+                }
+            }
+        }
+
+        private void SaveScene(string name)
+        {
+            var playingElements = SelectedSetting.Elements
+                .Where(x => x.IsPlaying)
+                .Select(x => new TrackSetup
+                {
+                    Path = x.FilePath,
+                    Volume = x.Volume,
+                })
+                .ToList();
+
+            SelectedScene.Elements = new ObservableCollection<TrackSetup>(playingElements);
+        }
+
+        private void DeleteElement(string name)
+        {
+            PlayerViewModel element = SelectedSetting.Elements.FirstOrDefault(x => x.Name.Equals(name));
+            SelectedSetting.Elements.Remove(element);
+            element.Dispose();
+        }
+
         private void InitializeMessagingCenter()
         {
             MessagingCenter.Subscribe<SceneManager>(this, SceneManagerMessages.SettingAdded, UpdateSettings);
@@ -101,26 +154,35 @@ namespace Siren.ViewModels
             AddSceneCommand = new Command(async () => await AddScene());
             AddElementsCommand = new Command(async () => await AddElements());
             AddEffectsCommand = new Command(async () => await AddEffects());
+            SelectSettingCommand = new Command<string>(SelectSetting);
+            SelectSceneCommand = new Command<string>(SelectScene);
+            DeleteElementCommand = new Command<string>(DeleteElement);
+            SaveSceneCommand = new Command<string>(SaveScene);
         }
 
         public Command AddSettingCommand { get; set; }
         public Command AddSceneCommand { get; set; }
         public Command AddElementsCommand { get; set; }
         public Command AddEffectsCommand { get; set; }
+        public Command SelectSettingCommand { get; set; }
+        public Command SelectSceneCommand { get; set; }
+        public Command DeleteElementCommand { get; set; }
+        public Command SaveSceneCommand { get; set; }
 
         public ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
 
         private Setting _selectedSetting;
         public Setting SelectedSetting
         {
-            get
-            {
-                return SceneManager.SelectedSetting;
-            }
+            get => _selectedSetting;
             set
             {
-                SceneManager.SelectedSetting = value;
                 SetProperty(ref _selectedSetting, value);
+                foreach (Setting item in Settings)
+                {
+                    item.IsSelected = false;
+                }
+                SelectedSetting.IsSelected = true;
             }
         }
 
@@ -128,7 +190,15 @@ namespace Siren.ViewModels
         public Scene SelectedScene
         {
             get => _selectedScene;
-            set => SetProperty(ref _selectedScene, value);
+            set
+            {
+                SetProperty(ref _selectedScene, value);
+                foreach (Scene item in SelectedSetting.Scenes)
+                {
+                    item.IsSelected = false;
+                }
+                SelectedScene.IsSelected = true;
+            }
         }
     }
 }

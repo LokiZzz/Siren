@@ -10,9 +10,9 @@ using Xamarin.Forms.Xaml;
 namespace Siren.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class SelectableCardView : ContentView
+    public partial class ElementPlayerView : ContentView
     {
-        public SelectableCardView()
+        public ElementPlayerView()
         {
             InitializeComponent();
         }
