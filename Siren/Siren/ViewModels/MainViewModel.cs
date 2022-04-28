@@ -108,15 +108,15 @@ namespace Siren.ViewModels
                 {
                     if(!element.IsPlaying)
                     {
-                        element.PlayCommand.Execute(null);
+                        element.SoftPlay();
                     }
-                    element.Volume = existingElement.Volume;
+                    //element.Volume = existingElement.Volume;
                 }
                 else
                 {
                     if (element.IsPlaying)
                     {
-                        element.StopCommand.Execute(null);
+                        element.Stop();
                     }
                 }
             }

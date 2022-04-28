@@ -1,10 +1,12 @@
 ﻿using Siren.Services;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Input;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -25,6 +27,41 @@ namespace Siren.ViewModels
 
             Player = DependencyService.Get<IAudioPlayer>(DependencyFetchTarget.NewInstance);
             Player.OnPositionChanged += OnPositionChanged;
+        }
+
+        public void Play()
+        {
+            Player.PlayPause();
+            OnPropertyChanged(nameof(IsPlaying));
+        }
+
+        public void SoftPlay(double targetVolume = 1)
+        {
+            Volume = 0;
+            Play();
+            IncreaseVolumeSoft();
+        }
+
+        Timer timer = new Timer();
+
+        private void IncreaseVolumeSoft()
+        {
+            timer.Dispose();
+            timer = new Timer();
+            timer.Interval = 4;
+            timer.Elapsed += IncreaseVolume;
+            timer.Start();
+        }
+
+        private void IncreaseVolume(object sender, ElapsedEventArgs e)
+        {
+            Volume += 0.5;
+        }
+
+        public void Stop()
+        {
+            Player.Stop();
+            OnPropertyChanged(nameof(IsPlaying));
         }
 
         public async Task Load(string path)
@@ -147,18 +184,6 @@ namespace Siren.ViewModels
             {
                 await Load(result.FullPath);
             }
-        }
-
-        private void Play()
-        {
-            Player.PlayPause();
-            OnPropertyChanged(nameof(IsPlaying));
-        }
-
-        private void Stop()
-        {
-            Player.Stop();
-            OnPropertyChanged(nameof(IsPlaying));
         }
     }
 }
