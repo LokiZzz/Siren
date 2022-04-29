@@ -106,9 +106,9 @@ namespace Siren.ViewModels
 
                 if (existingElement != null)
                 {
-                    if(!element.IsPlaying)
+                    if(!element.IsPlaying || element.Volume != existingElement.Volume)
                     {
-                        element.SoftPlay();
+                        element.SmoothPlay(targetVolume: existingElement.Volume);
                     }
                     //element.Volume = existingElement.Volume;
                 }
@@ -116,7 +116,7 @@ namespace Siren.ViewModels
                 {
                     if (element.IsPlaying)
                     {
-                        element.Stop();
+                        element.SmoothStop();
                     }
                 }
             }

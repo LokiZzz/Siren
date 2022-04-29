@@ -5,11 +5,13 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Input;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using Timer = System.Timers.Timer;
 
 namespace Siren.ViewModels
 {
@@ -20,7 +22,7 @@ namespace Siren.ViewModels
         public PlayerViewModel()
         {
             OpenCommand = new Command(async () => await Open());
-            PlayCommand = new Command(Play);
+            PlayCommand = new Command(PlayPause);
             StopCommand = new Command(Stop);
             SeekCommand = new Command(Seek);
             StopSeekCommand = new Command(StopSeek);
@@ -29,40 +31,79 @@ namespace Siren.ViewModels
             Player.OnPositionChanged += OnPositionChanged;
         }
 
-        public void Play()
+        #region Play & Stop
+
+        public void PlayPause()
         {
             Player.PlayPause();
             OnPropertyChanged(nameof(IsPlaying));
         }
 
-        public void SoftPlay(double targetVolume = 1)
+        public void SmoothPlay(double targetVolume)
         {
             Volume = 0;
-            Play();
-            IncreaseVolumeSoft();
-        }
-
-        Timer timer = new Timer();
-
-        private void IncreaseVolumeSoft()
-        {
-            timer.Dispose();
-            timer = new Timer();
-            timer.Interval = 4;
-            timer.Elapsed += IncreaseVolume;
-            timer.Start();
-        }
-
-        private void IncreaseVolume(object sender, ElapsedEventArgs e)
-        {
-            Volume += 0.5;
+            if(!IsPlaying) PlayPause();
+            StartAdjustingVolume(targetVolume);
         }
 
         public void Stop()
         {
+            _timer.Stop();
             Player.Stop();
             OnPropertyChanged(nameof(IsPlaying));
         }
+
+        public void SmoothStop()
+        {
+            StartAdjustingVolume(0);
+        }
+        
+        private Timer _timer = new Timer();
+        private double _targetVolume;
+
+        private void StartAdjustingVolume(double targetVolume)
+        {
+            _timer.Stop();
+            _timer.Dispose();
+            _timer = new Timer(4);
+            _targetVolume = targetVolume;
+            _timer.Elapsed += AdjustVolume;
+            _timer.Start();
+        }
+
+        public object _timerLocker = new object();
+
+        private void AdjustVolume(object sender, ElapsedEventArgs e)
+        {
+            lock (_timerLocker)
+            {
+                double step = 0.5;
+
+                if (_targetVolume > Volume)
+                {
+                    if (Volume + step >= 100)
+                        Volume = 100;
+                    else
+                        Volume += step;
+                }
+                if (_targetVolume < Volume)
+                {
+                    if (Volume - step <= 0)
+                        Volume = 0;
+                    else
+                        Volume -= step;
+                }
+                if (_targetVolume == Volume)
+                {
+                    if (_targetVolume == 0)
+                        Stop();
+                    else
+                        _timer.Stop();
+                }
+            }
+        }
+
+        #endregion
 
         public async Task Load(string path)
         {
@@ -76,6 +117,7 @@ namespace Siren.ViewModels
 
         public void Dispose()
         {
+            _timer.Dispose();
             Player.Dispose();
         }
 
@@ -99,6 +141,18 @@ namespace Siren.ViewModels
                 Position = newPosition.TotalSeconds;
             }
         }
+
+        private async Task Open()
+        {
+            FileResult result = await FilePicker.PickAsync(PickOptions.Default);
+
+            if (result != null)
+            {
+                await Load(result.FullPath);
+            }
+        }
+
+        #region Bindable properties
 
         public ICommand OpenCommand { get; }
         public ICommand PlayCommand { get; }
@@ -148,10 +202,10 @@ namespace Siren.ViewModels
 
         public double Volume
         {
-            get => Player.Volume * 100;
+            get => Math.Round(Player.Volume * 100d,2);
             set
             {
-                Player.Volume = value / 100;
+                Player.Volume = Math.Round(value / 100, 3);
                 OnPropertyChanged(nameof(Volume));
             }
         }
@@ -176,14 +230,6 @@ namespace Siren.ViewModels
 
         public string Name =>  Path.GetFileNameWithoutExtension(FilePath);
 
-        private async Task Open()
-        {
-            FileResult result = await FilePicker.PickAsync(PickOptions.Default);
-
-            if (result != null)
-            {
-                await Load(result.FullPath);
-            }
-        }
+        #endregion
     }
 }
