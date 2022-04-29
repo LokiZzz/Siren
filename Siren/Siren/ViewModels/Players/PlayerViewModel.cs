@@ -84,15 +84,15 @@ namespace Siren.ViewModels
 
                 if (_targetVolume > Volume)
                 {
-                    if (Volume + step >= 100)
-                        Volume = 100;
+                    if (Volume + step >= _targetVolume)
+                        Volume = _targetVolume;
                     else
                         Volume += step;
                 }
                 if (_targetVolume < Volume)
                 {
-                    if (Volume - step <= 0)
-                        Volume = 0;
+                    if (Volume - step <= _targetVolume)
+                        Volume = _targetVolume;
                     else
                         Volume -= step;
                 }

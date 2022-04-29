@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Xml.Linq;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 namespace Siren.ViewModels
 {
@@ -79,7 +80,7 @@ namespace Siren.ViewModels
 
             foreach(FileResult element in result)
             {
-                PlayerViewModel player = new PlayerViewModel { Loop = true };
+                ElementPlayerViewModel player = new ElementPlayerViewModel { Loop = true };
                 await player.Load(element.FullPath);
                 SelectedSetting.Elements.Add(player);
             }
@@ -99,7 +100,7 @@ namespace Siren.ViewModels
         {
             SelectedScene = SelectedSetting.Scenes.FirstOrDefault(x => x.Name.Equals(name));
 
-            foreach(PlayerViewModel element in SelectedSetting.Elements)
+            foreach(ElementPlayerViewModel element in SelectedSetting.Elements)
             {
                 TrackSetup existingElement = SelectedScene.Elements
                     .FirstOrDefault(x => x.Path.Equals(element.FilePath));
@@ -110,7 +111,6 @@ namespace Siren.ViewModels
                     {
                         element.SmoothPlay(targetVolume: existingElement.Volume);
                     }
-                    //element.Volume = existingElement.Volume;
                 }
                 else
                 {
@@ -120,6 +120,8 @@ namespace Siren.ViewModels
                     }
                 }
             }
+
+            OnPropertyChanged(nameof(IsScenePlaying));
         }
 
         private void SaveScene(string name)
@@ -138,9 +140,24 @@ namespace Siren.ViewModels
 
         private void DeleteElement(string name)
         {
-            PlayerViewModel element = SelectedSetting.Elements.FirstOrDefault(x => x.Name.Equals(name));
+            ElementPlayerViewModel element = SelectedSetting.Elements.FirstOrDefault(x => x.Name.Equals(name));
             SelectedSetting.Elements.Remove(element);
             element.Dispose();
+        }
+
+        public bool IsScenePlaying => SelectedSetting.Elements.Any(x => x.IsPlaying);
+
+        private void GlobalPlay()
+        {
+            if(IsScenePlaying)
+            {
+                SelectedSetting.Elements.ForEach(x => x.SmoothStop());
+            }
+            else
+            {
+                SelectScene(SelectedScene.Name);
+            }
+            OnPropertyChanged(nameof(IsScenePlaying));
         }
 
         private void InitializeMessagingCenter()
@@ -158,6 +175,7 @@ namespace Siren.ViewModels
             SelectSceneCommand = new Command<string>(SelectScene);
             DeleteElementCommand = new Command<string>(DeleteElement);
             SaveSceneCommand = new Command<string>(SaveScene);
+            GlobalPlayCommand = new Command(GlobalPlay);
         }
 
         public Command AddSettingCommand { get; set; }
@@ -168,6 +186,7 @@ namespace Siren.ViewModels
         public Command SelectSceneCommand { get; set; }
         public Command DeleteElementCommand { get; set; }
         public Command SaveSceneCommand { get; set; }
+        public Command GlobalPlayCommand { get; set; }
 
         public ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
 

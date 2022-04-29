@@ -16,7 +16,7 @@ namespace Siren.ViewModels
 
         public string Name { get; set; }
         public ObservableCollection<Scene> Scenes { get; set; } = new ObservableCollection<Scene>();
-        public ObservableCollection<PlayerViewModel> Elements { get; set; } = new ObservableCollection<PlayerViewModel>();
+        public ObservableCollection<ElementPlayerViewModel> Elements { get; set; } = new ObservableCollection<ElementPlayerViewModel>();
         public ObservableCollection<PlayerViewModel> Effects { get; set; } = new ObservableCollection<PlayerViewModel>();
     }
 

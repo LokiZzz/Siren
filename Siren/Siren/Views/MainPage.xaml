@@ -6,13 +6,13 @@
              xmlns:views="clr-namespace:Siren.Views"
              xmlns:icons="clr-namespace:Siren.Assets"
              Title="{Binding Title}"
-             BackgroundColor="{StaticResource VeryDark}">
+             BackgroundColor="{StaticResource Dark}">
 
     <ContentPage.BindingContext>
         <vm:MainViewModel />
     </ContentPage.BindingContext>
 
-    <Grid RowDefinitions="auto,auto,*,*" ColumnDefinitions="320,*" ColumnSpacing="0" RowSpacing="0">
+    <Grid RowDefinitions="auto,auto,*,*,auto" ColumnDefinitions="320,*" ColumnSpacing="0" RowSpacing="0">
 
         <Button Grid.Row="0" Grid.Column="0" Text="Add Setting" Command="{Binding AddSettingCommand}"/>
 
@@ -83,6 +83,24 @@
                     <Button Text="Add Effects" Command="{Binding AddEffectsCommand}"/>
                 </StackLayout>
             </Grid>
+        </Grid>
+
+        <Grid Grid.Row="4" BackgroundColor="{StaticResource Dark}" Grid.Column="0">
+            <Button FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" FontSize="32"
+                    Command="{Binding GlobalPlayCommand}"
+                    BackgroundColor="LightGreen"
+                    Margin="10"
+                    WidthRequest="300"
+                    HeightRequest="50"
+                    CornerRadius="15"
+                    HorizontalOptions="Fill">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsScenePlaying}" Value="True">
+                        <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
+                        <Setter Property="BackgroundColor" Value="Pink"/>
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
         </Grid>
     </Grid>
 
