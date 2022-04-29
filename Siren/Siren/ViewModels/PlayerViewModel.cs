@@ -41,8 +41,11 @@ namespace Siren.ViewModels
 
         public void SmoothPlay(double targetVolume)
         {
-            Volume = 0;
-            if(!IsPlaying) PlayPause();
+            if (!IsPlaying)
+            {
+                PlayPause();
+                Volume = 0;
+            }
             StartAdjustingVolume(targetVolume);
         }
 
