@@ -33,7 +33,7 @@ namespace Siren.ViewModels
 
         #region Play & Stop
 
-        public void PlayPause()
+        public virtual void PlayPause()
         {
             Player.PlayPause();
             OnPropertyChanged(nameof(IsPlaying));
@@ -49,7 +49,7 @@ namespace Siren.ViewModels
             StartAdjustingVolume(targetVolume);
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
             _timer.Stop();
             Player.Stop();
@@ -114,7 +114,7 @@ namespace Siren.ViewModels
 
             await Player.LoadAsync(path);
 
-            TrackDurationSeconds = Math.Round(Player.Duration.TotalSeconds, 0);
+            TrackDurationSeconds = Player.Duration.TotalSeconds;
             Duration = TimeSpan.FromSeconds(TrackDurationSeconds);
         }
 
@@ -193,6 +193,10 @@ namespace Siren.ViewModels
                 SetProperty(ref _position, value);
                 Time = TimeSpan.FromSeconds(value);
                 PositionPercent = Position / TrackDurationSeconds;
+                if(Position == TrackDurationSeconds)
+                {
+                    Stop();
+                }
             }
         }
 

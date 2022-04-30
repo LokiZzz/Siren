@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2401" />  
     <PackageReference Include="Xamarin.Essentials" Version="1.7.2" />
   </ItemGroup>
@@ -23,6 +24,9 @@
   <ItemGroup>
     <Compile Update="Views\AddOrEditSettingPage.xaml.cs">
       <DependentUpon>AddOrEditSettingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\EffectPlayerView.xaml.cs">
+      <DependentUpon>EffectPlayerView.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -35,9 +39,6 @@
     </Compile>
     <Compile Update="Views\SettingCardView.xaml.cs">
       <DependentUpon>SettingCardView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SettingsPage.xaml.cs">
-      <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -54,9 +55,5 @@
     <EmbeddedResource Update="Views\SettingCardView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
   </ItemGroup>
 </Project>

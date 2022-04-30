@@ -41,8 +41,7 @@ namespace Siren.ViewModels
 
         private async void OnSave()
         {
-            Setting newSetting = new Setting { Name = Name };
-            SceneManager.AddSetting(newSetting);
+            SceneManager.AddSetting(new SettingViewModel { Name = Name });
 
             await Shell.Current.GoToAsync("..");
         }

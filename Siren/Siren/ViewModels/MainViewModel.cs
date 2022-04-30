@@ -1,8 +1,10 @@
-﻿using Siren.Services;
+﻿using Siren.Messaging;
+using Siren.Services;
 using Siren.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -20,94 +22,50 @@ namespace Siren.ViewModels
         public MainViewModel()
         {
             InitializeMessagingCenter();
-            InitializeCommands();
-            InitializeAudioEnvironment();
-
             SceneManager = DependencyService.Get<SceneManager>();
+            IntializeCollections();
+        }
 
-            var setting = new Setting { Name = "Tavern" };
-            //Delete this:
-            for (int i = 0; i < 4; i++)
+        private async Task GoToAddSetting() => await Shell.Current.GoToAsync(nameof(AddOrEditSettingPage));
+
+        private void AddSetting(SceneManager manager)
+        {
+            Settings.Add(new SettingViewModel
             {
-                setting.Scenes.Add(new Scene { Name = $"Really fun scene in the Tavern #{i}" });
-            }
-            var setting2 = new Setting { Name = "Ship" };
-            //Delete this:
-            for (int i = 0; i < 4; i++)
-            {
-                setting2.Scenes.Add(new Scene { Name = $"Action pirate style scene #{i}" });
-            }
-
-            Settings.Add(setting);
-            Settings.Add(setting2);
-            SelectedSetting = setting;
-        }
-
-        private void InitializeAudioEnvironment()
-        {
-            if (SceneManager?.Settings != null)
-            {
-                Settings = new ObservableCollection<Setting>(SceneManager.Settings);
-                SelectedSetting = Settings.Any() ? Settings.First() : null;
-            }
-        }
-
-        private void UpdateSettings(SceneManager manager)
-        {
-            foreach (Setting setting in manager.Settings)
-            {
-                if (!Settings.Any(x => x.Name == setting.Name))
-                {
-                    Settings.Add(setting);
-                    SelectedSetting = setting;
-                }
-            }
-        }
-
-        private async Task AddSetting()
-        {
-            await Shell.Current.GoToAsync(nameof(AddOrEditSettingPage));
-        }
-
-        private async Task AddScene()
-        {
-            await Shell.Current.GoToAsync(nameof(AddOrEditScenePage));
-        }
-
-        private async Task AddElements()
-        {
-            IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
-
-            foreach(FileResult element in result)
-            {
-                ElementPlayerViewModel player = new ElementPlayerViewModel { Loop = true };
-                await player.Load(element.FullPath);
-                SelectedSetting.Elements.Add(player);
-            }
-        }
-
-        private async Task AddEffects()
-        {
-            
+                Name = SceneManager.SettingToAdd.Name,
+                ImagePath = SceneManager.SettingToAdd.ImagePath,
+            });
         }
 
         private void SelectSetting(string name)
         {
             SelectedSetting = Settings.FirstOrDefault(x => x.Name.Equals(name));
+            SceneManager.SelectedSetting = SelectedSetting;
+        }
+
+        private async Task GoToAddScene() => await Shell.Current.GoToAsync(nameof(AddOrEditScenePage));
+
+        private void AddScene(SceneManager manager)
+        {
+            SelectedSetting.Scenes.Add(new SceneViewModel
+            {
+                Name = SceneManager.SceneToAdd.Name,
+                ImagePath = SceneManager.SceneToAdd.ImagePath,
+            });
         }
 
         private void SelectScene(string name)
         {
             SelectedScene = SelectedSetting.Scenes.FirstOrDefault(x => x.Name.Equals(name));
 
-            foreach(ElementPlayerViewModel element in SelectedSetting.Elements)
+            foreach (SceneComponentViewModel element in SelectedSetting.Elements)
             {
-                TrackSetup existingElement = SelectedScene.Elements
-                    .FirstOrDefault(x => x.Path.Equals(element.FilePath));
+                TrackSetupViewModel existingElement = SelectedScene.Elements
+                    .FirstOrDefault(x => x.FilePath.Equals(element.FilePath));
 
                 if (existingElement != null)
                 {
-                    if(!element.IsPlaying || element.Volume != existingElement.Volume)
+                    if (!element.IsPlaying || element.Volume != existingElement.Volume)
                     {
                         element.SmoothPlay(targetVolume: existingElement.Volume);
                     }
@@ -128,26 +86,56 @@ namespace Siren.ViewModels
         {
             var playingElements = SelectedSetting.Elements
                 .Where(x => x.IsPlaying)
-                .Select(x => new TrackSetup
+                .Select(x => new TrackSetupViewModel
                 {
-                    Path = x.FilePath,
+                    FilePath = x.FilePath,
                     Volume = x.Volume,
                 })
                 .ToList();
 
-            SelectedScene.Elements = new ObservableCollection<TrackSetup>(playingElements);
+            SelectedScene.Elements = new ObservableCollection<TrackSetupViewModel>(playingElements);
+
+            SaveCurrentBundle();
+        }
+
+        private async Task AddElements()
+        {
+            IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
+
+            foreach(FileResult element in result)
+            {
+                if (!SelectedSetting.Elements.Any(x => x.FilePath.Equals(element.FullPath)))
+                {
+                    SceneComponentViewModel player = new SceneComponentViewModel { Loop = true };
+                    await player.Load(element.FullPath);
+                    SelectedSetting.Elements.Add(player);
+                }
+            }
         }
 
         private void DeleteElement(string name)
         {
-            ElementPlayerViewModel element = SelectedSetting.Elements.FirstOrDefault(x => x.Name.Equals(name));
+            SceneComponentViewModel element = SelectedSetting.Elements.FirstOrDefault(x => x.Name.Equals(name));
             SelectedSetting.Elements.Remove(element);
             element.Dispose();
         }
 
-        public bool IsScenePlaying => SelectedSetting.Elements.Any(x => x.IsPlaying);
+        private async Task AddEffects()
+        {
+            IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
-        private void GlobalPlay()
+            foreach (FileResult element in result)
+            {
+                if (!SelectedSetting.Effects.Any(x => x.FilePath.Equals(element.FullPath)))
+                {
+                    SceneComponentViewModel player = new SceneComponentViewModel();
+                    await player.Load(element.FullPath);
+                    SelectedSetting.Effects.Add(player);
+                }
+            }
+        }
+
+        private void GlobalPlayStop()
         {
             if(IsScenePlaying)
             {
@@ -160,44 +148,63 @@ namespace Siren.ViewModels
             OnPropertyChanged(nameof(IsScenePlaying));
         }
 
+        private void SaveCurrentBundle()
+        {
+            SceneManager.SaveCurrentBundle(Settings);
+        }
+
+        private void IntializeCollections()
+        {
+            Settings = SceneManager.GetCurrentBundle();
+
+            Settings.CollectionChanged += BindNewSettingEvents;
+            Settings.CollectionChanged += SaveCurrentBundle;
+            Settings.ForEach(x => x.SettingChanged += SaveCurrentBundle);
+        }
+
+        private void BindNewSettingEvents(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if(e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach(SettingViewModel item in e.NewItems)
+                {
+                    item.SettingChanged += SaveCurrentBundle;
+                }
+            }
+        }
+
+        private void SaveCurrentBundle(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            SaveCurrentBundle();
+        }
+
         private void InitializeMessagingCenter()
         {
-            MessagingCenter.Subscribe<SceneManager>(this, SceneManagerMessages.SettingAdded, UpdateSettings);
+            MessagingCenter.Subscribe<SceneComponentViewModel>(this, Messages.ElementPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsScenePlaying)));
+            MessagingCenter.Subscribe<SceneManager>(this, Messages.SettingAdded, AddSetting);
+            MessagingCenter.Subscribe<SceneManager>(this, Messages.SceneAdded, AddScene);
         }
 
-        private void InitializeCommands()
-        {
-            AddSettingCommand = new Command(async () => await AddSetting());
-            AddSceneCommand = new Command(async () => await AddScene());
-            AddElementsCommand = new Command(async () => await AddElements());
-            AddEffectsCommand = new Command(async () => await AddEffects());
-            SelectSettingCommand = new Command<string>(SelectSetting);
-            SelectSceneCommand = new Command<string>(SelectScene);
-            DeleteElementCommand = new Command<string>(DeleteElement);
-            SaveSceneCommand = new Command<string>(SaveScene);
-            GlobalPlayCommand = new Command(GlobalPlay);
-        }
+        public Command AddSettingCommand { get => new Command(async () => await GoToAddSetting()); }
+        public Command AddSceneCommand { get => new Command(async () => await GoToAddScene()); }
+        public Command AddElementsCommand { get => new Command(async () => await AddElements()); }
+        public Command AddEffectsCommand { get => new Command(async () => await AddEffects()); }
+        public Command SelectSettingCommand { get => new Command<string>(SelectSetting); }
+        public Command SelectSceneCommand { get => new Command<string>(SelectScene); }
+        public Command DeleteElementCommand { get => new Command<string>(DeleteElement); }
+        public Command SaveSceneCommand { get => new Command<string>(SaveScene); }
+        public Command GlobalPlayCommand { get => new Command(GlobalPlayStop); }
 
-        public Command AddSettingCommand { get; set; }
-        public Command AddSceneCommand { get; set; }
-        public Command AddElementsCommand { get; set; }
-        public Command AddEffectsCommand { get; set; }
-        public Command SelectSettingCommand { get; set; }
-        public Command SelectSceneCommand { get; set; }
-        public Command DeleteElementCommand { get; set; }
-        public Command SaveSceneCommand { get; set; }
-        public Command GlobalPlayCommand { get; set; }
+        public ObservableCollection<SettingViewModel> Settings { get; set; } = new ObservableCollection<SettingViewModel>();
 
-        public ObservableCollection<Setting> Settings { get; set; } = new ObservableCollection<Setting>();
-
-        private Setting _selectedSetting;
-        public Setting SelectedSetting
+        private SettingViewModel _selectedSetting;
+        public SettingViewModel SelectedSetting
         {
             get => _selectedSetting;
             set
             {
                 SetProperty(ref _selectedSetting, value);
-                foreach (Setting item in Settings)
+                foreach (SettingViewModel item in Settings)
                 {
                     item.IsSelected = false;
                 }
@@ -205,19 +212,21 @@ namespace Siren.ViewModels
             }
         }
 
-        private Scene _selectedScene;
-        public Scene SelectedScene
+        private SceneViewModel _selectedScene;
+        public SceneViewModel SelectedScene
         {
             get => _selectedScene;
             set
             {
                 SetProperty(ref _selectedScene, value);
-                foreach (Scene item in SelectedSetting.Scenes)
+                foreach (SceneViewModel item in SelectedSetting.Scenes)
                 {
                     item.IsSelected = false;
                 }
                 SelectedScene.IsSelected = true;
             }
         }
+
+        public bool IsScenePlaying => SelectedSetting?.Elements.Any(x => x.IsPlaying) == true;
     }
 }

@@ -41,7 +41,7 @@ namespace Siren.ViewModels
 
         private async void OnSave()
         {
-            Scene scene = new Scene { Name = Name };
+            SceneViewModel scene = new SceneViewModel { Name = Name };
             SceneManager.AddScene(scene);
 
             await Shell.Current.GoToAsync("..");
