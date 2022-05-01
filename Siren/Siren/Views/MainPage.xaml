@@ -117,7 +117,7 @@
                 <Button.Triggers>
                     <DataTrigger TargetType="Button" Binding="{Binding IsScenePlaying}" Value="True">
                         <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
-                        <Setter Property="BackgroundColor" Value="Pink"/>
+                        <Setter Property="BackgroundColor" Value="HotPink"/>
                     </DataTrigger>
                 </Button.Triggers>
             </Button>

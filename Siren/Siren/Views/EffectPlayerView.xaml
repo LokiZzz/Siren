@@ -33,7 +33,7 @@
                     <Button.Triggers>
                         <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
                             <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
-                            <Setter Property="BackgroundColor" Value="Pink"/>
+                            <Setter Property="BackgroundColor" Value="HotPink"/>
                             <Setter Property="Command" Value="{Binding StopCommand}"/>
                         </DataTrigger>
                     </Button.Triggers>
@@ -53,8 +53,8 @@
                     FontSize="18"
                     FontFamily="FA"
                     Text="{x:Static icons:FAFont.CircleXmark}" 
-                    Command="{Binding BindingContext.DeleteElementCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
-                    CommandParameter="{Binding Name}"
+                    Command="{Binding BindingContext.DeleteEffectCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
+                    CommandParameter="{Binding .}"
                     BackgroundColor="HotPink"/>
 
         </Grid>

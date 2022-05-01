@@ -1,18 +1,24 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:icons="clr-namespace:Siren.Assets"
              x:Class="Siren.Views.SettingCardView">
 
     <Grid Padding="10" RowDefinitions="80" ColumnDefinitions="300">
         <Grid.Triggers>
             <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
-                <Setter Property="BackgroundColor" Value="Pink" />
+                <Setter Property="BackgroundColor" Value="LightGreen" />
             </DataTrigger>
         </Grid.Triggers>
 
         <Frame BackgroundColor="{StaticResource Light}" Padding="10">
-            <Grid>
-                <Label Text="{Binding Name}" TextColor="White"/>
+            <Grid ColumnDefinitions="*,auto">
+                <Label Grid.Column="0" Text="{Binding Name}" TextColor="White"/>
+                <Button Grid.Column="1" VerticalOptions="Start" CornerRadius="3" WidthRequest="35" HeightRequest="35"
+                    FontSize="14" FontFamily="FA" Text="{x:Static icons:FAFont.CircleXmark}" 
+                    Command="{Binding BindingContext.DeleteSettingCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                    CommandParameter="{Binding .}"
+                    BackgroundColor="HotPink"/>
             </Grid>
         </Frame>
     </Grid>

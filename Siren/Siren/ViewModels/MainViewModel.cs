@@ -30,11 +30,13 @@ namespace Siren.ViewModels
 
         private void AddSetting(SceneManager manager)
         {
-            Settings.Add(new SettingViewModel
+            SettingViewModel newSetting = new SettingViewModel
             {
                 Name = SceneManager.SettingToAdd.Name,
                 ImagePath = SceneManager.SettingToAdd.ImagePath,
-            });
+            };
+            Settings.Add(newSetting);
+            SelectedSetting = newSetting;
         }
 
         private void SelectSetting(string name)
@@ -43,18 +45,29 @@ namespace Siren.ViewModels
             SceneManager.SelectedSetting = SelectedSetting;
         }
 
+        private void DeleteSetting(SettingViewModel setting)
+        {
+            setting.Scenes.Clear();
+            setting.Elements.ForEach(x => x.Dispose());
+            setting.Elements.Clear();
+            setting.Effects.ForEach(x => x.Dispose());
+            setting.Effects.Clear();
+            Settings.Remove(setting);
+        }
+
         private async Task GoToAddScene() => await Shell.Current.GoToAsync(nameof(AddOrEditScenePage));
 
         private void AddScene(SceneManager manager)
         {
-            SelectedSetting.Scenes.Add(new SceneViewModel
+            SceneViewModel newScene = new SceneViewModel
             {
                 Name = SceneManager.SceneToAdd.Name,
                 ImagePath = SceneManager.SceneToAdd.ImagePath,
-            });
+            };
+            SelectedSetting.Scenes.Add(newScene);
         }
 
-        private void SelectScene(string name)
+        private async Task SelectScene(string name)
         {
             SelectedScene = SelectedSetting.Scenes.FirstOrDefault(x => x.Name.Equals(name));
 
@@ -67,7 +80,7 @@ namespace Siren.ViewModels
                 {
                     if (!element.IsPlaying || element.Volume != existingElement.Volume)
                     {
-                        element.SmoothPlay(targetVolume: existingElement.Volume);
+                        await element.SmoothPlay(targetVolume: existingElement.Volume);
                     }
                 }
                 else
@@ -80,6 +93,11 @@ namespace Siren.ViewModels
             }
 
             OnPropertyChanged(nameof(IsScenePlaying));
+        }
+
+        private void DeleteScene(SceneViewModel scene)
+        {
+            SelectedSetting.Scenes.Remove(scene);
         }
 
         private void SaveScene(string name)
@@ -106,18 +124,16 @@ namespace Siren.ViewModels
             {
                 if (!SelectedSetting.Elements.Any(x => x.FilePath.Equals(element.FullPath)))
                 {
-                    SceneComponentViewModel player = new SceneComponentViewModel { Loop = true };
-                    await player.Load(element.FullPath);
+                    SceneComponentViewModel player = new SceneComponentViewModel { Loop = true, FilePath = element.FullPath };
                     SelectedSetting.Elements.Add(player);
                 }
             }
         }
 
-        private void DeleteElement(string name)
+        private void DeleteElement(SceneComponentViewModel component)
         {
-            SceneComponentViewModel element = SelectedSetting.Elements.FirstOrDefault(x => x.Name.Equals(name));
-            SelectedSetting.Elements.Remove(element);
-            element.Dispose();
+            SelectedSetting.Elements.Remove(component);
+            component.Dispose();
         }
 
         private async Task AddEffects()
@@ -128,14 +144,19 @@ namespace Siren.ViewModels
             {
                 if (!SelectedSetting.Effects.Any(x => x.FilePath.Equals(element.FullPath)))
                 {
-                    SceneComponentViewModel player = new SceneComponentViewModel();
-                    await player.Load(element.FullPath);
+                    SceneComponentViewModel player = new SceneComponentViewModel { FilePath = element.FullPath };
                     SelectedSetting.Effects.Add(player);
                 }
             }
         }
 
-        private void GlobalPlayStop()
+        private void DeleteEffect(SceneComponentViewModel component)
+        {
+            SelectedSetting.Effects.Remove(component);
+            component.Dispose();
+        }
+
+        private async Task GlobalPlayStop()
         {
             if(IsScenePlaying)
             {
@@ -143,7 +164,7 @@ namespace Siren.ViewModels
             }
             else
             {
-                SelectScene(SelectedScene.Name);
+                await SelectScene(SelectedScene.Name);
             }
             OnPropertyChanged(nameof(IsScenePlaying));
         }
@@ -156,6 +177,7 @@ namespace Siren.ViewModels
         private void IntializeCollections()
         {
             Settings = SceneManager.GetCurrentBundle();
+            SelectedSetting = Settings.FirstOrDefault();
 
             Settings.CollectionChanged += BindNewSettingEvents;
             Settings.CollectionChanged += SaveCurrentBundle;
@@ -186,14 +208,17 @@ namespace Siren.ViewModels
         }
 
         public Command AddSettingCommand { get => new Command(async () => await GoToAddSetting()); }
-        public Command AddSceneCommand { get => new Command(async () => await GoToAddScene()); }
-        public Command AddElementsCommand { get => new Command(async () => await AddElements()); }
-        public Command AddEffectsCommand { get => new Command(async () => await AddEffects()); }
         public Command SelectSettingCommand { get => new Command<string>(SelectSetting); }
-        public Command SelectSceneCommand { get => new Command<string>(SelectScene); }
-        public Command DeleteElementCommand { get => new Command<string>(DeleteElement); }
+        public Command DeleteSettingCommand { get => new Command<SettingViewModel>(DeleteSetting); }
+        public Command AddSceneCommand { get => new Command(async () => await GoToAddScene()); }
+        public Command SelectSceneCommand { get => new Command<string>(async (name) => await SelectScene(name)); }
+        public Command DeleteSceneCommand { get => new Command<SceneViewModel>(DeleteScene); }
+        public Command AddElementsCommand { get => new Command(async () => await AddElements()); }
+        public Command DeleteElementCommand { get => new Command<SceneComponentViewModel>(DeleteElement); }
+        public Command AddEffectsCommand { get => new Command(async () => await AddEffects()); }
+        public Command DeleteEffectCommand { get => new Command<SceneComponentViewModel>(DeleteEffect); }
         public Command SaveSceneCommand { get => new Command<string>(SaveScene); }
-        public Command GlobalPlayCommand { get => new Command(GlobalPlayStop); }
+        public Command GlobalPlayCommand { get => new Command(async () => await GlobalPlayStop()); }
 
         public ObservableCollection<SettingViewModel> Settings { get; set; } = new ObservableCollection<SettingViewModel>();
 
@@ -203,6 +228,11 @@ namespace Siren.ViewModels
             get => _selectedSetting;
             set
             {
+                if (value == null)
+                {
+                    return;
+                }
+
                 SetProperty(ref _selectedSetting, value);
                 foreach (SettingViewModel item in Settings)
                 {

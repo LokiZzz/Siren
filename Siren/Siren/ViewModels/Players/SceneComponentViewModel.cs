@@ -37,17 +37,15 @@ namespace Siren.ViewModels
             }
         }
 
-        public override void PlayPause()
+        public override async Task PlayPause()
         {
-            base.PlayPause();
-
+            await base.PlayPause();
             MessagingCenter.Send(this, Messages.ElementPlayingStatusChanged);
         }
 
         public override void Stop()
         {
             base.Stop();
-
             MessagingCenter.Send(this, Messages.ElementPlayingStatusChanged);
         }
     }

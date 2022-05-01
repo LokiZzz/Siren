@@ -22,7 +22,7 @@ namespace Siren.ViewModels
         public PlayerViewModel()
         {
             OpenCommand = new Command(async () => await Open());
-            PlayCommand = new Command(PlayPause);
+            PlayCommand = new Command(async () => await PlayPause());
             StopCommand = new Command(Stop);
             SeekCommand = new Command(Seek);
             StopSeekCommand = new Command(StopSeek);
@@ -33,17 +33,25 @@ namespace Siren.ViewModels
 
         #region Play & Stop
 
-        public virtual void PlayPause()
+        private bool _loaded = false;
+
+        public virtual async Task PlayPause()
         {
+            if(!_loaded)
+            {
+                await Load(FilePath);
+                _loaded = true;
+            }
+
             Player.PlayPause();
             OnPropertyChanged(nameof(IsPlaying));
         }
 
-        public void SmoothPlay(double targetVolume)
+        public async Task SmoothPlay(double targetVolume)
         {
             if (!IsPlaying)
             {
-                PlayPause();
+                await PlayPause();
                 Volume = 0;
             }
             StartAdjustingVolume(targetVolume);
