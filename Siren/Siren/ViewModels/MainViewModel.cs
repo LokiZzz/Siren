@@ -26,7 +26,12 @@ namespace Siren.ViewModels
             IntializeCollections();
         }
 
-        private async Task GoToAddSetting() => await Shell.Current.GoToAsync(nameof(AddOrEditSettingPage));
+        private async Task GoToAddSetting()
+        {
+            await Shell.Current.GoToAsync(
+                $"{nameof(AddOrEditComponentPage)}?intent={EAddOrEditIntent.Add}&component={EComponentType.Setting}"
+            );
+        }
 
         private void AddSetting(SceneManager manager)
         {
@@ -39,14 +44,16 @@ namespace Siren.ViewModels
             SelectedSetting = newSetting;
         }
 
-        private void SelectSetting(string name)
+        private void SelectSetting(SettingViewModel setting)
         {
-            SelectedSetting = Settings.FirstOrDefault(x => x.Name.Equals(name));
+            SelectedSetting = setting;
             SceneManager.SelectedSetting = SelectedSetting;
         }
 
         private void DeleteSetting(SettingViewModel setting)
         {
+            setting.DeleteImageFile();
+            setting.Scenes.ForEach(x => x.DeleteImageFile());
             setting.Scenes.Clear();
             setting.Elements.ForEach(x => x.Dispose());
             setting.Elements.Clear();
@@ -55,7 +62,7 @@ namespace Siren.ViewModels
             Settings.Remove(setting);
         }
 
-        private async Task GoToAddScene() => await Shell.Current.GoToAsync(nameof(AddOrEditScenePage));
+        private async Task GoToAddScene() => await Shell.Current.GoToAsync(nameof(AddOrEditComponentPage));
 
         private void AddScene(SceneManager manager)
         {
@@ -67,9 +74,9 @@ namespace Siren.ViewModels
             SelectedSetting.Scenes.Add(newScene);
         }
 
-        private async Task SelectScene(string name)
+        private async Task SelectScene(SceneViewModel scene)
         {
-            SelectedScene = SelectedSetting.Scenes.FirstOrDefault(x => x.Name.Equals(name));
+            SelectedScene = scene;
 
             foreach (SceneComponentViewModel element in SelectedSetting.Elements)
             {
@@ -164,7 +171,7 @@ namespace Siren.ViewModels
             }
             else
             {
-                await SelectScene(SelectedScene.Name);
+                await SelectScene(SelectedScene);
             }
             OnPropertyChanged(nameof(IsScenePlaying));
         }
@@ -208,10 +215,10 @@ namespace Siren.ViewModels
         }
 
         public Command AddSettingCommand { get => new Command(async () => await GoToAddSetting()); }
-        public Command SelectSettingCommand { get => new Command<string>(SelectSetting); }
+        public Command SelectSettingCommand { get => new Command<SettingViewModel>(SelectSetting); }
         public Command DeleteSettingCommand { get => new Command<SettingViewModel>(DeleteSetting); }
         public Command AddSceneCommand { get => new Command(async () => await GoToAddScene()); }
-        public Command SelectSceneCommand { get => new Command<string>(async (name) => await SelectScene(name)); }
+        public Command SelectSceneCommand { get => new Command<SceneViewModel>(async (scene) => await SelectScene(scene)); }
         public Command DeleteSceneCommand { get => new Command<SceneViewModel>(DeleteScene); }
         public Command AddElementsCommand { get => new Command(async () => await AddElements()); }
         public Command DeleteElementCommand { get => new Command<SceneComponentViewModel>(DeleteElement); }

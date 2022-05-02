@@ -10,9 +10,9 @@ using Xamarin.Forms.Xaml;
 namespace Siren.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AddOrEditSettingPage : ContentPage
+    public partial class AddOrEditComponentPage : ContentPage
     {
-        public AddOrEditSettingPage()
+        public AddOrEditComponentPage()
         {
             InitializeComponent();
         }

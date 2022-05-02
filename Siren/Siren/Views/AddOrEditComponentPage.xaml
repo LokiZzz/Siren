@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:vm="clr-namespace:Siren.ViewModels"
+             xmlns:icons="clr-namespace:Siren.Assets"
+             x:Class="Siren.Views.AddOrEditComponentPage"
+             BackgroundColor="{StaticResource Dark}">
+    <ContentPage.BindingContext>
+        <vm:AddOrEditComponentViewModel/>
+    </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <StackLayout Spacing="3" Padding="15">
+
+            <Label Text="Name"/>
+            <Entry Text="{Binding Name}"/>
+            
+            <Label Text="Image"/>
+            <Frame BackgroundColor="White" >
+                <Grid Padding="0">
+                    <Label VerticalOptions="Center" VerticalTextAlignment="Center"
+                           HorizontalOptions="Center" HorizontalTextAlignment="Center"
+                           FontFamily="FA" Text="{x:Static icons:FAFont.SquarePlus}" TextColor="Black" FontSize="40"
+                           InputTransparent="True"/>
+                    <Image Source="{Binding Image}" Aspect="AspectFit" />
+                </Grid>
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SelectImageCommand}"/>
+                </Frame.GestureRecognizers>
+            </Frame>
+            
+            <StackLayout Orientation="Horizontal">
+                <Button Text="Cancel" Command="{Binding CancelCommand}" HorizontalOptions="FillAndExpand"></Button>
+                <Button Text="Save" Command="{Binding SaveCommand}" HorizontalOptions="FillAndExpand"></Button>
+            </StackLayout>
+            
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

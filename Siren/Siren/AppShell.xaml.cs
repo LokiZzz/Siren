@@ -13,8 +13,7 @@ namespace Siren
         {
             InitializeComponent();
 
-            Routing.RegisterRoute(nameof(AddOrEditSettingPage), typeof(AddOrEditSettingPage));
-            Routing.RegisterRoute(nameof(AddOrEditScenePage), typeof(AddOrEditScenePage));
+            Routing.RegisterRoute(nameof(AddOrEditComponentPage), typeof(AddOrEditComponentPage));
         }
     }
 }

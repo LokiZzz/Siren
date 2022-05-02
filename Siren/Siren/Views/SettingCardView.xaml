@@ -13,9 +13,22 @@
 
         <Frame BackgroundColor="{StaticResource Light}" Padding="10">
             <Grid ColumnDefinitions="*,auto">
+                
+                <Image IsVisible="true" Source="{Binding Image}" Aspect="AspectFill" Grid.ColumnSpan="2" Margin="-10"/>
+                
+                <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" Grid.ColumnSpan="2" Margin="-10" Opacity="0.4">
+                    <Rectangle.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="Black" Offset="0" />
+                            <GradientStop Color="White" Offset="1" />
+                        </LinearGradientBrush>
+                    </Rectangle.Background>
+                </Rectangle>
+
                 <Label Grid.Column="0" Text="{Binding Name}" TextColor="White"/>
-                <Button Grid.Column="1" VerticalOptions="Start" CornerRadius="3" WidthRequest="35" HeightRequest="35"
-                    FontSize="14" FontFamily="FA" Text="{x:Static icons:FAFont.CircleXmark}" 
+                
+                <Button Grid.Column="1" VerticalOptions="Start" CornerRadius="3" WidthRequest="30" HeightRequest="30"
+                    FontSize="12" FontFamily="FA" Text="{x:Static icons:FAFont.CircleXmark}" 
                     Command="{Binding BindingContext.DeleteSettingCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                     CommandParameter="{Binding .}"
                     BackgroundColor="HotPink"/>

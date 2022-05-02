@@ -48,7 +48,7 @@
                    LineBreakMode="TailTruncation"
                    BackgroundColor="Transparent"/>
 
-            <Button Grid.Column="2" Margin="10,0,0,0"
+            <Button Grid.Column="2" VerticalOptions="Start" Margin="10,0,0,0"
                     CornerRadius="3"
                     FontSize="18"
                     FontFamily="FA"

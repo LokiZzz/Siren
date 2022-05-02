@@ -16,9 +16,11 @@ namespace Siren.Services
     public class SceneManager
     {
         public SettingViewModel SelectedSetting { get; set; }
-        public List<SettingViewModel> Settings { get; private set; } = new List<SettingViewModel>();
 
         public SettingViewModel SettingToAdd { get; private set; }
+
+        public SettingViewModel SettingToEdit { get; private set; }
+
         public void AddSetting(SettingViewModel setting)
         {
             SettingToAdd = setting;
@@ -26,13 +28,18 @@ namespace Siren.Services
         }
 
         public SceneViewModel SceneToAdd { get; private set; }
+
+        public SceneViewModel SceneToEdit { get; private set; }
+
         public void AddScene(SceneViewModel scene)
         {
             SceneToAdd = scene;
             MessagingCenter.Send(this, Messages.SceneAdded);
         }
 
-        string _bundleFileName = "current-bundle.json";
+        public SceneComponentViewModel SceneComponentToEdit { get; set; }
+
+        private string _bundleFileName = "current-bundle.json";
 
         public void SaveCurrentBundle(ObservableCollection<SettingViewModel> settings)
         {

@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\AddOrEditSettingPage.xaml.cs">
-      <DependentUpon>AddOrEditSettingPage.xaml</DependentUpon>
+    <Compile Update="Views\AddOrEditComponentPage.xaml.cs">
+      <DependentUpon>AddOrEditComponentPage.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\EffectPlayerView.xaml.cs">
       <DependentUpon>EffectPlayerView.xaml</DependentUpon>
@@ -43,12 +43,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Views\AddOrEditScenePage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Views\AddOrEditSettingPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </EmbeddedResource>
     <EmbeddedResource Update="Views\PlayerView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>

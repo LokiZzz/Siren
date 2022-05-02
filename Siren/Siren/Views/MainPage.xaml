@@ -30,7 +30,7 @@
                             <views:SettingCardView>
                                 <views:SettingCardView.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding BindingContext.SelectSettingCommand,Source={x:Reference SettingsList}}" 
-                                                          CommandParameter="{Binding Name}"/>
+                                                          CommandParameter="{Binding .}"/>
                                 </views:SettingCardView.GestureRecognizers>
                             </views:SettingCardView>
                         </DataTemplate>
@@ -47,7 +47,7 @@
                             <views:SceneCardView>
                                 <views:SceneCardView.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding BindingContext.SelectSceneCommand,Source={x:Reference ScenesList}}" 
-                                                          CommandParameter="{Binding Name}"/>
+                                                          CommandParameter="{Binding .}"/>
                                 </views:SceneCardView.GestureRecognizers>
                             </views:SceneCardView>
                         </DataTemplate>
