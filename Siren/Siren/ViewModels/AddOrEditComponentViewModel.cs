@@ -1,4 +1,5 @@
-﻿using Siren.Services;
+﻿using Siren.Messaging;
+using Siren.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -79,10 +80,94 @@ namespace Siren.ViewModels
                     break;
             }
 
+            MessagingCenter.Send(this, Messages.IllustratedCardEdited);
             await Shell.Current.GoToAsync("..");
         }
 
         private async Task Add()
+        {
+            string imagePath = await CopyImageToLocalAppFiles();
+
+            switch (ComponentType)
+            {
+                case EComponentType.Setting:
+                    SceneManager.AddSetting(new SettingViewModel { Name = this.Name, ImagePath = imagePath,Image = this.Image });
+                    break;
+                case EComponentType.Scene:
+                    SceneManager.AddScene(new SceneViewModel { Name = this.Name, ImagePath = imagePath, Image = this.Image });
+                    break;
+            }
+        }
+
+        private async Task Edit()
+        {
+            switch(ComponentType)
+            {
+                case EComponentType.Setting:
+                case EComponentType.Scene:
+                    await EditIllustratedCard();
+                    break;
+                case EComponentType.Element:
+                case EComponentType.Effect:
+                    EditSceneComponent();
+                    break;
+            }
+
+            
+        }
+
+        private async Task EditIllustratedCard()
+        {
+            SceneManager.IllustratedCardToEdit.Name = Name;
+
+            if (SceneManager.IllustratedCardToEdit.ImagePath != _imagePath)
+            {
+                SceneManager.IllustratedCardToEdit.DeleteImageFile();
+                string imagePath = await CopyImageToLocalAppFiles();
+                SceneManager.IllustratedCardToEdit.ImagePath = imagePath;
+            }
+        }
+
+        private void EditSceneComponent()
+        {
+            SceneManager.ComponentToEdit.Alias = Name;
+        }
+
+        public void ApplyQueryAttributes(IDictionary<string, string> query)
+        {
+            string intentString = HttpUtility.UrlDecode(query["intent"]);
+            Enum.TryParse(intentString, out EAddOrEditIntent intent);
+            Intent = intent;
+
+            string componentString = HttpUtility.UrlDecode(query["component"]);
+            Enum.TryParse(componentString, out EComponentType component);
+            ComponentType = component;
+
+            if(intent == EAddOrEditIntent.Edit)
+            {
+                if (component == EComponentType.Element || component == EComponentType.Effect)
+                {
+                    Name = string.IsNullOrEmpty(SceneManager.ComponentToEdit.Alias)
+                        ? SceneManager.ComponentToEdit.Name
+                        : SceneManager.ComponentToEdit.Alias;
+                }
+                if (component == EComponentType.Setting || component == EComponentType.Scene)
+                {
+                    Name = SceneManager.IllustratedCardToEdit.Name;
+                    _imagePath = SceneManager.IllustratedCardToEdit.ImagePath;
+                    if (!string.IsNullOrEmpty(_imagePath))
+                    {
+                        Stream stream = File.OpenRead(_imagePath);
+                        Image = ImageSource.FromStream(() => stream);
+                    }
+                    OnPropertyChanged(nameof(Image));
+                }
+            }
+
+            InitializeVisibilityProperties();
+        }
+
+        private async Task<string> CopyImageToLocalAppFiles()
         {
             string imagePath = string.Empty;
 
@@ -98,46 +183,25 @@ namespace Siren.ViewModels
                 }
             }
 
-            switch (ComponentType)
-            {
-                case EComponentType.Setting:
-                    SceneManager.AddSetting(new SettingViewModel 
-                    { 
-                        Name = this.Name, 
-                        ImagePath = imagePath,
-                        Image = this.Image 
-                    });
-                    break;
-                case EComponentType.Scene:
-                    break;
-            }
+            return imagePath;
         }
 
-        private async Task Edit()
+        #region Controls visibility
+
+        private bool _isImagePickerVisible;
+        public bool IsImagePickerVisible
         {
-            switch (ComponentType)
-            {
-                case EComponentType.Setting:
-                    break;
-                case EComponentType.Scene:
-                    break;
-                case EComponentType.Element:
-                    break;
-                case EComponentType.Effect:
-                    break;
-            }
+            get => _isImagePickerVisible;
+            set => SetProperty(ref _isImagePickerVisible, value);
         }
 
-        public void ApplyQueryAttributes(IDictionary<string, string> query)
+        private void InitializeVisibilityProperties()
         {
-            string intentString = HttpUtility.UrlDecode(query["intent"]);
-            Enum.TryParse(intentString, out EAddOrEditIntent intent);
-            Intent = intent;
-
-            string componentString = HttpUtility.UrlDecode(query["component"]);
-            Enum.TryParse(componentString, out EComponentType component);
-            ComponentType = component;
+            IsImagePickerVisible = ComponentType == EComponentType.Setting
+                || ComponentType == EComponentType.Scene;
         }
+
+        #endregion
     }
 
     public enum EAddOrEditIntent

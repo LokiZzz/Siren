@@ -44,10 +44,20 @@ namespace Siren.ViewModels
             SelectedSetting = newSetting;
         }
 
+        private async Task GoToEditSetting(SettingViewModel setting)
+        {
+            SceneManager.IllustratedCardToEdit = setting;
+
+            await Shell.Current.GoToAsync(
+                $"{nameof(AddOrEditComponentPage)}?intent={EAddOrEditIntent.Edit}&component={EComponentType.Setting}"
+            );
+        }
+
         private void SelectSetting(SettingViewModel setting)
         {
             SelectedSetting = setting;
             SceneManager.SelectedSetting = SelectedSetting;
+            SelectedSetting.Scenes.ForEach(x => x.ReloadImage());
         }
 
         private void DeleteSetting(SettingViewModel setting)
@@ -62,7 +72,12 @@ namespace Siren.ViewModels
             Settings.Remove(setting);
         }
 
-        private async Task GoToAddScene() => await Shell.Current.GoToAsync(nameof(AddOrEditComponentPage));
+        private async Task GoToAddScene()
+        {
+            await Shell.Current.GoToAsync(
+                $"{nameof(AddOrEditComponentPage)}?intent={EAddOrEditIntent.Add}&component={EComponentType.Scene}"
+            );
+        }
 
         private void AddScene(SceneManager manager)
         {
@@ -74,11 +89,21 @@ namespace Siren.ViewModels
             SelectedSetting.Scenes.Add(newScene);
         }
 
+        private async Task GoToEditScene(SceneViewModel scene)
+        {
+            SceneManager.IllustratedCardToEdit = scene;
+
+            await Shell.Current.GoToAsync(
+                $"{nameof(AddOrEditComponentPage)}?intent={EAddOrEditIntent.Edit}&component={EComponentType.Scene}"
+            );
+        }
+
         private async Task SelectScene(SceneViewModel scene)
         {
+            Settings.SelectMany(x => x.Scenes).ForEach(x => x.IsSelected = false);
             SelectedScene = scene;
 
-            foreach (SceneComponentViewModel element in SelectedSetting.Elements)
+            foreach (SceneComponentViewModel element in Settings.SelectMany(x => x.Elements))
             {
                 TrackSetupViewModel existingElement = SelectedScene.Elements
                     .FirstOrDefault(x => x.FilePath.Equals(element.FilePath));
@@ -100,6 +125,7 @@ namespace Siren.ViewModels
             }
 
             OnPropertyChanged(nameof(IsScenePlaying));
+            OnPropertyChanged(nameof(CurrentSceneText));
         }
 
         private void DeleteScene(SceneViewModel scene)
@@ -137,6 +163,15 @@ namespace Siren.ViewModels
             }
         }
 
+        private async Task GoToEditElement(SceneComponentViewModel element)
+        {
+            SceneManager.ComponentToEdit = element;
+
+            await Shell.Current.GoToAsync(
+                $"{nameof(AddOrEditComponentPage)}?intent={EAddOrEditIntent.Edit}&component={EComponentType.Element}"
+            );
+        }
+
         private void DeleteElement(SceneComponentViewModel component)
         {
             SelectedSetting.Elements.Remove(component);
@@ -157,6 +192,15 @@ namespace Siren.ViewModels
             }
         }
 
+        private async Task GoToEditEffect(SceneComponentViewModel effect)
+        {
+            SceneManager.ComponentToEdit = effect;
+
+            await Shell.Current.GoToAsync(
+                $"{nameof(AddOrEditComponentPage)}?intent={EAddOrEditIntent.Edit}&component={EComponentType.Effect}"
+            );
+        }
+
         private void DeleteEffect(SceneComponentViewModel component)
         {
             SelectedSetting.Effects.Remove(component);
@@ -167,7 +211,9 @@ namespace Siren.ViewModels
         {
             if(IsScenePlaying)
             {
-                SelectedSetting.Elements.ForEach(x => x.SmoothStop());
+                Settings.SelectMany(x => x.Elements)
+                    .Where(x => x.IsPlaying)
+                    .ForEach(x => x.SmoothStop());
             }
             else
             {
@@ -212,17 +258,22 @@ namespace Siren.ViewModels
             MessagingCenter.Subscribe<SceneComponentViewModel>(this, Messages.ElementPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsScenePlaying)));
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SettingAdded, AddSetting);
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SceneAdded, AddScene);
+            MessagingCenter.Subscribe<AddOrEditComponentViewModel>(this, Messages.IllustratedCardEdited, (manager) => SaveCurrentBundle());
         }
 
         public Command AddSettingCommand { get => new Command(async () => await GoToAddSetting()); }
+        public Command EditSettingCommand { get => new Command<SettingViewModel>(async (setting) => await GoToEditSetting(setting)); }
         public Command SelectSettingCommand { get => new Command<SettingViewModel>(SelectSetting); }
         public Command DeleteSettingCommand { get => new Command<SettingViewModel>(DeleteSetting); }
         public Command AddSceneCommand { get => new Command(async () => await GoToAddScene()); }
+        public Command EditSceneCommand { get => new Command<SceneViewModel>(async (scene) => await GoToEditScene(scene)); }
         public Command SelectSceneCommand { get => new Command<SceneViewModel>(async (scene) => await SelectScene(scene)); }
         public Command DeleteSceneCommand { get => new Command<SceneViewModel>(DeleteScene); }
         public Command AddElementsCommand { get => new Command(async () => await AddElements()); }
+        public Command EditElementCommand { get => new Command<SceneComponentViewModel>(async (element) => await GoToEditElement(element)); }
         public Command DeleteElementCommand { get => new Command<SceneComponentViewModel>(DeleteElement); }
         public Command AddEffectsCommand { get => new Command(async () => await AddEffects()); }
+        public Command EditEffectCommand { get => new Command<SceneComponentViewModel>(async (effect) => await GoToEditEffect(effect)); }
         public Command DeleteEffectCommand { get => new Command<SceneComponentViewModel>(DeleteEffect); }
         public Command SaveSceneCommand { get => new Command<string>(SaveScene); }
         public Command GlobalPlayCommand { get => new Command(async () => await GlobalPlayStop()); }
@@ -264,6 +315,27 @@ namespace Siren.ViewModels
             }
         }
 
-        public bool IsScenePlaying => SelectedSetting?.Elements.Any(x => x.IsPlaying) == true;
+        public bool IsScenePlaying => Settings.SelectMany(x => x.Elements).Any(x => x.IsPlaying) == true;
+
+        public string CurrentSceneText
+        {
+            get
+            {
+                string current;
+
+                if(SelectedSetting == null || SelectedScene == null)
+                {
+                    current = "still does not selected...";
+                }
+                else
+                {
+                    string setting = Settings.FirstOrDefault(x => x.Scenes.Contains(SelectedScene)).Name;
+                    current = $"{setting} — { SelectedScene.Name}";
+                }
+
+                return $"Current scene: {current}";
+            }
+        }
+
     }
 }

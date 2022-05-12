@@ -19,8 +19,6 @@ namespace Siren.Services
 
         public SettingViewModel SettingToAdd { get; private set; }
 
-        public SettingViewModel SettingToEdit { get; private set; }
-
         public void AddSetting(SettingViewModel setting)
         {
             SettingToAdd = setting;
@@ -29,15 +27,15 @@ namespace Siren.Services
 
         public SceneViewModel SceneToAdd { get; private set; }
 
-        public SceneViewModel SceneToEdit { get; private set; }
-
         public void AddScene(SceneViewModel scene)
         {
             SceneToAdd = scene;
             MessagingCenter.Send(this, Messages.SceneAdded);
         }
 
-        public SceneComponentViewModel SceneComponentToEdit { get; set; }
+        public IllustratedCardViewModel IllustratedCardToEdit { get; set; }
+
+        public SceneComponentViewModel ComponentToEdit { get; set; }
 
         private string _bundleFileName = "current-bundle.json";
 

@@ -21,7 +21,12 @@ namespace Siren.ViewModels
     /// </summary>
     public class SceneComponentViewModel : PlayerViewModel
     {
-        public string Alias { get; set; }
+        public string _alias;
+        public string Alias
+        {
+            get => string.IsNullOrEmpty(_alias) ? Name : _alias;
+            set => SetProperty(ref _alias, value);
+        }
 
         public ImageSource Image { get; set; }
 

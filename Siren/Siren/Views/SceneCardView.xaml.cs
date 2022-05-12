@@ -1,5 +1,8 @@
-﻿using System;
+﻿using FFImageLoading.Forms;
+using Siren.ViewModels;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +18,11 @@ namespace Siren.Views
         public SceneCardView()
         {
             InitializeComponent();
+        }
+
+        private void ContentView_LayoutChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

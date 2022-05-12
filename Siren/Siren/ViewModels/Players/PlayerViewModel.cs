@@ -29,6 +29,7 @@ namespace Siren.ViewModels
 
             Player = DependencyService.Get<IAudioPlayer>(DependencyFetchTarget.NewInstance);
             Player.OnPositionChanged += OnPositionChanged;
+            Player.OnIsPlayingChanged += OnIsPlayingChanged;
         }
 
         #region Play & Stop
@@ -107,9 +108,14 @@ namespace Siren.ViewModels
                 if (_targetVolume == Volume)
                 {
                     if (_targetVolume == 0)
+                    {
                         Stop();
+                        Volume = 100;
+                    }
                     else
+                    {
                         _timer.Stop();
+                    }
                 }
             }
         }
@@ -151,6 +157,11 @@ namespace Siren.ViewModels
             {
                 Position = newPosition.TotalSeconds;
             }
+        }
+
+        private void OnIsPlayingChanged(bool isPlaying)
+        {
+            OnPropertyChanged(nameof(IsPlaying));
         }
 
         private async Task Open()

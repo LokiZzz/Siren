@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:icons="clr-namespace:Siren.Assets"
-             x:Class="Siren.Views.SceneCardView">
+             xmlns:icons="clr-namespace:Siren.Assets" 
+             xmlns:ff="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms" xmlns:fftransform="clr-namespace:FFImageLoading.Transformations;assembly=FFImageLoading.Transformations"
+             x:Class="Siren.Views.SceneCardView"
+             LayoutChanged="ContentView_LayoutChanged">
 
     <Grid Padding="10" RowDefinitions="80" ColumnDefinitions="300">
         <Grid.Triggers>
@@ -13,12 +15,34 @@
         
         <Frame BackgroundColor="{StaticResource Light}" Padding="10">
             <Grid ColumnDefinitions="*,auto">
-                <Label Grid.Column="0" Text="{Binding Name}" TextColor="White"/>
-                <Button Grid.Column="1" VerticalOptions="Start" CornerRadius="3" WidthRequest="35" HeightRequest="35"
-                    FontSize="14" FontFamily="FA" Text="{x:Static icons:FAFont.CircleXmark}" 
-                    Command="{Binding BindingContext.DeleteSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
-                    CommandParameter="{Binding .}"
-                    BackgroundColor="HotPink"/>
+
+                <ff:CachedImage x:Name="Image" Source="{Binding Image}" Aspect="AspectFill" Grid.ColumnSpan="2" Margin="-10"/>
+
+                <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" Grid.ColumnSpan="2" Margin="-10" Opacity="0.4">
+                    <Rectangle.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="White" Offset="0" />
+                            <GradientStop Color="Black" Offset="1" />
+                        </LinearGradientBrush>
+                    </Rectangle.Background>
+                </Rectangle>
+
+                <Label Grid.Column="0" VerticalOptions="End" VerticalTextAlignment="End" Text="{Binding Name}" TextColor="White"/>
+
+                <Grid Grid.Column="1">
+                    <Button CornerRadius="3" WidthRequest="30" HeightRequest="30"
+                            FontSize="12" FontFamily="FA" Text="{x:Static icons:FAFont.CircleXmark}" 
+                            Command="{Binding BindingContext.DeleteSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            CommandParameter="{Binding .}"
+                            BackgroundColor="HotPink"/>
+
+                    <Button Grid.Row="1" CornerRadius="3" WidthRequest="30" HeightRequest="30"
+                            FontSize="12" FontFamily="FA" Text="{x:Static icons:FAFont.PenToSquare}" 
+                            Command="{Binding BindingContext.EditSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            CommandParameter="{Binding .}"
+                            BackgroundColor="DodgerBlue"/>
+                </Grid>
+                
             </Grid>
         </Frame>
     </Grid>

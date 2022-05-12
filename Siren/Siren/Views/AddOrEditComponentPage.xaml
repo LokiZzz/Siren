@@ -15,8 +15,8 @@
             <Label Text="Name"/>
             <Entry Text="{Binding Name}"/>
             
-            <Label Text="Image"/>
-            <Frame BackgroundColor="White" >
+            <Label Text="Image" IsVisible="{Binding IsImagePickerVisible}"/>
+            <Frame BackgroundColor="White" IsVisible="{Binding IsImagePickerVisible}">
                 <Grid Padding="0">
                     <Label VerticalOptions="Center" VerticalTextAlignment="Center"
                            HorizontalOptions="Center" HorizontalTextAlignment="Center"

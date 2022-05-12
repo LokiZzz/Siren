@@ -9,5 +9,6 @@ namespace Siren.Messaging
         public static string ElementPlayingStatusChanged = nameof(ElementPlayingStatusChanged);
         public static string SettingAdded = nameof(SettingAdded);
         public static string SceneAdded = nameof(SceneAdded);
+        public static string IllustratedCardEdited = nameof(IllustratedCardEdited);
     }
 }

@@ -42,9 +42,16 @@ namespace Siren.UWP.Services
             OnPositionChanged(sender.Position);
         }
 
+        public event IsPlayingChangedHandler OnIsPlayingChanged;
+
         private void MediaEnded(MediaPlayer sender, object args)
         {
             if (!Loop) IsPlaying = false;
+
+            if (OnIsPlayingChanged != null)
+            {
+                OnIsPlayingChanged(IsPlaying);
+            }
         }
 
         public TimeSpan Duration => _player.PlaybackSession.NaturalDuration;

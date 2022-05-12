@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 namespace Siren.Services
 {
     public delegate void PositionChangedHandler(TimeSpan newPosition);
+    
+    public delegate void IsPlayingChangedHandler(bool isPlaying);
 
     public interface IAudioPlayer
     {
@@ -28,5 +30,6 @@ namespace Siren.Services
         void Dispose();
         
         event PositionChangedHandler OnPositionChanged;
+        event IsPlayingChangedHandler OnIsPlayingChanged;
     }
 }

@@ -21,6 +21,8 @@ namespace Siren.UWP
         {
             this.InitializeComponent();
 
+            FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
+
             LoadApplication(new Siren.App());
         }
     }

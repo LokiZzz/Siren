@@ -15,15 +15,15 @@
     <Grid RowDefinitions="auto,auto,*,*,auto" ColumnDefinitions="320,*" ColumnSpacing="0" RowSpacing="0">
 
         <Grid Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource VeryDark}">
-            <Button Text="Add Setting" Command="{Binding AddSettingCommand}" HorizontalOptions="Start" Margin="10"/>
+            <Button Text="Add Setting" Command="{Binding AddSettingCommand}" HorizontalOptions="Start" Margin="10" CornerRadius="3"/>
         </Grid>
 
         <Grid Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource VeryDark}">
-            <Button Text="Add Scene" Command="{Binding AddSceneCommand}" HorizontalOptions="Start" Margin="10"/>
+            <Button Text="Add Scene" Command="{Binding AddSceneCommand}" HorizontalOptions="Start" Margin="10" CornerRadius="3"/>
         </Grid>
         
         <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" BackgroundColor="{StaticResource Dark}" >
-            <ScrollView Orientation="Vertical" VerticalScrollBarVisibility="Always">
+            <ScrollView Orientation="Vertical">
                 <StackLayout x:Name="SettingsList" Grid.Row="0" BindableLayout.ItemsSource="{Binding Settings}" Spacing="0">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
@@ -39,8 +39,8 @@
             </ScrollView>
         </Grid>
 
-        <Grid Grid.Row="1" Grid.Column="1" HeightRequest="100" BackgroundColor="{StaticResource Medium}">
-            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Always" Grid.Row="0" Grid.Column="0">
+        <Grid Grid.Row="1" Grid.Column="1" HeightRequest="100" BackgroundColor="{StaticResource Dark}">
+            <ScrollView Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
                 <StackLayout x:Name="ScenesList" Grid.Row="0" BindableLayout.ItemsSource="{Binding SelectedSetting.Scenes}" Orientation="Horizontal" Spacing="0">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
@@ -57,10 +57,10 @@
         </Grid>
 
         <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="{StaticResource Medium}">
-            <Grid BackgroundColor="{StaticResource Dark}">
+            <Grid BackgroundColor="{StaticResource VeryDark}">
                 <StackLayout Grid.Row="0" Orientation="Horizontal" Margin="10">
-                    <Button Text="Add Elements" Command="{Binding AddElementsCommand}"/>
-                    <Button FontFamily="FA" Text="{x:Static icons:FAFont.FloppyDisk}" Command="{Binding SaveSceneCommand}"/>
+                    <Button Text="Add Elements" Command="{Binding AddElementsCommand}" CornerRadius="3"/>
+                    <Button FontFamily="FA" Text="{x:Static icons:FAFont.FloppyDisk}" Command="{Binding SaveSceneCommand}" CornerRadius="5"/>
                 </StackLayout>
             </Grid>
             <ScrollView Grid.Row="1">
@@ -82,9 +82,9 @@
         </Grid>
 
         <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="{StaticResource Medium}">
-            <Grid BackgroundColor="{StaticResource Dark}">
+            <Grid BackgroundColor="{StaticResource VeryDark}">
                 <StackLayout Orientation="Horizontal" Margin="10">
-                    <Button Text="Add Effects" Command="{Binding AddEffectsCommand}"/>
+                    <Button Text="Add Effects" Command="{Binding AddEffectsCommand}" CornerRadius="3"/>
                 </StackLayout>
             </Grid>
             <ScrollView Grid.Row="1">
@@ -106,21 +106,39 @@
         </Grid>
 
         <Grid Grid.Row="4" BackgroundColor="{StaticResource VeryDark}" Grid.ColumnSpan="2">
-            <Button FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" FontSize="32"
-                    Command="{Binding GlobalPlayCommand}"
-                    BackgroundColor="LightGreen"
-                    Margin="10"
-                    WidthRequest="120"
-                    HeightRequest="50"
-                    CornerRadius="15"
-                    HorizontalOptions="Center">
-                <Button.Triggers>
-                    <DataTrigger TargetType="Button" Binding="{Binding IsScenePlaying}" Value="True">
-                        <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
-                        <Setter Property="BackgroundColor" Value="HotPink"/>
-                    </DataTrigger>
-                </Button.Triggers>
-            </Button>
+            <StackLayout Orientation="Horizontal" Margin="10" Spacing="10">
+                <Button FontFamily="FA" Text="{x:Static icons:FAFont.Lemon}" FontSize="32"
+                        Command="{Binding GlobalPlayCommand}"
+                        BackgroundColor="{StaticResource Light}"
+                        TextColor="Yellow"
+                        WidthRequest="120"
+                        HeightRequest="50"
+                        CornerRadius="10"
+                        HorizontalOptions="Center"/>
+
+                <Button FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" FontSize="32"
+                        Command="{Binding GlobalPlayCommand}"
+                        BackgroundColor="LightGreen"
+                        WidthRequest="120"
+                        HeightRequest="50"
+                        CornerRadius="10"
+                        HorizontalOptions="Center">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding IsScenePlaying}" Value="True">
+                            <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
+                            <Setter Property="BackgroundColor" Value="HotPink"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <Label Text="{Binding CurrentSceneText}" 
+                       HorizontalOptions="Start" 
+                       FontSize="24" 
+                       VerticalOptions="Center" VerticalTextAlignment="Center"
+                       Margin="10,0,0,0"/>
+            </StackLayout>
+            
+            
         </Grid>
     </Grid>
 

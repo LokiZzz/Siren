@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              x:Class="Siren.Views.ElementPlayerView"
              xmlns:viewmodels="clr-namespace:Siren.ViewModels" 
-             x:DataType="viewmodels:PlayerViewModel"
+             x:DataType="viewmodels:SceneComponentViewModel"
              xmlns:icons="clr-namespace:Siren.Assets">
 
     <ContentView.Resources>
@@ -52,7 +52,7 @@
 
             <Label Grid.Row="1" Grid.Column="1" Margin="0" Padding="0"
                    TextColor="{StaticResource TextColor}" 
-                   Text="{Binding Name}"
+                   Text="{Binding Alias}"
                    VerticalOptions="Center" 
                    VerticalTextAlignment="Center"
                    LineBreakMode="TailTruncation"
@@ -85,8 +85,8 @@
                     FontSize="18"
                     FontFamily="FA"
                     Text="{x:Static icons:FAFont.PenToSquare}" 
-                    Command="{Binding BindingContext.DeleteElementCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
-                    CommandParameter="{Binding Name}"
+                    Command="{Binding BindingContext.EditElementCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
+                    CommandParameter="{Binding .}"
                     BackgroundColor="DeepSkyBlue"/>
             </Grid>
 

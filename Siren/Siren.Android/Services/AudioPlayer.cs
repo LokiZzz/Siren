@@ -26,6 +26,7 @@ namespace Siren.Droid.Services
         {
             _player = new MediaPlayer();
             _positionChangedTimer.Elapsed += FirePositionChanged;
+            _player.Completion += OnCompleted;
         }
 
         public TimeSpan CutFrom { get; set; }
@@ -51,6 +52,15 @@ namespace Siren.Droid.Services
         }
 
         public event PositionChangedHandler OnPositionChanged;
+        public event IsPlayingChangedHandler OnIsPlayingChanged;
+
+        private void OnCompleted(object sender, EventArgs e)
+        {
+            if (OnIsPlayingChanged != null)
+            {
+                OnIsPlayingChanged(false);
+            }
+        }
 
         public TimeSpan Duration => TimeSpan.FromMilliseconds(_player.Duration);
 
