@@ -58,8 +58,8 @@ namespace Siren.Models
                 Name = m.Name,
                 ImagePath = m.ImagePath,
                 Scenes = m.Scenes.Select(x => x.ToVM()).ToObservableCollection(),
-                Elements = m.Elements.Select(x => x.ToVM()).ToObservableCollection(),
-                Effects = m.Effects.Select(x => x.ToVM()).ToObservableCollection()
+                Elements = m.Elements.Select(x => x.ToVM(true)).ToObservableCollection(),
+                Effects = m.Effects.Select(x => x.ToVM(false)).ToObservableCollection()
             };
         }
 
@@ -82,13 +82,14 @@ namespace Siren.Models
             };
         }
 
-        public static SceneComponentViewModel ToVM(this Track m)
+        public static SceneComponentViewModel ToVM(this Track m, bool loop)
         {
             return new SceneComponentViewModel
             {
                 Alias = m.Alias,
                 FilePath = m.FilePath,
-                ImagePath = m.ImagePath
+                ImagePath = m.ImagePath,
+                Loop = loop
             };
         }
 

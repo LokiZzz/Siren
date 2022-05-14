@@ -21,6 +21,7 @@
               Padding="10" 
               RowSpacing="0"
               ColumnSpacing="0"
+              RowDefinitions="auto"
               ColumnDefinitions="auto,*,auto">
 
             <Grid Grid.Column="0" BackgroundColor="Transparent">

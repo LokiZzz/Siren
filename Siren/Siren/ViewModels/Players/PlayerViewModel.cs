@@ -52,8 +52,9 @@ namespace Siren.ViewModels
         {
             if (!IsPlaying)
             {
-                await PlayPause();
                 Volume = 0;
+                Thread.Sleep(100);
+                await PlayPause();
             }
             StartAdjustingVolume(targetVolume);
         }
@@ -110,6 +111,7 @@ namespace Siren.ViewModels
                     if (_targetVolume == 0)
                     {
                         Stop();
+                        Thread.Sleep(100);
                         Volume = 100;
                     }
                     else

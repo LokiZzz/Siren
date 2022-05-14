@@ -217,7 +217,10 @@ namespace Siren.ViewModels
             }
             else
             {
-                await SelectScene(SelectedScene);
+                if (SelectedScene != null)
+                {
+                    await SelectScene(SelectedScene);
+                }
             }
             OnPropertyChanged(nameof(IsScenePlaying));
         }

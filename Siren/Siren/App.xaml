@@ -14,7 +14,7 @@
             <Color x:Key="Medium">#36393f</Color>
             <Color x:Key="Light">#40444b</Color>
 
-            <Color x:Key="Primary">#B3B7EE</Color>
+            <Color x:Key="Primary">#2f3136</Color>
             <Color x:Key="WeakPrimary">#77FF6978</Color>
 
             <Style TargetType="Button">
@@ -24,7 +24,7 @@
                         <VisualStateGroup x:Name="CommonStates">
                             <VisualState x:Name="Normal">
                                 <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                    <Setter Property="BackgroundColor" Value="#40444b" />
                                 </VisualState.Setters>
                             </VisualState>
                             <VisualState x:Name="Disabled">
