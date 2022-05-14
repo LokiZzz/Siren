@@ -1,4 +1,5 @@
 ﻿using Siren.Messaging;
+using Siren.Models;
 using Siren.Services;
 using Siren.Views;
 using System;
@@ -60,16 +61,25 @@ namespace Siren.ViewModels
             SelectedSetting.Scenes.ForEach(x => x.ReloadImage());
         }
 
-        private void DeleteSetting(SettingViewModel setting)
+        private async Task DeleteSetting(SettingViewModel setting)
         {
-            setting.DeleteImageFile();
-            setting.Scenes.ForEach(x => x.DeleteImageFile());
-            setting.Scenes.Clear();
-            setting.Elements.ForEach(x => x.Dispose());
-            setting.Elements.Clear();
-            setting.Effects.ForEach(x => x.Dispose());
-            setting.Effects.Clear();
-            Settings.Remove(setting);
+            bool wantToDelete = await App.Current.MainPage.DisplayAlert(
+                "Warning",
+                $"Are you really want to delete \"{setting.Name}\" setting?",
+                "Yes", "No"
+            );
+
+            if (wantToDelete)
+            {
+                setting.DeleteImageFile();
+                setting.Scenes.ForEach(x => x.DeleteImageFile());
+                setting.Scenes.Clear();
+                setting.Elements.ForEach(x => x.Dispose());
+                setting.Elements.Clear();
+                setting.Effects.ForEach(x => x.Dispose());
+                setting.Effects.Clear();
+                Settings.Remove(setting);
+            }
         }
 
         private async Task GoToAddScene()
@@ -126,11 +136,21 @@ namespace Siren.ViewModels
 
             OnPropertyChanged(nameof(IsScenePlaying));
             OnPropertyChanged(nameof(CurrentSceneText));
+            Settings.ForEach(x => x.UpdateHasSelectedScene());
         }
 
-        private void DeleteScene(SceneViewModel scene)
+        private async Task DeleteScene(SceneViewModel scene)
         {
-            SelectedSetting.Scenes.Remove(scene);
+            bool wantToDelete = await App.Current.MainPage.DisplayAlert(
+                "Warning",
+                $"Are you really want to delete \"{scene.Name}\" scene?",
+                "Yes", "No"
+            );
+
+            if (wantToDelete)
+            {
+                SelectedSetting.Scenes.Remove(scene);
+            }
         }
 
         private void SaveScene(string name)
@@ -267,11 +287,11 @@ namespace Siren.ViewModels
         public Command AddSettingCommand { get => new Command(async () => await GoToAddSetting()); }
         public Command EditSettingCommand { get => new Command<SettingViewModel>(async (setting) => await GoToEditSetting(setting)); }
         public Command SelectSettingCommand { get => new Command<SettingViewModel>(SelectSetting); }
-        public Command DeleteSettingCommand { get => new Command<SettingViewModel>(DeleteSetting); }
+        public Command DeleteSettingCommand { get => new Command<SettingViewModel>(async (scetting) => await DeleteSetting(scetting)); }
         public Command AddSceneCommand { get => new Command(async () => await GoToAddScene()); }
         public Command EditSceneCommand { get => new Command<SceneViewModel>(async (scene) => await GoToEditScene(scene)); }
         public Command SelectSceneCommand { get => new Command<SceneViewModel>(async (scene) => await SelectScene(scene)); }
-        public Command DeleteSceneCommand { get => new Command<SceneViewModel>(DeleteScene); }
+        public Command DeleteSceneCommand { get => new Command<SceneViewModel>(async (scene) => await DeleteScene(scene)); }
         public Command AddElementsCommand { get => new Command(async () => await AddElements()); }
         public Command EditElementCommand { get => new Command<SceneComponentViewModel>(async (element) => await GoToEditElement(element)); }
         public Command DeleteElementCommand { get => new Command<SceneComponentViewModel>(DeleteElement); }

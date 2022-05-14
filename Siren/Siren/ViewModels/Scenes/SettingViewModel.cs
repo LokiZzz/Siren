@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -24,6 +25,9 @@ namespace Siren.ViewModels
             get => _isSelected;
             set => SetProperty(ref _isSelected, value);
         }
+
+        public void UpdateHasSelectedScene() => OnPropertyChanged(nameof(HasSelectedScene));
+        public bool HasSelectedScene => Scenes?.Any(x => x.IsSelected) == true;
 
         private ObservableCollection<SceneViewModel> _scenes;
         public ObservableCollection<SceneViewModel> Scenes
