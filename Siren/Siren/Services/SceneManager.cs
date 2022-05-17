@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
@@ -48,13 +49,16 @@ namespace Siren.Services
             File.WriteAllText(fileName, content);
         }
 
-        public ObservableCollection<SettingViewModel> GetCurrentBundle()
+        public async Task<ObservableCollection<SettingViewModel>> GetCurrentBundle()
         {
             string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _bundleFileName);
             if (File.Exists(fileName))
             {
                 string content = File.ReadAllText(fileName);
                 Bundle bundle = JsonConvert.DeserializeObject<Bundle>(content);
+
+                IBundleService bundleService = DependencyService.Get<IBundleService>();
+                await bundleService.SaveBundleAsync(bundle, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\test.gz");
 
                 return bundle.Settings.Select(x => x.ToVM()).ToObservableCollection();
             }

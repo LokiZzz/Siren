@@ -21,6 +21,7 @@ namespace Siren
         private static void RegisterServices()
         {
             DependencyService.RegisterSingleton(new SceneManager());
+            DependencyService.RegisterSingleton<IBundleService>(new BundleService());
         }
 
         protected override void OnStart()

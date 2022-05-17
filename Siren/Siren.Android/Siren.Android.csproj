@@ -84,6 +84,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ActivityResultMessage.cs" />
     <Compile Include="Services\AudioPlayer.cs" />
+    <Compile Include="Services\FileStreamProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

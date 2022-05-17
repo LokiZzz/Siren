@@ -252,7 +252,7 @@ namespace Siren.ViewModels
 
         private void IntializeCollections()
         {
-            Settings = SceneManager.GetCurrentBundle();
+            Settings = SceneManager.GetCurrentBundle().GetAwaiter().GetResult();
             SelectedSetting = Settings.FirstOrDefault();
 
             Settings.CollectionChanged += BindNewSettingEvents;
