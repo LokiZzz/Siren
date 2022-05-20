@@ -8,7 +8,9 @@ namespace Siren.Services
 {
     public interface IFileStreamProvider
     {
-        Stream GetFileStreamToRead(string filePath);
-        Stream GetFileStreamToWrite(string filePath);
+        FileStream GetFileStreamToRead(string filePath);
+        FileStream GetFileStreamToWrite(string filePath);
+        Stream GetStreamToRead(string filePath);
+        Stream GetStreamToWrite(string filePath);
     }
 }

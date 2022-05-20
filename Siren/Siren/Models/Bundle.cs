@@ -6,6 +6,7 @@ namespace Siren.Models
 {
     public class Bundle
     {
+        public string Name { get; set; }
         public List<Setting> Settings { get; set; }
     }
 

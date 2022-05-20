@@ -58,7 +58,12 @@ namespace Siren.Services
                 Bundle bundle = JsonConvert.DeserializeObject<Bundle>(content);
 
                 IBundleService bundleService = DependencyService.Get<IBundleService>();
-                await bundleService.SaveBundleAsync(bundle, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\test.gz");
+                await bundleService.SaveBundleAsync(
+                    bundle, 
+                    Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
+                        "testbundle.siren")
+                );
 
                 return bundle.Settings.Select(x => x.ToVM()).ToObservableCollection();
             }

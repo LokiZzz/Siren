@@ -19,14 +19,24 @@ namespace Siren.Droid.Services
 {
     public class FileStreamProvider : IFileStreamProvider
     {
-        public Stream GetFileStreamToRead(string filePath)
+        public FileStream GetFileStreamToRead(string filePath)
         {
             return new FileStream(filePath, FileMode.Open);
         }
 
-        public Stream GetFileStreamToWrite(string filePath)
+        public FileStream GetFileStreamToWrite(string filePath)
         {
             return new FileStream(filePath, FileMode.Create);
+        }
+
+        public Stream GetStreamToRead(string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Stream GetStreamToWrite(string filePath)
+        {
+            throw new NotImplementedException();
         }
     }
 }

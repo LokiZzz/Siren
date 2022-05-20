@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Xamarin.Forms;
 using Newtonsoft.Json;
+using Microsoft.Win32.SafeHandles;
 
 namespace Siren.Services
 {
@@ -21,26 +22,27 @@ namespace Siren.Services
     public class BundleService : IBundleService
     {
         IFileStreamProvider _fileStreamProvider;
-        const int _metadataFrameSize = 128 * 1024;
-        string _sirenFileName = string.Empty;
+
+        const int _metadataFrameSize = 128 * 1024; //128kB
+        string _sirenFilePath = string.Empty;
 
         public async Task SaveBundleAsync(Bundle bundle, string filePath)
         {
             _fileStreamProvider = DependencyService.Resolve<IFileStreamProvider>();
-            _sirenFileName = filePath;
+            _sirenFilePath = filePath;
 
-            await CreateBundle(bundle);
+            await CreateBundleAsync(bundle);
         }
 
         public async Task<Bundle> LoadBundleAsync(string filePath)
         {
             _fileStreamProvider = DependencyService.Resolve<IFileStreamProvider>();
-            _sirenFileName = Path.GetFileName(filePath);
+            _sirenFilePath = filePath;
 
-            throw new NotImplementedException();
+            return await UnpackBundleAsync();
         }
 
-        public async Task CreateBundle(Bundle bundle)
+        public async Task CreateBundleAsync(Bundle bundle)
         {
             SirenFileMetaData metadata = new SirenFileMetaData
             {
@@ -50,22 +52,22 @@ namespace Siren.Services
             List<string> filesToCompress = GetAllFileFromBundle(bundle);
 
             //Create a gap for metadata frame and write compressed data;
-            using (FileStream targetStream = new FileStream(_sirenFileName, FileMode.Create))
+            using (Stream targetStream = _fileStreamProvider.GetStreamToWrite(_sirenFilePath)) //new FileStream(_sirenFilePath, FileMode.Create))
             {
                 await targetStream.WriteAsync(new byte[_metadataFrameSize], 0, _metadataFrameSize); //Create a gap
-                targetStream.Position = _metadataFrameSize;
+                targetStream.Position = _metadataFrameSize; //Maybe delete this
 
                 using (GZipStream compressionStream = new GZipStream(targetStream, CompressionMode.Compress))
                 {
                     foreach (string file in filesToCompress)
                     {
-                        using (FileStream sourceStream = new FileStream(file, FileMode.Open))
+                        using (Stream sourceStream = _fileStreamProvider.GetStreamToRead(file)) //= new FileStream(file, FileMode.Open))
                         {
                             await sourceStream.CopyToAsync(compressionStream);
 
                             metadata.CompressedFiles.Add(new CompressedFileInfo
                             {
-                                Name = file,
+                                Name = Path.GetFileName(file),
                                 CompressedSizeBytes = sourceStream.Length,
                             });
                         }
@@ -74,9 +76,9 @@ namespace Siren.Services
             }
 
             //Write the metadata into frame to the begining of file;
-            using (FileStream targetStream = new FileStream(_sirenFileName, FileMode.Open))
+            using (FileStream targetStream = new FileStream(_sirenFilePath, FileMode.Open))
             {
-                targetStream.Position = 0;
+                targetStream.Position = 0; //Maybe delete this
                 byte[] metadataFrame = new byte[_metadataFrameSize];
                 byte[] metadataActualBytes = ConvertToByteArray(metadata);
                 metadataActualBytes.CopyTo(metadataFrame, 0);
@@ -84,10 +86,10 @@ namespace Siren.Services
             }
         }
 
-        public async Task Decompress()
+        public async Task<Bundle> UnpackBundleAsync()
         {
             //Read metadata file and decompress data;
-            using (FileStream sourceStream = new FileStream(_sirenFileName, FileMode.Open))
+            using (FileStream sourceStream = new FileStream(_sirenFilePath, FileMode.Open))
             {
                 byte[] metadataFrame = new byte[_metadataFrameSize];
                 await sourceStream.ReadAsync(metadataFrame, 0, _metadataFrameSize);
@@ -98,7 +100,7 @@ namespace Siren.Services
                 {
                     foreach (CompressedFileInfo file in metadata.CompressedFiles)
                     {
-                        using (FileStream targetStream = new FileStream(file.Name.Replace(".", " (decompressed)."), FileMode.Create))
+                        using (FileStream targetStream = new FileStream(GetDecompressedFilePath(file, metadata.Bundle), FileMode.Create))
                         {
                             byte[] singleFileChunk = new byte[file.CompressedSizeBytes];
                             await decompressionStream.ReadAsync(singleFileChunk, 0, singleFileChunk.Length);
@@ -106,20 +108,31 @@ namespace Siren.Services
                         }
                     }
                 }
+
+                return metadata.Bundle;
             }
         }
 
-        byte[] ConvertToByteArray<T>(T objectToSerialize)
+        private string GetDecompressedFilePath(CompressedFileInfo file, Bundle bundle)
+        {
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                bundle.Name,
+                file.Name
+            );
+        }
+
+        private byte[] ConvertToByteArray<T>(T objectToSerialize)
         {
             return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(objectToSerialize));
         }
 
-        T ConvertToObject<T>(byte[] bytesToDeserialize)
+        private T ConvertToObject<T>(byte[] bytesToDeserialize)
         {
             return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytesToDeserialize));
         }
 
-        List<string> GetAllFileFromBundle(Bundle bundle)
+        private List<string> GetAllFileFromBundle(Bundle bundle)
         {
             IEnumerable<string> elements = bundle.Settings.SelectMany(x => x.Elements).Select(x => x.FilePath);
             IEnumerable<string> effects = bundle.Settings.SelectMany(x => x.Effects).Select(x => x.FilePath);
