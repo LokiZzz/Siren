@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Xamarin.Forms;
+using Newtonsoft.Json;
 
 namespace Siren.Services
 {
@@ -19,42 +20,125 @@ namespace Siren.Services
 
     public class BundleService : IBundleService
     {
-        public async Task<Bundle> LoadBundleAsync(string filePath)
-        {
-            throw new NotImplementedException();
-        }
+        IFileStreamProvider _fileStreamProvider;
+        const int _metadataFrameSize = 128 * 1024;
+        string _sirenFileName = string.Empty;
 
         public async Task SaveBundleAsync(Bundle bundle, string filePath)
         {
-            long sourceSize = 0;
-            long destSize = 0;
+            _fileStreamProvider = DependencyService.Resolve<IFileStreamProvider>();
+            _sirenFileName = filePath;
 
+            await CreateBundle(bundle);
+        }
+
+        public async Task<Bundle> LoadBundleAsync(string filePath)
+        {
+            _fileStreamProvider = DependencyService.Resolve<IFileStreamProvider>();
+            _sirenFileName = Path.GetFileName(filePath);
+
+            throw new NotImplementedException();
+        }
+
+        public async Task CreateBundle(Bundle bundle)
+        {
+            SirenFileMetaData metadata = new SirenFileMetaData
+            {
+                Bundle = bundle,
+                CompressedFiles = new List<CompressedFileInfo>()
+            };
+            List<string> filesToCompress = GetAllFileFromBundle(bundle);
+
+            //Create a gap for metadata frame and write compressed data;
+            using (FileStream targetStream = new FileStream(_sirenFileName, FileMode.Create))
+            {
+                await targetStream.WriteAsync(new byte[_metadataFrameSize], 0, _metadataFrameSize); //Create a gap
+                targetStream.Position = _metadataFrameSize;
+
+                using (GZipStream compressionStream = new GZipStream(targetStream, CompressionMode.Compress))
+                {
+                    foreach (string file in filesToCompress)
+                    {
+                        using (FileStream sourceStream = new FileStream(file, FileMode.Open))
+                        {
+                            await sourceStream.CopyToAsync(compressionStream);
+
+                            metadata.CompressedFiles.Add(new CompressedFileInfo
+                            {
+                                Name = file,
+                                CompressedSizeBytes = sourceStream.Length,
+                            });
+                        }
+                    }
+                }
+            }
+
+            //Write the metadata into frame to the begining of file;
+            using (FileStream targetStream = new FileStream(_sirenFileName, FileMode.Open))
+            {
+                targetStream.Position = 0;
+                byte[] metadataFrame = new byte[_metadataFrameSize];
+                byte[] metadataActualBytes = ConvertToByteArray(metadata);
+                metadataActualBytes.CopyTo(metadataFrame, 0);
+                await targetStream.WriteAsync(metadataFrame, 0, _metadataFrameSize);
+            }
+        }
+
+        public async Task Decompress()
+        {
+            //Read metadata file and decompress data;
+            using (FileStream sourceStream = new FileStream(_sirenFileName, FileMode.Open))
+            {
+                byte[] metadataFrame = new byte[_metadataFrameSize];
+                await sourceStream.ReadAsync(metadataFrame, 0, _metadataFrameSize);
+                SirenFileMetaData metadata = ConvertToObject<SirenFileMetaData>(metadataFrame);
+                sourceStream.Position = _metadataFrameSize;
+
+                using (GZipStream decompressionStream = new GZipStream(sourceStream, CompressionMode.Decompress))
+                {
+                    foreach (CompressedFileInfo file in metadata.CompressedFiles)
+                    {
+                        using (FileStream targetStream = new FileStream(file.Name.Replace(".", " (decompressed)."), FileMode.Create))
+                        {
+                            byte[] singleFileChunk = new byte[file.CompressedSizeBytes];
+                            await decompressionStream.ReadAsync(singleFileChunk, 0, singleFileChunk.Length);
+                            await targetStream.WriteAsync(singleFileChunk, 0, singleFileChunk.Length);
+                        }
+                    }
+                }
+            }
+        }
+
+        byte[] ConvertToByteArray<T>(T objectToSerialize)
+        {
+            return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(objectToSerialize));
+        }
+
+        T ConvertToObject<T>(byte[] bytesToDeserialize)
+        {
+            return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytesToDeserialize));
+        }
+
+        List<string> GetAllFileFromBundle(Bundle bundle)
+        {
             IEnumerable<string> elements = bundle.Settings.SelectMany(x => x.Elements).Select(x => x.FilePath);
             IEnumerable<string> effects = bundle.Settings.SelectMany(x => x.Effects).Select(x => x.FilePath);
             IEnumerable<string> settingsImages = bundle.Settings.Select(x => x.ImagePath);
             IEnumerable<string> scenesImages = bundle.Settings.SelectMany(x => x.Scenes).Select(x => x.ImagePath);
 
-            List<string> allFiles = elements.Union(effects).Union(settingsImages).Union(scenesImages).ToList();
-
-            IFileStreamProvider fileStreamProvider = DependencyService.Resolve<IFileStreamProvider>();
-
-            using (Stream fsTarget = await fileStreamProvider.GetFileStreamToWrite(filePath))
-            {
-                foreach(string file in allFiles)
-                {
-                    using (Stream fsSource = await fileStreamProvider.GetFileStreamToRead(filePath))
-                    {
-                        sourceSize += fsSource.Length;
-
-                        using (GZipStream compressionStream = new GZipStream(fsTarget, CompressionLevel.Optimal))
-                        {
-                            await fsTarget.CopyToAsync(compressionStream);
-                        }
-                    }
-                }
-
-                destSize = fsTarget.Length;
-            }
+            return elements.Union(effects).Union(settingsImages).Union(scenesImages).ToList();
         }
+    }
+
+    public class SirenFileMetaData
+    {
+        public Bundle Bundle { get; set; }
+        public List<CompressedFileInfo> CompressedFiles { get; set; }
+    }
+
+    public class CompressedFileInfo
+    {
+        public string Name { get; set; }
+        public long CompressedSizeBytes { get; set; }
     }
 }

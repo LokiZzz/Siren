@@ -15,20 +15,20 @@ namespace Siren.UWP.Services
 {
     public class FileStreamProvider : IFileStreamProvider
     {
-        public async Task<Stream> GetFileStreamToRead(string filePath)
+        public Stream GetFileStreamToRead(string filePath)
         {
-            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
-            StorageFile file = await storageFolder.GetFileAsync(Path.GetFileName(filePath));
+            StorageFolder storageFolder = StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath)).AsTask().Result;
+            StorageFile file = storageFolder.GetFileAsync(Path.GetFileName(filePath)).AsTask().Result;
 
-            return await file.OpenStreamForReadAsync();
+            return file.OpenStreamForReadAsync().GetAwaiter().GetResult();
         }
 
-        public async Task<Stream> GetFileStreamToWrite(string filePath)
+        public Stream GetFileStreamToWrite(string filePath)
         {
-            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
-            StorageFile file = await storageFolder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.ReplaceExisting);
+            StorageFolder storageFolder = StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath)).AsTask().Result;
+            StorageFile file = storageFolder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.ReplaceExisting).AsTask().Result;
 
-            return await file.OpenStreamForWriteAsync();
+            return file.OpenStreamForWriteAsync().GetAwaiter().GetResult();
         }
     }
 }
