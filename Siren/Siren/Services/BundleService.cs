@@ -10,6 +10,7 @@ using System.Linq;
 using Xamarin.Forms;
 using Newtonsoft.Json;
 using Microsoft.Win32.SafeHandles;
+using static System.Net.WebRequestMethods;
 
 namespace Siren.Services
 {
@@ -17,10 +18,47 @@ namespace Siren.Services
     {
         Task SaveBundleAsync(Bundle bundle, string filePath);
         Task<Bundle> LoadBundleAsync(string filePath);
+        Task Test();
     }
 
     public class BundleService : IBundleService
     {
+        public async Task Test()
+        {
+            _fileStreamProvider = DependencyService.Resolve<IFileStreamProvider>();
+
+            string source = @"F:\Temp\hxeo3tbudtk61.jpg";
+            string targetCompressed = @"F:\Temp\hxeo3tbudtk61.gzip";
+            string targetDecompressed = @"F:\Temp\hxeo3tbudtk61_Uncompressed.jpg";
+
+            //Compress
+
+            using (Stream fsTarget = _fileStreamProvider.GetStreamToWrite(targetCompressed)) 
+            {
+                using (GZipStream gzsCompress = new GZipStream(fsTarget, CompressionMode.Compress))
+                {
+                    using (Stream fsSource = _fileStreamProvider.GetStreamToRead(source))
+                    {
+                        fsSource.CopyTo(gzsCompress);
+                    }
+                }
+            }
+
+
+            //Decompress
+
+            using (Stream fsSource = _fileStreamProvider.GetStreamToRead(targetCompressed))
+            {
+                using (GZipStream gzsCompress = new GZipStream(fsSource, CompressionMode.Decompress))
+                {
+                    using (Stream fsTarget = _fileStreamProvider.GetStreamToWrite(targetDecompressed))
+                    {
+                        gzsCompress.CopyTo(fsTarget);
+                    }
+                }
+            }
+        }
+
         IFileStreamProvider _fileStreamProvider;
 
         const int _metadataFrameSize = 128 * 1024; //128kB
@@ -52,7 +90,7 @@ namespace Siren.Services
             List<string> filesToCompress = GetAllFileFromBundle(bundle);
 
             //Create a gap for metadata frame and write compressed data;
-            using (Stream targetStream = _fileStreamProvider.GetStreamToWrite(_sirenFilePath)) //new FileStream(_sirenFilePath, FileMode.Create))
+            using (Stream targetStream = await _fileStreamProvider.GetStreamToWriteAsync(_sirenFilePath))
             {
                 await targetStream.WriteAsync(new byte[_metadataFrameSize], 0, _metadataFrameSize); //Create a gap
                 targetStream.Position = _metadataFrameSize; //Maybe delete this
@@ -61,7 +99,7 @@ namespace Siren.Services
                 {
                     foreach (string file in filesToCompress)
                     {
-                        using (Stream sourceStream = _fileStreamProvider.GetStreamToRead(file)) //= new FileStream(file, FileMode.Open))
+                        using (Stream sourceStream = await _fileStreamProvider.GetStreamToReadAsync(file))
                         {
                             await sourceStream.CopyToAsync(compressionStream);
 

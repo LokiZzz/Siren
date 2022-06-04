@@ -31,12 +31,22 @@ namespace Siren.Droid.Services
 
         public Stream GetStreamToRead(string filePath)
         {
-            throw new NotImplementedException();
+            return new FileStream(filePath, FileMode.Open);
+        }
+
+        public async Task<Stream> GetStreamToReadAsync(string filePath)
+        {
+            return await Task.FromResult(new FileStream(filePath, FileMode.Open));
         }
 
         public Stream GetStreamToWrite(string filePath)
         {
-            throw new NotImplementedException();
+            return new FileStream(filePath, FileMode.Create);
+        }
+
+        public async Task<Stream> GetStreamToWriteAsync(string filePath)
+        {
+            return await Task.FromResult(new FileStream(filePath, FileMode.Create));
         }
     }
 }

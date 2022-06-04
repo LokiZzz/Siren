@@ -24,7 +24,7 @@ namespace Siren.ViewModels
         {
             InitializeMessagingCenter();
             SceneManager = DependencyService.Get<SceneManager>();
-            IntializeCollections();
+            IntializeCollections().GetAwaiter().GetResult();
         }
 
         private async Task GoToAddSetting()
@@ -250,9 +250,9 @@ namespace Siren.ViewModels
             SceneManager.SaveCurrentBundle(Settings);
         }
 
-        private void IntializeCollections()
+        private async Task IntializeCollections()
         {
-            Settings = SceneManager.GetCurrentBundle().GetAwaiter().GetResult();
+            Settings = await SceneManager.GetCurrentBundle();
             SelectedSetting = Settings.FirstOrDefault();
 
             Settings.CollectionChanged += BindNewSettingEvents;
