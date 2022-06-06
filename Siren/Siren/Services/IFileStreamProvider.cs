@@ -12,7 +12,7 @@ namespace Siren.Services
         FileStream GetFileStreamToWrite(string filePath);
         Stream GetStreamToRead(string filePath);
         Stream GetStreamToWrite(string filePath);
-        Task<Stream> GetStreamToReadAsync(string filePath);
-        Task<Stream> GetStreamToWriteAsync(string filePath);
+        ValueTask<Stream> GetStreamToReadAsync(string filePath);
+        ValueTask<Stream> GetStreamToWriteAsync(string filePath);
     }
 }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -25,6 +26,16 @@ namespace Siren.ViewModels
             InitializeMessagingCenter();
             SceneManager = DependencyService.Get<SceneManager>();
             IntializeCollections().GetAwaiter().GetResult();
+        }
+
+        public Command TestBundleServiceCommand { get => new Command(async () => await TestBundleService()); }
+        private async Task TestBundleService()
+        {
+            IBundleService bundleService = DependencyService.Get<IBundleService>();
+            Bundle bundle = await SceneManager.GetCurrentBundle();
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TestBundle.siren");
+
+            await bundleService.SaveBundleAsync(bundle, fileName);
         }
 
         private async Task GoToAddSetting()
@@ -247,12 +258,12 @@ namespace Siren.ViewModels
 
         private void SaveCurrentBundle()
         {
-            SceneManager.SaveCurrentBundle(Settings);
+            SceneManager.SaveCurrentSettings(Settings);
         }
 
         private async Task IntializeCollections()
         {
-            Settings = await SceneManager.GetCurrentBundle();
+            Settings = await SceneManager.GetCurrentSettings();
             SelectedSetting = Settings.FirstOrDefault();
 
             Settings.CollectionChanged += BindNewSettingEvents;

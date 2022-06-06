@@ -15,7 +15,9 @@
     <Grid RowDefinitions="auto,auto,*,*,auto" ColumnDefinitions="320,*" ColumnSpacing="0" RowSpacing="0">
 
         <Grid Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource VeryDark}">
-            <Button Text="Add Setting" Command="{Binding AddSettingCommand}" HorizontalOptions="Start" Margin="10" CornerRadius="3"/>
+            <!--<Button Text="Add Setting" Command="{Binding AddSettingCommand}" HorizontalOptions="Start" Margin="10" CornerRadius="3"/>-->
+            <Button Text="Test!!!" Command="{Binding TestBundleServiceCommand}" HorizontalOptions="Start" Margin="10" CornerRadius="3"/>
+
         </Grid>
 
         <Grid Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource VeryDark}">

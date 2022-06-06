@@ -40,7 +40,7 @@ namespace Siren.Services
 
         private string _bundleFileName = "current-bundle.json";
 
-        public void SaveCurrentBundle(ObservableCollection<SettingViewModel> settings)
+        public void SaveCurrentSettings(ObservableCollection<SettingViewModel> settings)
         {
             Bundle bundle = new Bundle { Settings = settings.Select(x => x.ToModel()).ToList() };
             string content = JsonConvert.SerializeObject(bundle);
@@ -49,7 +49,7 @@ namespace Siren.Services
             File.WriteAllText(fileName, content);
         }
 
-        public async Task<ObservableCollection<SettingViewModel>> GetCurrentBundle()
+        public async Task<ObservableCollection<SettingViewModel>> GetCurrentSettings()
         {
             string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _bundleFileName);
             if (File.Exists(fileName))
@@ -57,20 +57,26 @@ namespace Siren.Services
                 string content = File.ReadAllText(fileName);
                 Bundle bundle = JsonConvert.DeserializeObject<Bundle>(content);
 
-                IBundleService bundleService = DependencyService.Get<IBundleService>();
-                await bundleService.Test();
-                //await bundleService.SaveBundleAsync(
-                //    bundle,
-                //    Path.Combine(
-                //        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                //        "testbundle.siren")
-                //);
-
                 return bundle.Settings.Select(x => x.ToVM()).ToObservableCollection();
             }
             else
             {
                 return new ObservableCollection<SettingViewModel>();
+            }
+        }
+
+        public async Task<Bundle> GetCurrentBundle()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _bundleFileName);
+            if (File.Exists(fileName))
+            {
+                string content = File.ReadAllText(fileName);
+                
+                return JsonConvert.DeserializeObject<Bundle>(content);
+            }
+            else
+            {
+                return null;
             }
         }
     }

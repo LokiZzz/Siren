@@ -46,13 +46,12 @@ namespace Siren.UWP.Services
             return file.OpenStreamForReadAsync().GetAwaiter().GetResult();
         }
 
-        public async Task<Stream> GetStreamToReadAsync(string filePath)
+        public async ValueTask<Stream> GetStreamToReadAsync(string filePath)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
             StorageFile file = await storageFolder.GetFileAsync(Path.GetFileName(filePath));
-            SafeFileHandle handle = file.CreateSafeFileHandle(); //storageFolder.CreateSafeFileHandle(mode)
 
-            return new FileStream(handle, FileAccess.Read);
+            return await file.OpenStreamForReadAsync();
         }
 
         public Stream GetStreamToWrite(string filePath)
@@ -63,13 +62,10 @@ namespace Siren.UWP.Services
             return file.OpenStreamForWriteAsync().GetAwaiter().GetResult();
         }
 
-        public async Task<Stream> GetStreamToWriteAsync(string filePath)
+        public async ValueTask<Stream> GetStreamToWriteAsync(string filePath)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
             StorageFile file = await storageFolder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.OpenIfExists);
-
-            //SafeFileHandle handle = file.CreateSafeFileHandle(access: FileAccess.ReadWrite);
-            //return new FileStream(handle, FileAccess.Write);
 
             return await file.OpenStreamForWriteAsync();
         }

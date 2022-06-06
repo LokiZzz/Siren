@@ -32,31 +32,51 @@ namespace Siren.Services
             string targetDecompressed = @"F:\Temp\hxeo3tbudtk61_Uncompressed.jpg";
 
             //Compress
-
-            using (Stream fsTarget = _fileStreamProvider.GetStreamToWrite(targetCompressed)) 
+            using (Stream fsTarget = await _fileStreamProvider.GetStreamToWriteAsync(targetCompressed))
             {
                 using (GZipStream gzsCompress = new GZipStream(fsTarget, CompressionMode.Compress))
                 {
-                    using (Stream fsSource = _fileStreamProvider.GetStreamToRead(source))
+                    using (Stream fsSource = await _fileStreamProvider.GetStreamToReadAsync(source))
                     {
-                        fsSource.CopyTo(gzsCompress);
+                        await fsSource.CopyToAsync(gzsCompress);
                     }
                 }
             }
-
-
             //Decompress
-
-            using (Stream fsSource = _fileStreamProvider.GetStreamToRead(targetCompressed))
+            using (Stream fsSource = await _fileStreamProvider.GetStreamToReadAsync(targetCompressed))
             {
                 using (GZipStream gzsCompress = new GZipStream(fsSource, CompressionMode.Decompress))
                 {
-                    using (Stream fsTarget = _fileStreamProvider.GetStreamToWrite(targetDecompressed))
+                    using (Stream fsTarget = await _fileStreamProvider.GetStreamToWriteAsync(targetDecompressed))
                     {
-                        gzsCompress.CopyTo(fsTarget);
+                        await gzsCompress.CopyToAsync(fsTarget);
                     }
                 }
             }
+
+            //Nice! ->
+            ////Compress
+            //using (Stream fsTarget = _fileStreamProvider.GetStreamToWrite(targetCompressed)) 
+            //{
+            //    using (GZipStream gzsCompress = new GZipStream(fsTarget, CompressionMode.Compress))
+            //    {
+            //        using (Stream fsSource = _fileStreamProvider.GetStreamToRead(source))
+            //        {
+            //            fsSource.CopyTo(gzsCompress);
+            //        }
+            //    }
+            //}
+            ////Decompress
+            //using (Stream fsSource = _fileStreamProvider.GetStreamToRead(targetCompressed))
+            //{
+            //    using (GZipStream gzsCompress = new GZipStream(fsSource, CompressionMode.Decompress))
+            //    {
+            //        using (Stream fsTarget = _fileStreamProvider.GetStreamToWrite(targetDecompressed))
+            //        {
+            //            gzsCompress.CopyTo(fsTarget);
+            //        }
+            //    }
+            //}
         }
 
         IFileStreamProvider _fileStreamProvider;
