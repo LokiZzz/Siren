@@ -28,12 +28,22 @@ namespace Siren.ViewModels
             IntializeCollections().GetAwaiter().GetResult();
         }
 
-        public Command TestBundleServiceCommand { get => new Command(async () => await TestBundleService()); }
-        private async Task TestBundleService()
+        public Command CreateBundleCommand { get => new Command(async () => await TestBundleCreation()); }
+        private async Task TestBundleCreation()
         {
             IBundleService bundleService = DependencyService.Get<IBundleService>();
             Bundle bundle = await SceneManager.GetCurrentBundle();
             string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TestBundle.siren");
+
+            await bundleService.SaveBundleAsync(bundle, fileName);
+        }
+
+        public Command LoadBundleCommand { get => new Command(async () => await LoadBundle()); }
+        private async Task LoadBundle()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TestBundle.siren");
+            IBundleService bundleService = DependencyService.Get<IBundleService>();
+            Bundle bundle = await bundleService.LoadBundleAsync(fileName);
 
             await bundleService.SaveBundleAsync(bundle, fileName);
         }
