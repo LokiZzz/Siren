@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Xamarin.Forms;
 using Newtonsoft.Json;
-using Microsoft.Win32.SafeHandles;
-using static System.Net.WebRequestMethods;
+using Siren.Utility;
 
 namespace Siren.Services
 {
@@ -53,30 +52,6 @@ namespace Siren.Services
                     }
                 }
             }
-
-            //Nice! ->
-            ////Compress
-            //using (Stream fsTarget = _fileStreamProvider.GetStreamToWrite(targetCompressed)) 
-            //{
-            //    using (GZipStream gzsCompress = new GZipStream(fsTarget, CompressionMode.Compress))
-            //    {
-            //        using (Stream fsSource = _fileStreamProvider.GetStreamToRead(source))
-            //        {
-            //            fsSource.CopyTo(gzsCompress);
-            //        }
-            //    }
-            //}
-            ////Decompress
-            //using (Stream fsSource = _fileStreamProvider.GetStreamToRead(targetCompressed))
-            //{
-            //    using (GZipStream gzsCompress = new GZipStream(fsSource, CompressionMode.Decompress))
-            //    {
-            //        using (Stream fsTarget = _fileStreamProvider.GetStreamToWrite(targetDecompressed))
-            //        {
-            //            gzsCompress.CopyTo(fsTarget);
-            //        }
-            //    }
-            //}
         }
 
         IFileStreamProvider _fileStreamProvider;
@@ -102,12 +77,13 @@ namespace Siren.Services
 
         public async Task CreateBundleAsync(Bundle bundle)
         {
+            Bundle bundleCopy = bundle.GetDeepCopy();
             SirenFileMetaData metadata = new SirenFileMetaData
             {
-                Bundle = bundle,
+                Bundle = bundleCopy,
                 CompressedFiles = new List<CompressedFileInfo>()
             };
-            List<string> filesToCompress = GetAllFileFromBundle(bundle);
+            List<string> filesToCompress = GetAllFileFromBundle(bundleCopy);
 
             //Create a gap for metadata frame and write compressed data;
             using (Stream targetStream = await _fileStreamProvider.GetStreamToWriteAsync(_sirenFilePath))
@@ -147,18 +123,27 @@ namespace Siren.Services
         public async Task<Bundle> UnpackBundleAsync()
         {
             //Read metadata file and decompress data;
-            using (FileStream sourceStream = new FileStream(_sirenFilePath, FileMode.Open))
+            using (Stream sourceStream = await _fileStreamProvider.GetStreamToReadAsync(_sirenFilePath))
             {
                 byte[] metadataFrame = new byte[_metadataFrameSize];
                 await sourceStream.ReadAsync(metadataFrame, 0, _metadataFrameSize);
                 SirenFileMetaData metadata = ConvertToObject<SirenFileMetaData>(metadataFrame);
+                metadata.Bundle.Name = string.IsNullOrEmpty(metadata.Bundle.Name)
+                    ? Path.GetFileNameWithoutExtension(_sirenFilePath)
+                    : metadata.Bundle.Name;
                 sourceStream.Position = _metadataFrameSize;
+                await _fileStreamProvider.CreateFolderIfNotExists(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    metadata.Bundle.Name
+                );
 
                 using (GZipStream decompressionStream = new GZipStream(sourceStream, CompressionMode.Decompress))
                 {
                     foreach (CompressedFileInfo file in metadata.CompressedFiles)
                     {
-                        using (FileStream targetStream = new FileStream(GetDecompressedFilePath(file, metadata.Bundle), FileMode.Create))
+                        string path = GetLocalAppDataBundleFilePath(file.Name, metadata.Bundle.Name);
+
+                        using (Stream targetStream = await _fileStreamProvider.GetStreamToWriteAsync(path))
                         {
                             byte[] singleFileChunk = new byte[file.CompressedSizeBytes];
                             await decompressionStream.ReadAsync(singleFileChunk, 0, singleFileChunk.Length);
@@ -167,16 +152,45 @@ namespace Siren.Services
                     }
                 }
 
+                //Bind bundle to brand new unpacked files
+                SetFilePathsToLocalAppData(metadata);
+
                 return metadata.Bundle;
             }
         }
 
-        private string GetDecompressedFilePath(CompressedFileInfo file, Bundle bundle)
+        private void SetFilePathsToLocalAppData(SirenFileMetaData metadata)
+        {
+            string bundleName = metadata.Bundle.Name;
+
+            foreach (Setting setting in metadata.Bundle.Settings)
+            {
+                setting.ImagePath = GetLocalAppDataBundleFilePath(Path.GetFileName(setting.ImagePath), bundleName);
+
+                foreach (Scene scene in setting.Scenes)
+                {
+                    scene.ImagePath = GetLocalAppDataBundleFilePath(Path.GetFileName(scene.ImagePath), bundleName);
+                    scene.ElementsSetup.ForEach(element => {
+                        element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(setting.ImagePath), bundleName);
+                    });
+                }
+
+                setting.Elements.ForEach(element => {
+                    element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(setting.ImagePath), bundleName);
+                });
+
+                setting.Effects.ForEach(effect => {
+                    effect.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(setting.ImagePath), bundleName);
+                });
+            }
+        }
+
+        private string GetLocalAppDataBundleFilePath(string fileName, string bundleName)
         {
             return Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                bundle.Name,
-                file.Name
+                bundleName,
+                fileName
             );
         }
 

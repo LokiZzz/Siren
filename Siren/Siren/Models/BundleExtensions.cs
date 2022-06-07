@@ -47,7 +47,6 @@ namespace Siren.Models
             {
                 Alias = vm.Alias,
                 FilePath = vm.FilePath,
-                ImagePath = vm.ImagePath
             };
         }
 
@@ -88,7 +87,6 @@ namespace Siren.Models
             {
                 Alias = m.Alias,
                 FilePath = m.FilePath,
-                ImagePath = m.ImagePath,
                 Loop = loop
             };
         }

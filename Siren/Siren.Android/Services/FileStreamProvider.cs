@@ -19,32 +19,19 @@ namespace Siren.Droid.Services
 {
     public class FileStreamProvider : IFileStreamProvider
     {
-        public FileStream GetFileStreamToRead(string filePath)
+        public Task CreateFolderIfNotExists(string folderPath, string folderName)
         {
-            return new FileStream(filePath, FileMode.Open);
+            return Task.Run(() => 
+                Directory.CreateDirectory(Path.Combine(folderPath, folderName))
+            );
         }
 
-        public FileStream GetFileStreamToWrite(string filePath)
-        {
-            return new FileStream(filePath, FileMode.Create);
-        }
-
-        public Stream GetStreamToRead(string filePath)
-        {
-            return new FileStream(filePath, FileMode.Open);
-        }
-
-        public async Task<Stream> GetStreamToReadAsync(string filePath)
+        public async ValueTask<Stream> GetStreamToReadAsync(string filePath)
         {
             return await Task.FromResult(new FileStream(filePath, FileMode.Open));
         }
 
-        public Stream GetStreamToWrite(string filePath)
-        {
-            return new FileStream(filePath, FileMode.Create);
-        }
-
-        public async Task<Stream> GetStreamToWriteAsync(string filePath)
+        public async ValueTask<Stream> GetStreamToWriteAsync(string filePath)
         {
             return await Task.FromResult(new FileStream(filePath, FileMode.Create));
         }

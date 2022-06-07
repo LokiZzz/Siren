@@ -35,6 +35,5 @@ namespace Siren.Models
     {
         public string Alias { get; set; }
         public string FilePath { get; set; }
-        public string ImagePath { get; set; }
     }
 }

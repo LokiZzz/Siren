@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Geolocation;
 using Windows.Storage;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -17,33 +18,10 @@ namespace Siren.UWP.Services
 {
     public class FileStreamProvider : IFileStreamProvider
     {
-        public FileStream GetFileStreamToRead(string filePath)
+        public async Task CreateFolderIfNotExists(string folderPath, string folderName)
         {
-            StorageFolder storageFolder = StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath)).AsTask().Result;
-            StorageFile file = storageFolder.GetFileAsync(Path.GetFileName(filePath)).AsTask().Result;
-
-            Windows.Storage.Streams.IRandomAccessStreamWithContentType randomAccessStream = file.OpenReadAsync().AsTask().Result;
-            return randomAccessStream.AsStreamForRead() as FileStream;
-        }
-
-        public FileStream GetFileStreamToWrite(string filePath)
-        {
-            StorageFolder storageFolder = StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath)).AsTask().Result;
-            StorageFile file = storageFolder
-                .CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.OpenIfExists)
-                .AsTask()
-                .Result;
-
-            Windows.Storage.Streams.IRandomAccessStreamWithContentType randomAccessStream = file.OpenReadAsync().AsTask().Result;
-            return randomAccessStream.AsStreamForWrite() as FileStream;
-        }
-
-        public Stream GetStreamToRead(string filePath)
-        {
-            StorageFolder storageFolder = StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath)).AsTask().Result;
-            StorageFile file = storageFolder.GetFileAsync(Path.GetFileName(filePath)).AsTask().Result;
-
-            return file.OpenStreamForReadAsync().GetAwaiter().GetResult();
+            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(folderPath);
+            await storageFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
         }
 
         public async ValueTask<Stream> GetStreamToReadAsync(string filePath)
@@ -52,14 +30,6 @@ namespace Siren.UWP.Services
             StorageFile file = await storageFolder.GetFileAsync(Path.GetFileName(filePath));
 
             return await file.OpenStreamForReadAsync();
-        }
-
-        public Stream GetStreamToWrite(string filePath)
-        {
-            StorageFolder storageFolder = StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath)).AsTask().Result;
-            StorageFile file = storageFolder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.OpenIfExists).AsTask().Result;
-
-            return file.OpenStreamForWriteAsync().GetAwaiter().GetResult();
         }
 
         public async ValueTask<Stream> GetStreamToWriteAsync(string filePath)
