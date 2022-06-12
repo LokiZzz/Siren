@@ -98,7 +98,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AudioPlayer.cs" />
-    <Compile Include="Services\FileStreamProvider.cs" />
+    <Compile Include="Services\FileManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

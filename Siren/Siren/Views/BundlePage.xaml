@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:vm="clr-namespace:Siren.ViewModels"
+             x:Class="Siren.Views.BundlePage"
+             BackgroundColor="{StaticResource Dark}">
+
+    <ContentPage.BindingContext>
+        <vm:BundlePageViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <Grid RowDefinitions="auto,*">
+
+            <StackLayout Orientation="Horizontal" Spacing="5">
+                <Button Text="Install" Command="{Binding InstallCommand}" WidthRequest="350"/>
+                <Label Text="If you want to create new bundle, enter the name and press «Create»:"
+                       VerticalOptions="Center" VerticalTextAlignment="Center"/>
+                <Entry Text="{Binding NewBundleName}"/>
+                <Button Text="Create" Command="{Binding CreateCommand}" WidthRequest="350"/>
+            </StackLayout>
+
+            <ScrollView Grid.Row="1" Orientation="Vertical">
+                <StackLayout x:Name="BundlesList" BindableLayout.ItemsSource="{Binding Bundles}" Spacing="0">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Frame>
+                                <Grid RowDefinitions="*,*,*" ColumnDefinitions="*,*,*">
+                                    <Label Grid.Row="0" Grid.ColumnSpan="3" Text="{Binding Name}"/>
+
+                                    <Button Text="Activate" Grid.Row="1" Grid.Column="0" 
+                                            Command="{Binding BindingContext.ActivateCommand,Source={x:Reference BundlesList}}" 
+                                                CommandParameter="{Binding .}"/>
+                                    <Button Text="Deactivate" Grid.Row="1" Grid.Column="1" 
+                                            Command="{Binding BindingContext.DeactivateCommand,Source={x:Reference BundlesList}}" 
+                                                CommandParameter="{Binding .}"/>
+                                    <Button Text="Uninstall" Grid.Row="1" Grid.Column="2" 
+                                            Command="{Binding BindingContext.UninstallCommand,Source={x:Reference BundlesList}}" 
+                                                CommandParameter="{Binding .}"/>
+
+                                    <ProgressBar Progress="0.75"/>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+            </ScrollView>
+            
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

@@ -38,46 +38,39 @@ namespace Siren.Services
 
         public SceneComponentViewModel ComponentToEdit { get; set; }
 
-        private string _bundleFileName = "current-bundle.json";
+        private string _currentEnvironmentFileName = "current-env.json";
 
         public void SaveCurrentSettings(ObservableCollection<SettingViewModel> settings)
         {
             Bundle bundle = new Bundle { Settings = settings.Select(x => x.ToModel()).ToList() };
             string content = JsonConvert.SerializeObject(bundle);
 
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _bundleFileName);
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _currentEnvironmentFileName);
             File.WriteAllText(fileName, content);
         }
 
-        public async Task<ObservableCollection<SettingViewModel>> GetCurrentSettings()
+        public Bundle GetCurrentAgregatedBundle()
         {
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _bundleFileName);
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _currentEnvironmentFileName);
             if (File.Exists(fileName))
             {
                 string content = File.ReadAllText(fileName);
-                Bundle bundle = JsonConvert.DeserializeObject<Bundle>(content);
 
-                return bundle.Settings.Select(x => x.ToVM()).ToObservableCollection();
-            }
-            else
-            {
-                return new ObservableCollection<SettingViewModel>();
-            }
-        }
-
-        public async Task<Bundle> GetCurrentBundle()
-        {
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _bundleFileName);
-            if (File.Exists(fileName))
-            {
-                string content = File.ReadAllText(fileName);
-                
                 return JsonConvert.DeserializeObject<Bundle>(content);
             }
             else
             {
                 return null;
             }
+        }
+
+        public ObservableCollection<SettingViewModel> GetCurrentSettings()
+        {
+            Bundle bundle = GetCurrentAgregatedBundle();
+            
+            return bundle != null
+                ? bundle.Settings.Select(x => x.ToVM()).ToObservableCollection()
+                : new ObservableCollection<SettingViewModel>();
         }
     }
 

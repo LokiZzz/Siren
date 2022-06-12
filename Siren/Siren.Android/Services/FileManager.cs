@@ -14,10 +14,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
-[assembly: Dependency(typeof(FileStreamProvider))]
+[assembly: Dependency(typeof(FileManager))]
 namespace Siren.Droid.Services
 {
-    public class FileStreamProvider : IFileStreamProvider
+    public class FileManager : IFileManager
     {
         public Task CreateFolderIfNotExists(string folderPath, string folderName)
         {

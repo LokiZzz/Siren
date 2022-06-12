@@ -25,27 +25,7 @@ namespace Siren.ViewModels
         {
             InitializeMessagingCenter();
             SceneManager = DependencyService.Get<SceneManager>();
-            IntializeCollections().GetAwaiter().GetResult();
-        }
-
-        public Command CreateBundleCommand { get => new Command(async () => await TestBundleCreation()); }
-        private async Task TestBundleCreation()
-        {
-            IBundleService bundleService = DependencyService.Get<IBundleService>();
-            Bundle bundle = await SceneManager.GetCurrentBundle();
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TestBundle.siren");
-
-            await bundleService.SaveBundleAsync(bundle, fileName);
-        }
-
-        public Command LoadBundleCommand { get => new Command(async () => await LoadBundle()); }
-        private async Task LoadBundle()
-        {
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TestBundle.siren");
-            IBundleService bundleService = DependencyService.Get<IBundleService>();
-            Bundle bundle = await bundleService.LoadBundleAsync(fileName);
-
-            await bundleService.SaveBundleAsync(bundle, fileName);
+            IntializeCollections();
         }
 
         private async Task GoToAddSetting()
@@ -93,7 +73,9 @@ namespace Siren.ViewModels
             if (wantToDelete)
             {
                 setting.DeleteImageFile();
+
                 setting.Scenes.ForEach(x => x.DeleteImageFile());
+
                 setting.Scenes.Clear();
                 setting.Elements.ForEach(x => x.Dispose());
                 setting.Elements.Clear();
@@ -271,9 +253,9 @@ namespace Siren.ViewModels
             SceneManager.SaveCurrentSettings(Settings);
         }
 
-        private async Task IntializeCollections()
+        private void IntializeCollections()
         {
-            Settings = await SceneManager.GetCurrentSettings();
+            Settings = SceneManager.GetCurrentSettings();
             SelectedSetting = Settings.FirstOrDefault();
 
             Settings.CollectionChanged += BindNewSettingEvents;

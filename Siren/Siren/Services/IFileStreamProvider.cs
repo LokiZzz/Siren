@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Siren.Services
 {
-    public interface IFileStreamProvider
+    public interface IFileManager
     {
         ValueTask<Stream> GetStreamToReadAsync(string filePath);
         ValueTask<Stream> GetStreamToWriteAsync(string filePath);

@@ -13,10 +13,10 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using static System.Net.WebRequestMethods;
 
-[assembly: Dependency(typeof(FileStreamProvider))]
+[assembly: Dependency(typeof(FileManager))]
 namespace Siren.UWP.Services
 {
-    public class FileStreamProvider : IFileStreamProvider
+    public class FileManager : IFileManager
     {
         public async Task CreateFolderIfNotExists(string folderPath, string folderName)
         {

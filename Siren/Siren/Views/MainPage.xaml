@@ -15,11 +15,7 @@
     <Grid RowDefinitions="auto,auto,*,*,auto" ColumnDefinitions="320,*" ColumnSpacing="0" RowSpacing="0">
 
         <Grid Grid.Row="0" Grid.Column="0" BackgroundColor="{StaticResource VeryDark}">
-            <!--<Button Text="Add Setting" Command="{Binding AddSettingCommand}" HorizontalOptions="Start" Margin="10" CornerRadius="3"/>-->
-            <StackLayout Orientation="Horizontal">
-                <Button Text="Create!!!" Command="{Binding CreateBundleCommand}" HorizontalOptions="Start" Margin="10" CornerRadius="3"/>
-                <Button Text="Load!!!" Command="{Binding LoadBundleCommand}" HorizontalOptions="Start" Margin="10" CornerRadius="3"/>
-            </StackLayout>
+            <Button Text="Add Setting" Command="{Binding AddSettingCommand}" HorizontalOptions="Start" Margin="10" CornerRadius="3"/>
         </Grid>
 
         <Grid Grid.Row="0" Grid.Column="1" BackgroundColor="{StaticResource VeryDark}">
@@ -43,7 +39,7 @@
             </ScrollView>
         </Grid>
 
-        <Grid Grid.Row="1" Grid.Column="1" HeightRequest="100" BackgroundColor="{StaticResource Dark}">
+        <Grid Grid.Row="1" Grid.Column="1" HeightRequest="100" BackgroundColor="{StaticResource Medium}">
             <ScrollView Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
                 <StackLayout x:Name="ScenesList" Grid.Row="0" BindableLayout.ItemsSource="{Binding SelectedSetting.Scenes}" Orientation="Horizontal" Spacing="0">
                     <BindableLayout.ItemTemplate>
