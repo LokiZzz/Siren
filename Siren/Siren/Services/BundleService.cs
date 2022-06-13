@@ -83,7 +83,7 @@ namespace Siren.Services
                 Bundle = bundleCopy,
                 CompressedFiles = new List<CompressedFileInfo>()
             };
-            List<string> filesToCompress = GetAllFileFromBundle(bundleCopy);
+            List<string> filesToCompress = GetAllFilesFromBundle(bundleCopy);
 
             //Create a gap for metadata frame and write compressed data;
             using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
@@ -97,12 +97,15 @@ namespace Siren.Services
                     {
                         using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(file))
                         {
+                            byte[] fileProba = await GetBytes(sourceStream, 0, 100);
+                            byte[] fileProba2 = await GetBytes(sourceStream, (int)(sourceStream.Length-10), 10);
+
                             await sourceStream.CopyToAsync(compressionStream);
 
                             metadata.CompressedFiles.Add(new CompressedFileInfo
                             {
                                 Name = Path.GetFileName(file),
-                                CompressedSizeBytes = sourceStream.Length,
+                                SizeBytes = sourceStream.Length,
                             });
                         }
                     }
@@ -137,6 +140,8 @@ namespace Siren.Services
                     metadata.Bundle.Name
                 );
 
+                byte[] firstFileCompressed = await GetBytes(sourceStream, _metadataFrameSize, 5);
+
                 using (GZipStream decompressionStream = new GZipStream(sourceStream, CompressionMode.Decompress))
                 {
                     foreach (CompressedFileInfo file in metadata.CompressedFiles)
@@ -145,9 +150,11 @@ namespace Siren.Services
 
                         using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(path))
                         {
-                            byte[] singleFileChunk = new byte[file.CompressedSizeBytes];
+                            byte[] singleFileChunk = new byte[file.SizeBytes];
                             await decompressionStream.ReadAsync(singleFileChunk, 0, singleFileChunk.Length);
                             await targetStream.WriteAsync(singleFileChunk, 0, singleFileChunk.Length);
+
+                            //Посмотреть хвост файла!!!
                         }
                     }
                 }
@@ -204,7 +211,7 @@ namespace Siren.Services
             return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytesToDeserialize));
         }
 
-        private List<string> GetAllFileFromBundle(Bundle bundle)
+        private List<string> GetAllFilesFromBundle(Bundle bundle)
         {
             IEnumerable<string> elements = bundle.Settings.SelectMany(x => x.Elements).Select(x => x.FilePath);
             IEnumerable<string> effects = bundle.Settings.SelectMany(x => x.Effects).Select(x => x.FilePath);
@@ -214,6 +221,19 @@ namespace Siren.Services
                 .Where(x => !string.IsNullOrEmpty(x)); ;
 
             return elements.Union(effects).Union(settingsImages).Union(scenesImages).ToList();
+        }
+
+        private async Task<byte[]> GetBytes(Stream stream, int from, int size)
+        {
+            long initialPosition = stream.Position;
+
+            byte[] output = new byte[size];
+            stream.Position = from;
+            await stream.ReadAsync(output, 0, size);
+
+            stream.Position = initialPosition;
+
+            return output;
         }
     }
 
@@ -226,6 +246,6 @@ namespace Siren.Services
     public class CompressedFileInfo
     {
         public string Name { get; set; }
-        public long CompressedSizeBytes { get; set; }
+        public long SizeBytes { get; set; }
     }
 }
