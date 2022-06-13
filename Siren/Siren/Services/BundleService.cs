@@ -26,9 +26,9 @@ namespace Siren.Services
         {
             _fileManager = DependencyService.Resolve<IFileManager>();
 
-            string source = @"F:\Temp\hxeo3tbudtk61.jpg";
-            string targetCompressed = @"F:\Temp\hxeo3tbudtk61.gzip";
-            string targetDecompressed = @"F:\Temp\hxeo3tbudtk61_Uncompressed.jpg";
+            string source = @"F:\Temp\123.jpg";
+            string targetCompressed = @"F:\Temp\123.gzip";
+            string targetDecompressed = @"F:\Temp\123_Uncompressed.jpg";
 
             //Compress
             using (Stream fsTarget = await _fileManager.GetStreamToWriteAsync(targetCompressed))
@@ -208,8 +208,10 @@ namespace Siren.Services
         {
             IEnumerable<string> elements = bundle.Settings.SelectMany(x => x.Elements).Select(x => x.FilePath);
             IEnumerable<string> effects = bundle.Settings.SelectMany(x => x.Effects).Select(x => x.FilePath);
-            IEnumerable<string> settingsImages = bundle.Settings.Select(x => x.ImagePath);
-            IEnumerable<string> scenesImages = bundle.Settings.SelectMany(x => x.Scenes).Select(x => x.ImagePath);
+            IEnumerable<string> settingsImages = bundle.Settings.Select(x => x.ImagePath)
+                .Where(x => !string.IsNullOrEmpty(x));
+            IEnumerable<string> scenesImages = bundle.Settings.SelectMany(x => x.Scenes).Select(x => x.ImagePath)
+                .Where(x => !string.IsNullOrEmpty(x)); ;
 
             return elements.Union(effects).Union(settingsImages).Union(scenesImages).ToList();
         }

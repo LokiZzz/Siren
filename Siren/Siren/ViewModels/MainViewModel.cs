@@ -72,8 +72,10 @@ namespace Siren.ViewModels
 
             if (wantToDelete)
             {
+                //If other settings does not use Image, then:
                 setting.DeleteImageFile();
 
+                //If other scenes of other settings does not use Image, then:
                 setting.Scenes.ForEach(x => x.DeleteImageFile());
 
                 setting.Scenes.Clear();
@@ -285,6 +287,7 @@ namespace Siren.ViewModels
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SettingAdded, AddSetting);
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SceneAdded, AddScene);
             MessagingCenter.Subscribe<AddOrEditComponentViewModel>(this, Messages.IllustratedCardEdited, (manager) => SaveCurrentBundle());
+            MessagingCenter.Subscribe<BundlePageViewModel>(this, Messages.NeedToUpdateEnvironment, (manager) => IntializeCollections());
         }
 
         public Command AddSettingCommand { get => new Command(async () => await GoToAddSetting()); }

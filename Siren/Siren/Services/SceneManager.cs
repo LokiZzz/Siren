@@ -35,18 +35,22 @@ namespace Siren.Services
         }
 
         public IllustratedCardViewModel IllustratedCardToEdit { get; set; }
-
         public SceneComponentViewModel ComponentToEdit { get; set; }
 
         private string _currentEnvironmentFileName = "current-env.json";
 
-        public void SaveCurrentSettings(ObservableCollection<SettingViewModel> settings)
+        public void SaveCurrentSettings(List<Setting> settings)
         {
-            Bundle bundle = new Bundle { Settings = settings.Select(x => x.ToModel()).ToList() };
+            Bundle bundle = new Bundle { Settings = settings };
             string content = JsonConvert.SerializeObject(bundle);
 
             string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _currentEnvironmentFileName);
             File.WriteAllText(fileName, content);
+        }
+
+        public void SaveCurrentSettings(ObservableCollection<SettingViewModel> settings)
+        {
+            SaveCurrentSettings(settings.Select(x => x.ToModel()).ToList());
         }
 
         public Bundle GetCurrentAgregatedBundle()

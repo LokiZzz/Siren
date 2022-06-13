@@ -1,4 +1,5 @@
-﻿using Siren.Models;
+﻿using Siren.Messaging;
+using Siren.Models;
 using Siren.Services;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,12 @@ namespace Siren.ViewModels
 {
     public class BundlePageViewModel : BaseViewModel
     {
+        public Command TestCommand { get => new Command(async () => await Test()); }
+        private async Task Test()
+        {
+            await BundleService.Test();
+        }
+
         private SceneManager SceneManager { get; }
         private IBundleService BundleService { get; }
 
@@ -33,10 +40,9 @@ namespace Siren.ViewModels
             set { _newBundleName = value; }
         }
 
-
         public Command CreateCommand { get => new Command(async () => await CreateBundle()); }
         public Command InstallCommand { get => new Command(async () => await InstallBundle()); }
-        public Command ActivateCommand { get => new Command<Bundle>(async (bundle) => await ActivateBundle(bundle)); }
+        public Command ActivateCommand { get => new Command<Bundle>((bundle) => ActivateBundle(bundle)); }
         public Command DeactivateCommand { get => new Command<Bundle>(async (bundle) => await DeactivateBundle(bundle)); }
         public Command UninstallCommand { get => new Command<Bundle>(async (bundle) => await UninstallBundle(bundle)); }
 
@@ -56,15 +62,24 @@ namespace Siren.ViewModels
         {
             FileResult result = await FilePicker.PickAsync(GetSirenFilePickOption());
             Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath);
-            await ActivateBundle(unpackedBundle);
+            ActivateBundle(unpackedBundle);
         }
 
-        private async Task ActivateBundle(Bundle bundle)
+        private void ActivateBundle(Bundle newBundle)
         {
-            bundle.Settings
-                .Select(x => x.ToVM())
-                .ToList()
-                .ForEach(x => SceneManager.AddSetting(x));
+            Bundle currentEnv = SceneManager.GetCurrentAgregatedBundle();
+
+            if (currentEnv != null)
+            {
+                currentEnv.Settings.AddRange(newBundle.Settings);
+            }
+            else
+            {
+                currentEnv = newBundle;
+            }
+
+            SceneManager.SaveCurrentSettings(currentEnv.Settings);
+            MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
         }
 
         private Task DeactivateBundle(Bundle bundle)
@@ -75,11 +90,6 @@ namespace Siren.ViewModels
         private Task UninstallBundle(Bundle bundle)
         {
             throw new NotImplementedException();
-        }
-
-        private async Task TestBundleCreation()
-        {
-            
         }
 
         private async Task LoadBundle()
