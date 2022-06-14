@@ -16,12 +16,6 @@ namespace Siren.ViewModels
 {
     public class BundlePageViewModel : BaseViewModel
     {
-        public Command TestCommand { get => new Command(async () => await Test()); }
-        private async Task Test()
-        {
-            await BundleService.Test();
-        }
-
         private SceneManager SceneManager { get; }
         private IBundleService BundleService { get; }
 

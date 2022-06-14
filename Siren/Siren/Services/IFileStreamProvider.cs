@@ -10,6 +10,7 @@ namespace Siren.Services
     {
         ValueTask<Stream> GetStreamToReadAsync(string filePath);
         ValueTask<Stream> GetStreamToWriteAsync(string filePath);
-        Task CreateFolderIfNotExists(string folderPath, string folderName);
+        Task CreateFolderIfNotExistsAsync(string folderPath, string folderName);
+        Task DeleteFileAsync(string filePath);
     }
 }

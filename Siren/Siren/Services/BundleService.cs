@@ -1,7 +1,6 @@
 ﻿using Siren.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO.Compression;
 using System.IO;
 using System.Text;
@@ -17,47 +16,16 @@ namespace Siren.Services
     {
         Task SaveBundleAsync(Bundle bundle, string filePath);
         Task<Bundle> LoadBundleAsync(string filePath);
-        Task Test();
     }
 
     public class BundleService : IBundleService
     {
-        public async Task Test()
-        {
-            _fileManager = DependencyService.Resolve<IFileManager>();
-
-            string source = @"F:\Temp\123.jpg";
-            string targetCompressed = @"F:\Temp\123.gzip";
-            string targetDecompressed = @"F:\Temp\123_Uncompressed.jpg";
-
-            //Compress
-            using (Stream fsTarget = await _fileManager.GetStreamToWriteAsync(targetCompressed))
-            {
-                using (GZipStream gzsCompress = new GZipStream(fsTarget, CompressionMode.Compress))
-                {
-                    using (Stream fsSource = await _fileManager.GetStreamToReadAsync(source))
-                    {
-                        await fsSource.CopyToAsync(gzsCompress);
-                    }
-                }
-            }
-            //Decompress
-            using (Stream fsSource = await _fileManager.GetStreamToReadAsync(targetCompressed))
-            {
-                using (GZipStream gzsCompress = new GZipStream(fsSource, CompressionMode.Decompress))
-                {
-                    using (Stream fsTarget = await _fileManager.GetStreamToWriteAsync(targetDecompressed))
-                    {
-                        await gzsCompress.CopyToAsync(fsTarget);
-                    }
-                }
-            }
-        }
-
         IFileManager _fileManager;
 
         const int _metadataFrameSize = 128 * 1024; //128kB
         string _sirenFilePath = string.Empty;
+
+        string SirenTempFile => $"{_sirenFilePath}.temp";
 
         public async Task SaveBundleAsync(Bundle bundle, string filePath)
         {
@@ -77,6 +45,7 @@ namespace Siren.Services
 
         public async Task CreateBundleAsync(Bundle bundle)
         {
+            //1. Create bundle model for metadata
             Bundle bundleCopy = bundle.GetDeepCopy();
             SirenFileMetaData metadata = new SirenFileMetaData
             {
@@ -85,86 +54,200 @@ namespace Siren.Services
             };
             List<string> filesToCompress = GetAllFilesFromBundle(bundleCopy);
 
-            //Create a gap for metadata frame and write compressed data;
-            using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+            //2. Create a big melted file chunk to give it to the compressor (creating a *.siren.temp)
+
+            //2.1 Create a metadata frame gap
+            using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(SirenTempFile))
             {
-                await targetStream.WriteAsync(new byte[_metadataFrameSize], 0, _metadataFrameSize); //Create a gap
-                targetStream.Position = _metadataFrameSize; //Maybe delete this
-
-                using (GZipStream compressionStream = new GZipStream(targetStream, CompressionMode.Compress))
-                {
-                    foreach (string file in filesToCompress)
-                    {
-                        using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(file))
-                        {
-                            byte[] fileProba = await GetBytes(sourceStream, 0, 100);
-                            byte[] fileProba2 = await GetBytes(sourceStream, (int)(sourceStream.Length-10), 10);
-
-                            await sourceStream.CopyToAsync(compressionStream);
-
-                            metadata.CompressedFiles.Add(new CompressedFileInfo
-                            {
-                                Name = Path.GetFileName(file),
-                                SizeBytes = sourceStream.Length,
-                            });
-                        }
-                    }
-                }
-            }
-
-            //Write the metadata into frame to the begining of file;
-            using (FileStream targetStream = new FileStream(_sirenFilePath, FileMode.Open))
-            {
-                targetStream.Position = 0; //Maybe delete this
                 byte[] metadataFrame = new byte[_metadataFrameSize];
                 byte[] metadataActualBytes = ConvertToByteArray(metadata);
                 metadataActualBytes.CopyTo(metadataFrame, 0);
                 await targetStream.WriteAsync(metadataFrame, 0, _metadataFrameSize);
             }
+
+            //2.2 Add actual files 
+            foreach (string file in filesToCompress)
+            {
+                using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(file))
+                {
+                    using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(SirenTempFile))
+                    {
+                        await sourceStream.CopyToAsync(targetStream);
+                    }
+
+                    metadata.CompressedFiles.Add(new CompressedFileInfo
+                    {
+                        Name = Path.GetFileName(file),
+                        SizeBytesBefore = sourceStream.Length,
+                    });
+                }
+            }
+
+            //3. Create a compressed bundle (*.siren) file
+            using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+            {
+                using (GZipStream compressionStream = new GZipStream(targetStream, CompressionMode.Compress))
+                {
+                    using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(SirenTempFile))
+                    {
+                        await sourceStream.CopyToAsync(compressionStream);
+                    }
+                }
+            }
+
+            //4. Delete temp file
+            await _fileManager.DeleteFileAsync(SirenTempFile);
         }
+
+        //public async Task CreateBundleAsync(Bundle bundle)
+        //{
+        //    Bundle bundleCopy = bundle.GetDeepCopy();
+        //    SirenFileMetaData metadata = new SirenFileMetaData
+        //    {
+        //        Bundle = bundleCopy,
+        //        CompressedFiles = new List<CompressedFileInfo>()
+        //    };
+        //    List<string> filesToCompress = GetAllFilesFromBundle(bundleCopy);
+
+        //    //Create a gap for metadata frame and write compressed data;
+        //    using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+        //    {
+        //        await targetStream.WriteAsync(new byte[_metadataFrameSize], 0, _metadataFrameSize); //Create a gap
+
+        //        using (GZipStream compressionStream = new GZipStream(targetStream, CompressionMode.Compress))
+        //        {
+        //            foreach (string file in filesToCompress)
+        //            {
+        //                using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(file))
+        //                {
+        //                    long sizeBefore = targetStream.Length;
+        //                    await sourceStream.CopyToAsync(compressionStream);
+        //                    long sizeAfter = targetStream.Length;
+
+        //                    metadata.CompressedFiles.Add(new CompressedFileInfo
+        //                    {
+        //                        Name = Path.GetFileName(file),
+        //                        SizeBytesBefore = sourceStream.Length,
+        //                        SizeBytesAfter = sizeAfter - sizeBefore,
+        //                    });
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    //Write the metadata into frame to the begining of file;
+        //    using (FileStream targetStream = new FileStream(_sirenFilePath, FileMode.Open))
+        //    {
+        //        targetStream.Position = 0; //Maybe delete this
+        //        byte[] metadataFrame = new byte[_metadataFrameSize];
+        //        byte[] metadataActualBytes = ConvertToByteArray(metadata);
+        //        metadataActualBytes.CopyTo(metadataFrame, 0);
+        //        await targetStream.WriteAsync(metadataFrame, 0, _metadataFrameSize);
+        //    }
+        //}
 
         public async Task<Bundle> UnpackBundleAsync()
         {
-            //Read metadata file and decompress data;
+            SirenFileMetaData metadata = null;
+
+            //1. Unpack big melted chunk (*.siren.temp)
             using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
             {
-                byte[] metadataFrame = new byte[_metadataFrameSize];
-                await sourceStream.ReadAsync(metadataFrame, 0, _metadataFrameSize);
-                SirenFileMetaData metadata = ConvertToObject<SirenFileMetaData>(metadataFrame);
-                metadata.Bundle.Name = string.IsNullOrEmpty(metadata.Bundle.Name)
-                    ? Path.GetFileNameWithoutExtension(_sirenFilePath)
-                    : metadata.Bundle.Name;
-                sourceStream.Position = _metadataFrameSize;
-                await _fileManager.CreateFolderIfNotExists(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    metadata.Bundle.Name
-                );
-
-                byte[] firstFileCompressed = await GetBytes(sourceStream, _metadataFrameSize, 5);
-
                 using (GZipStream decompressionStream = new GZipStream(sourceStream, CompressionMode.Decompress))
-                {
-                    foreach (CompressedFileInfo file in metadata.CompressedFiles)
+{
+                    using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(SirenTempFile))
                     {
-                        string path = GetLocalAppDataBundleFilePath(file.Name, metadata.Bundle.Name);
-
-                        using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(path))
-                        {
-                            byte[] singleFileChunk = new byte[file.SizeBytes];
-                            await decompressionStream.ReadAsync(singleFileChunk, 0, singleFileChunk.Length);
-                            await targetStream.WriteAsync(singleFileChunk, 0, singleFileChunk.Length);
-
-                            //Посмотреть хвост файла!!!
-                        }
+                        await decompressionStream.CopyToAsync(targetStream);
                     }
                 }
-
-                //Bind bundle to brand new unpacked files
-                SetFilePathsToLocalAppData(metadata);
-
-                return metadata.Bundle;
             }
+
+            //2. Divide big chank to separate files and put it to the Bundle folder at LocalApp directory
+            using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(SirenTempFile))
+            {
+                //2.1 Get the metadata from metadata frame
+                metadata = await GetMetadataFromSirenFile(sourceStream);
+
+                //2.2 Divide file
+                foreach (CompressedFileInfo file in metadata.CompressedFiles)
+                {
+                    string path = GetLocalAppDataBundleFilePath(file.Name, metadata.Bundle.Name);
+
+                    using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(path))
+                    {
+                        byte[] buffer = new byte[file.SizeBytesBefore];
+                        await sourceStream.ReadAsync(buffer, 0, buffer.Length);
+                        await targetStream.WriteAsync(buffer, 0, buffer.Length);
+                    }
+                }
+            }
+
+            //3. Delete temp file
+            await _fileManager.DeleteFileAsync(SirenTempFile);
+
+            //4. Bind bundle to brand new unpacked files
+            SetFilePathsToLocalAppData(metadata);
+
+            return metadata.Bundle;
         }
+
+        private async Task<SirenFileMetaData> GetMetadataFromSirenFile(Stream sourceStream)
+        {
+            byte[] metadataFrame = new byte[_metadataFrameSize];
+            await sourceStream.ReadAsync(metadataFrame, 0, _metadataFrameSize);
+            SirenFileMetaData metadata = ConvertToObject<SirenFileMetaData>(metadataFrame);
+            metadata.Bundle.Name = string.IsNullOrEmpty(metadata.Bundle.Name)
+                ? Path.GetFileNameWithoutExtension(_sirenFilePath)
+                : metadata.Bundle.Name;
+
+            return metadata;
+        }
+
+        //public async Task<Bundle> UnpackBundleAsync()
+        //{
+        //    //Read metadata file and decompress data;
+        //    using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
+        //    {
+        //        byte[] metadataFrame = new byte[_metadataFrameSize];
+        //        await sourceStream.ReadAsync(metadataFrame, 0, _metadataFrameSize);
+        //        SirenFileMetaData metadata = ConvertToObject<SirenFileMetaData>(metadataFrame);
+        //        metadata.Bundle.Name = string.IsNullOrEmpty(metadata.Bundle.Name)
+        //            ? Path.GetFileNameWithoutExtension(_sirenFilePath)
+        //            : metadata.Bundle.Name;
+        //        sourceStream.Position = _metadataFrameSize;
+        //        await _fileManager.CreateFolderIfNotExists(
+        //            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        //            metadata.Bundle.Name
+        //        );
+
+        //        byte[] firstFileCompressed = await GetBytes(sourceStream, _metadataFrameSize, 5);
+
+        //        using (GZipStream decompressionStream = new GZipStream(sourceStream, CompressionMode.Decompress))
+        //        {
+        //            foreach (CompressedFileInfo file in metadata.CompressedFiles)
+        //            {
+        //                string path = GetLocalAppDataBundleFilePath(file.Name, metadata.Bundle.Name);
+
+        //                using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(path))
+        //                {
+        //                    byte[] singleFileChunk = new byte[file.SizeBytes];
+        //                    await decompressionStream.ReadAsync(singleFileChunk, 0, singleFileChunk.Length);
+        //                    await targetStream.WriteAsync(singleFileChunk, 0, singleFileChunk.Length);
+
+        //                    //Посмотреть хвост файла!!!
+        //                    byte[] fullFile = await GetBytes(targetStream, 0, (int)sourceStream.Length);
+        //                    string fileProba = await GetProba(targetStream, 0, 10);
+        //                    string fileProba2 = await GetProba(targetStream, (int)(sourceStream.Length - 10), 10);
+        //                }
+        //            }
+        //        }
+
+        //        //Bind bundle to brand new unpacked files
+        //        SetFilePathsToLocalAppData(metadata);
+
+        //        return metadata.Bundle;
+        //    }
+        //}
 
         private void SetFilePathsToLocalAppData(SirenFileMetaData metadata)
         {
@@ -223,6 +306,19 @@ namespace Siren.Services
             return elements.Union(effects).Union(settingsImages).Union(scenesImages).ToList();
         }
 
+        private async Task<string> GetProba(Stream stream, int from, int size)
+        {
+            byte[] bytes = await GetBytes(stream, from, size);
+            string output = string.Empty;
+
+            foreach(byte b in bytes)
+            {
+                output += b.ToString() + "\t";
+            }
+
+            return output;
+        }
+
         private async Task<byte[]> GetBytes(Stream stream, int from, int size)
         {
             long initialPosition = stream.Position;
@@ -246,6 +342,7 @@ namespace Siren.Services
     public class CompressedFileInfo
     {
         public string Name { get; set; }
-        public long SizeBytes { get; set; }
+        public long SizeBytesBefore { get; set; }
+        //public long SizeBytesAfter { get; set; }
     }
 }

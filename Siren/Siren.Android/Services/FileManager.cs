@@ -19,10 +19,17 @@ namespace Siren.Droid.Services
 {
     public class FileManager : IFileManager
     {
-        public Task CreateFolderIfNotExists(string folderPath, string folderName)
+        public Task CreateFolderIfNotExistsAsync(string folderPath, string folderName)
         {
             return Task.Run(() => 
                 Directory.CreateDirectory(Path.Combine(folderPath, folderName))
+            );
+        }
+
+        public Task DeleteFileAsync(string filePath)
+        {
+            return Task.Run(() =>
+                File.Delete(filePath)
             );
         }
 

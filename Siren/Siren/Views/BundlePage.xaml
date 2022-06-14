@@ -13,8 +13,6 @@
         <Grid RowDefinitions="auto,*">
 
             <StackLayout Orientation="Horizontal" Spacing="5">
-                <Button Text="Test command" Command="{Binding TestCommand}" WidthRequest="350"/>
-
                 <Button Text="Install" Command="{Binding InstallCommand}" WidthRequest="350"/>
                 <Label Text="If you want to create new bundle, enter the name and press «Create»:"
                        VerticalOptions="Center" VerticalTextAlignment="Center"/>

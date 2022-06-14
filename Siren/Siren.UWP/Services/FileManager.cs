@@ -18,10 +18,18 @@ namespace Siren.UWP.Services
 {
     public class FileManager : IFileManager
     {
-        public async Task CreateFolderIfNotExists(string folderPath, string folderName)
+        public async Task CreateFolderIfNotExistsAsync(string folderPath, string folderName)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(folderPath);
             await storageFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
+        }
+
+        public async Task DeleteFileAsync(string filePath)
+        {
+            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
+            StorageFile file = await storageFolder.GetFileAsync(Path.GetFileName(filePath));
+
+            await file.DeleteAsync();
         }
 
         public async ValueTask<Stream> GetStreamToReadAsync(string filePath)
