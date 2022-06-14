@@ -180,16 +180,16 @@ namespace Siren.Services
                 {
                     scene.ImagePath = GetLocalAppDataBundleFilePath(Path.GetFileName(scene.ImagePath), bundleName);
                     scene.ElementsSetup.ForEach(element => {
-                        element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(setting.ImagePath), bundleName);
+                        element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(element.FilePath), bundleName);
                     });
                 }
 
                 setting.Elements.ForEach(element => {
-                    element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(setting.ImagePath), bundleName);
+                    element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(element.FilePath), bundleName);
                 });
 
                 setting.Effects.ForEach(effect => {
-                    effect.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(setting.ImagePath), bundleName);
+                    effect.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(effect.FilePath), bundleName);
                 });
             }
         }

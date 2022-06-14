@@ -307,7 +307,12 @@ namespace Siren.ViewModels
         public Command SaveSceneCommand { get => new Command<string>(SaveScene); }
         public Command GlobalPlayCommand { get => new Command(async () => await GlobalPlayStop()); }
 
-        public ObservableCollection<SettingViewModel> Settings { get; set; } = new ObservableCollection<SettingViewModel>();
+        private ObservableCollection<SettingViewModel> _settings;
+        public ObservableCollection<SettingViewModel> Settings
+        {
+            get => _settings;
+            set => SetProperty(ref _settings, value);
+        }
 
         private SettingViewModel _selectedSetting;
         public SettingViewModel SelectedSetting

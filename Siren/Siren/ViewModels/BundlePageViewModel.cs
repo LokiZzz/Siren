@@ -56,7 +56,7 @@ namespace Siren.ViewModels
         {
             FileResult result = await FilePicker.PickAsync(GetSirenFilePickOption());
             Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath);
-            //ActivateBundle(unpackedBundle);
+            ActivateBundle(unpackedBundle);
         }
 
         private void ActivateBundle(Bundle newBundle)
