@@ -32,6 +32,13 @@ namespace Siren.UWP.Services
             await file.DeleteAsync();
         }
 
+        public async Task DeleteFolderAsync(string folderPath)
+        {
+            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(folderPath));
+
+            await storageFolder.DeleteAsync();
+        }
+
         public async ValueTask<Stream> GetStreamToReadAsync(string filePath)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));

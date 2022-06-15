@@ -77,10 +77,10 @@ namespace Siren.ViewModels
                     break;
                 case EAddOrEditIntent.Edit:
                     await Edit();
+                    MessagingCenter.Send(this, Messages.IllustratedCardEdited);
                     break;
             }
 
-            MessagingCenter.Send(this, Messages.IllustratedCardEdited);
             await Shell.Current.GoToAsync("..");
         }
 
@@ -171,7 +171,7 @@ namespace Siren.ViewModels
         {
             string imagePath = string.Empty;
 
-            if (Image != null)
+            if (Image != null && _imageFileResult != null)
             {
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(_imageFileResult.FullPath);
                 imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName);

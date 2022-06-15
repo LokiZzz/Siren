@@ -12,7 +12,7 @@
     <ContentPage.Content>
         <Grid RowDefinitions="auto,*">
 
-            <StackLayout Orientation="Horizontal" Spacing="5">
+            <StackLayout Grid.Row="0" Orientation="Horizontal" Spacing="5" Margin="0,15">
                 <Button Text="Install" Command="{Binding InstallCommand}" WidthRequest="350"/>
                 <Label Text="If you want to create new bundle, enter the name and press «Create»:"
                        VerticalOptions="Center" VerticalTextAlignment="Center"/>
@@ -21,10 +21,10 @@
             </StackLayout>
 
             <ScrollView Grid.Row="1" Orientation="Vertical">
-                <StackLayout x:Name="BundlesList" BindableLayout.ItemsSource="{Binding Bundles}" Spacing="0">
+                <StackLayout x:Name="BundlesList" BindableLayout.ItemsSource="{Binding Bundles}" Spacing="15" Margin="15">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Frame>
+                            <Frame BackgroundColor="{StaticResource VeryDark}">
                                 <Grid RowDefinitions="*,*,*" ColumnDefinitions="*,*,*">
                                     <Label Grid.Row="0" Grid.ColumnSpan="3" Text="{Binding Name}"/>
 
@@ -38,7 +38,7 @@
                                             Command="{Binding BindingContext.UninstallCommand,Source={x:Reference BundlesList}}" 
                                                 CommandParameter="{Binding .}"/>
 
-                                    <ProgressBar Progress="0.75"/>
+                                    <ProgressBar Grid.Row="2" Grid.ColumnSpan="3" Progress="0.75"/>
                                 </Grid>
                             </Frame>
                         </DataTemplate>

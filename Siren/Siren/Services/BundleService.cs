@@ -16,6 +16,7 @@ namespace Siren.Services
     {
         Task SaveBundleAsync(Bundle bundle, string filePath);
         Task<Bundle> LoadBundleAsync(string filePath);
+        Task DeleteBundleFilesAsync(Guid bundleId);
     }
 
     public class BundleService : IBundleService
@@ -47,6 +48,8 @@ namespace Siren.Services
         {
             //1. Create bundle model for metadata
             Bundle bundleCopy = bundle.GetDeepCopy();
+            bundleCopy.Id = Guid.NewGuid();
+            bundleCopy.Settings.ForEach(x => x.BundleId = bundleCopy.Id);
             SirenFileMetaData metadata = new SirenFileMetaData
             {
                 Bundle = bundleCopy,
@@ -130,13 +133,13 @@ namespace Siren.Services
                 //2.2 Create bundle folder if it is not exists
                 await _fileManager.CreateFolderIfNotExistsAsync(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    metadata.Bundle.Name
+                    metadata.Bundle.Id.ToString()
                 );
 
                 //2.3 Divide file
                 foreach (CompressedFileInfo file in metadata.CompressedFiles)
                 {
-                    string path = GetLocalAppDataBundleFilePath(file.Name, metadata.Bundle.Name);
+                    string path = GetLocalAppDataBundleFilePath(file.Name, metadata.Bundle.Id);
 
                     using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(path))
                     {
@@ -156,6 +159,17 @@ namespace Siren.Services
             return metadata.Bundle;
         }
 
+        public async Task DeleteBundleFilesAsync(Guid dundleId)
+        {
+            _fileManager = DependencyService.Resolve<IFileManager>();
+            string path = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                dundleId.ToString()
+            );
+
+            await _fileManager.DeleteFileAsync(path);
+        }
+
         private async Task<SirenFileMetaData> GetMetadataModel(Stream sourceStream)
         {
             byte[] metadataFrame = new byte[_metadataFrameSize];
@@ -170,35 +184,35 @@ namespace Siren.Services
 
         private void SetFilePathsToLocalAppData(SirenFileMetaData metadata)
         {
-            string bundleName = metadata.Bundle.Name;
+            Guid bundleId = metadata.Bundle.Id;
 
             foreach (Setting setting in metadata.Bundle.Settings)
             {
-                setting.ImagePath = GetLocalAppDataBundleFilePath(Path.GetFileName(setting.ImagePath), bundleName);
+                setting.ImagePath = GetLocalAppDataBundleFilePath(Path.GetFileName(setting.ImagePath), bundleId);
 
                 foreach (Scene scene in setting.Scenes)
                 {
-                    scene.ImagePath = GetLocalAppDataBundleFilePath(Path.GetFileName(scene.ImagePath), bundleName);
+                    scene.ImagePath = GetLocalAppDataBundleFilePath(Path.GetFileName(scene.ImagePath), bundleId);
                     scene.ElementsSetup.ForEach(element => {
-                        element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(element.FilePath), bundleName);
+                        element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(element.FilePath), bundleId);
                     });
                 }
 
                 setting.Elements.ForEach(element => {
-                    element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(element.FilePath), bundleName);
+                    element.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(element.FilePath), bundleId);
                 });
 
                 setting.Effects.ForEach(effect => {
-                    effect.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(effect.FilePath), bundleName);
+                    effect.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(effect.FilePath), bundleId);
                 });
             }
         }
 
-        private string GetLocalAppDataBundleFilePath(string fileName, string bundleName)
+        private string GetLocalAppDataBundleFilePath(string fileName, Guid bundleId)
         {
             return Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                bundleName,
+                bundleId.ToString(),
                 fileName
             );
         }

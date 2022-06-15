@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Siren.Messaging;
 using Siren.Models;
+using Siren.Utility;
 using Siren.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,13 @@ namespace Siren.Services
 {
     public class SceneManager
     {
-        public SettingViewModel SelectedSetting { get; set; }
+        private string _currentEnvironmentFileName = "current-env.json";
 
+        public IllustratedCardViewModel IllustratedCardToEdit { get; set; }
+        public SceneComponentViewModel ComponentToEdit { get; set; }
         public SettingViewModel SettingToAdd { get; private set; }
+        public SettingViewModel SelectedSetting { get; set; }
+        public SceneViewModel SceneToAdd { get; private set; }
 
         public void AddSetting(SettingViewModel setting)
         {
@@ -26,56 +31,77 @@ namespace Siren.Services
             MessagingCenter.Send(this, Messages.SettingAdded);
         }
 
-        public SceneViewModel SceneToAdd { get; private set; }
-
         public void AddScene(SceneViewModel scene)
         {
             SceneToAdd = scene;
             MessagingCenter.Send(this, Messages.SceneAdded);
         }
 
-        public IllustratedCardViewModel IllustratedCardToEdit { get; set; }
-        public SceneComponentViewModel ComponentToEdit { get; set; }
-
-        private string _currentEnvironmentFileName = "current-env.json";
-
-        public void SaveCurrentSettings(List<Setting> settings)
+        public void SaveEnvironment(List<Bundle> bundles)
         {
-            Bundle bundle = new Bundle { Settings = settings };
-            string content = JsonConvert.SerializeObject(bundle);
-
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _currentEnvironmentFileName);
-            File.WriteAllText(fileName, content);
+            LocalDataHelper.WriteToTheLocalAppFile(bundles, _currentEnvironmentFileName);
         }
 
-        public void SaveCurrentSettings(ObservableCollection<SettingViewModel> settings)
+        public List<Bundle> GetEnvironment()
         {
-            SaveCurrentSettings(settings.Select(x => x.ToModel()).ToList());
-        }
-
-        public Bundle GetCurrentAgregatedBundle()
-        {
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), _currentEnvironmentFileName);
-            if (File.Exists(fileName))
-            {
-                string content = File.ReadAllText(fileName);
-
-                return JsonConvert.DeserializeObject<Bundle>(content);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public ObservableCollection<SettingViewModel> GetCurrentSettings()
-        {
-            Bundle bundle = GetCurrentAgregatedBundle();
+            List<Bundle> environment = LocalDataHelper.GetObjectFromLocalAppFile<List<Bundle>>(_currentEnvironmentFileName);
             
-            return bundle != null
-                ? bundle.Settings.Select(x => x.ToVM()).ToObservableCollection()
-                : new ObservableCollection<SettingViewModel>();
+            return environment ?? new List<Bundle>();
+        }
+
+        public List<Setting> GetSettingsFromCurrentEnvironment(bool onlyActivatedBundles = true)
+        {
+            List<Setting> currentEnvironment = new List<Setting>();
+            List<Bundle> bundles = GetEnvironment();
+
+            if (bundles != null && bundles.Any())
+            {
+                if (onlyActivatedBundles)
+                {
+                    bundles = bundles.Where(x => x.IsActivated).ToList();
+                }
+
+                currentEnvironment = bundles.SelectMany(x => x.Settings).ToList();
+            }
+
+            return currentEnvironment;
+        }
+
+        public ObservableCollection<SettingViewModel> GetVMFromCurrentEnvironment(bool onlyActivatedBundles = true)
+        {
+            ObservableCollection<SettingViewModel> currentEnvironment = new ObservableCollection<SettingViewModel>();
+            List<Setting> settings = GetSettingsFromCurrentEnvironment(onlyActivatedBundles);
+            
+            if(settings != null && settings.Any())
+            {
+                currentEnvironment = settings.Select(x => x.ToVM()).ToObservableCollection();
+            }
+
+            return currentEnvironment;
+        }
+
+        public void SaveCurrentEnvironment(ObservableCollection<SettingViewModel> settings)
+        {
+            List<Bundle> environment = GetEnvironment();
+
+            if(!environment.Any(x => x.Id == Guid.Empty))
+            {
+                environment.Add(new Bundle 
+                {
+                    Id = Guid.Empty,
+                    Name = "DefaultBundle",
+                    Settings = new List<Setting>(),
+                    IsActivated = true
+                });
+            }
+
+            //Rewrite all settings to specific bundles (including DefaultBundle)
+            foreach (Bundle bundle in environment)
+            {
+                bundle.Settings = settings.Where(x => x.BundleId == bundle.Id).Select(x => x.ToModel()).ToList();
+            }
+
+            SaveEnvironment(environment);
         }
     }
-
 }

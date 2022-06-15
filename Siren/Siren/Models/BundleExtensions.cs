@@ -14,6 +14,7 @@ namespace Siren.Models
         {
             return new Setting
             {
+                BundleId = vm.BundleId,
                 Name = vm.Name,
                 ImagePath = vm.ImagePath,
                 Scenes = vm.Scenes.Select(x => x.ToModel()).ToList(),
@@ -54,6 +55,7 @@ namespace Siren.Models
         {
             return new SettingViewModel
             {
+                BundleId = m.BundleId,
                 Name = m.Name,
                 ImagePath = m.ImagePath,
                 Scenes = m.Scenes.Select(x => x.ToVM()).ToObservableCollection(),

@@ -23,9 +23,13 @@ namespace Siren.ViewModels
         {
             SceneManager = DependencyService.Get<SceneManager>();
             BundleService = DependencyService.Get<IBundleService>();
+
+            Bundles = SceneManager.GetEnvironment()
+                .Where(x => x.Id != Guid.Empty)
+                .ToObservableCollection();
         }
 
-        public ObservableCollection<Bundle> Bundles { get; set; }
+        public ObservableCollection<Bundle> Bundles { get; set; } = new ObservableCollection<Bundle>();
 
         private string _newBundleName;
         public string NewBundleName
@@ -36,14 +40,18 @@ namespace Siren.ViewModels
 
         public Command CreateCommand { get => new Command(async () => await CreateBundle()); }
         public Command InstallCommand { get => new Command(async () => await InstallBundle()); }
-        public Command ActivateCommand { get => new Command<Bundle>((bundle) => ActivateBundle(bundle)); }
-        public Command DeactivateCommand { get => new Command<Bundle>(async (bundle) => await DeactivateBundle(bundle)); }
-        public Command UninstallCommand { get => new Command<Bundle>(async (bundle) => await UninstallBundle(bundle)); }
+        public Command ActivateCommand { get => new Command<Bundle>((bundle) => ActivateBundle(bundle.Id)); }
+        public Command DeactivateCommand { get => new Command<Bundle>((bundle) => DeactivateBundle(bundle.Id)); }
+        public Command UninstallCommand { get => new Command<Bundle>(async (bundle) => await UninstallBundle(bundle.Id)); }
 
         private async Task CreateBundle()
         {
-            Bundle bundle = SceneManager.GetCurrentAgregatedBundle();
-            bundle.Name = _newBundleName;
+            Bundle bundle = new Bundle 
+            {
+                Name = _newBundleName,
+                Settings = SceneManager.GetSettingsFromCurrentEnvironment() 
+            };
+
             string fileName = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
                 GetNewBundleFileName()
@@ -55,43 +63,47 @@ namespace Siren.ViewModels
         private async Task InstallBundle()
         {
             FileResult result = await FilePicker.PickAsync(GetSirenFilePickOption());
-            Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath);
-            ActivateBundle(unpackedBundle);
+
+            if (result != null)
+            {
+                Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath);
+                Bundles.Add(unpackedBundle);
+
+                List<Bundle> bundles = SceneManager.GetEnvironment();
+                bundles.Add(unpackedBundle);
+                SceneManager.SaveEnvironment(bundles);
+
+                ActivateBundle(unpackedBundle.Id);
+            }
         }
 
-        private void ActivateBundle(Bundle newBundle)
+        private void ActivateBundle(Guid bundleId) => SetBundleIsActivatedProperty(bundleId, true);
+
+        private void DeactivateBundle(Guid bundleId) => SetBundleIsActivatedProperty(bundleId, false);
+
+        private async Task UninstallBundle(Guid bundleId)
         {
-            Bundle currentEnv = SceneManager.GetCurrentAgregatedBundle();
+            //Delete from environment
+            List<Bundle> bundles = SceneManager.GetEnvironment();
+            Bundle bundleToRemove = bundles.FirstOrDefault(x => x.Id == bundleId);
+            bundles.Remove(bundleToRemove);
+            SceneManager.SaveEnvironment(bundles);
 
-            if (currentEnv != null)
-            {
-                currentEnv.Settings.AddRange(newBundle.Settings);
-            }
-            else
-            {
-                currentEnv = newBundle;
-            }
+            //Delete files
+            await BundleService.DeleteBundleFilesAsync(bundleId);
 
-            SceneManager.SaveCurrentSettings(currentEnv.Settings);
+            //Update MainViewModel
             MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
         }
 
-        private Task DeactivateBundle(Bundle bundle)
+        private void SetBundleIsActivatedProperty(Guid id, bool isActivated)
         {
-            throw new NotImplementedException();
-        }
+            List<Bundle> bundles = SceneManager.GetEnvironment();
+            Bundle bundleToActivate = bundles.FirstOrDefault(x => x.Id == id);
+            bundleToActivate.IsActivated = isActivated;
+            SceneManager.SaveEnvironment(bundles);
 
-        private Task UninstallBundle(Bundle bundle)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task LoadBundle()
-        {
-            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TestBundle.siren");
-            Bundle bundle = await BundleService.LoadBundleAsync(fileName);
-
-            await BundleService.SaveBundleAsync(bundle, fileName);
+            MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
         }
 
         private PickOptions GetSirenFilePickOption()

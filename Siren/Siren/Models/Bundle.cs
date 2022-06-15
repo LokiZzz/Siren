@@ -6,12 +6,15 @@ namespace Siren.Models
 {
     public class Bundle
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public List<Setting> Settings { get; set; }
+        public bool IsActivated { get; set; }
     }
 
     public class Setting
     {
+        public Guid BundleId { get; set; }
         public string Name { get; set; }
         public string ImagePath { get; set; }
         public List<Scene> Scenes { get; set; }

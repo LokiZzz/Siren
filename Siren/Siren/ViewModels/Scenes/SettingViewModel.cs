@@ -19,6 +19,8 @@ namespace Siren.ViewModels
             Effects = new ObservableCollection<SceneComponentViewModel>();
         }
 
+        public Guid BundleId { get; set; }
+
         public bool _isSelected;
         public bool IsSelected 
         { 

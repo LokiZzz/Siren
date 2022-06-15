@@ -171,7 +171,7 @@ namespace Siren.ViewModels
 
             SelectedScene.Elements = new ObservableCollection<TrackSetupViewModel>(playingElements);
 
-            SaveCurrentBundle();
+            SaveCurrentEnvironment();
         }
 
         private async Task AddElements()
@@ -250,19 +250,21 @@ namespace Siren.ViewModels
             OnPropertyChanged(nameof(IsScenePlaying));
         }
 
-        private void SaveCurrentBundle()
+        private void SaveCurrentEnvironment(object sender, NotifyCollectionChangedEventArgs e) => SaveCurrentEnvironment();
+
+        private void SaveCurrentEnvironment()
         {
-            SceneManager.SaveCurrentSettings(Settings);
+            SceneManager.SaveCurrentEnvironment(Settings);
         }
 
         private void IntializeCollections()
         {
-            Settings = SceneManager.GetCurrentSettings();
+            Settings = SceneManager.GetVMFromCurrentEnvironment();
             SelectedSetting = Settings.FirstOrDefault();
 
             Settings.CollectionChanged += BindNewSettingEvents;
-            Settings.CollectionChanged += SaveCurrentBundle;
-            Settings.ForEach(x => x.SettingChanged += SaveCurrentBundle);
+            Settings.CollectionChanged += SaveCurrentEnvironment;
+            Settings.ForEach(x => x.SettingChanged += SaveCurrentEnvironment);
         }
 
         private void BindNewSettingEvents(object sender, NotifyCollectionChangedEventArgs e)
@@ -271,14 +273,9 @@ namespace Siren.ViewModels
             {
                 foreach(SettingViewModel item in e.NewItems)
                 {
-                    item.SettingChanged += SaveCurrentBundle;
+                    item.SettingChanged += SaveCurrentEnvironment;
                 }
             }
-        }
-
-        private void SaveCurrentBundle(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            SaveCurrentBundle();
         }
 
         private void InitializeMessagingCenter()
@@ -286,7 +283,7 @@ namespace Siren.ViewModels
             MessagingCenter.Subscribe<SceneComponentViewModel>(this, Messages.ElementPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsScenePlaying)));
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SettingAdded, AddSetting);
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SceneAdded, AddScene);
-            MessagingCenter.Subscribe<AddOrEditComponentViewModel>(this, Messages.IllustratedCardEdited, (manager) => SaveCurrentBundle());
+            MessagingCenter.Subscribe<AddOrEditComponentViewModel>(this, Messages.IllustratedCardEdited, (manager) => SaveCurrentEnvironment());
             MessagingCenter.Subscribe<BundlePageViewModel>(this, Messages.NeedToUpdateEnvironment, (manager) => IntializeCollections());
         }
 

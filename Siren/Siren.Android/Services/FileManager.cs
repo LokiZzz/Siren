@@ -33,6 +33,13 @@ namespace Siren.Droid.Services
             );
         }
 
+        public Task DeleteFolderAsync(string folderPath)
+        {
+            return Task.Run(() =>
+                Directory.Delete(folderPath)
+            );
+        }
+
         public async ValueTask<Stream> GetStreamToReadAsync(string filePath)
         {
             return await Task.FromResult(new FileStream(filePath, FileMode.Open));
