@@ -89,11 +89,14 @@ namespace Siren.ViewModels
             bundles.Remove(bundleToRemove);
             SceneManager.SaveEnvironment(bundles);
 
+            //Update MainViewModel
+            MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
+
             //Delete files
             await BundleService.DeleteBundleFilesAsync(bundleId);
 
-            //Update MainViewModel
-            MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
+            //Delete local VM
+            Bundles.Remove(Bundles.First(x => x.Id == bundleId));
         }
 
         private void SetBundleIsActivatedProperty(Guid id, bool isActivated)

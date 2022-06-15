@@ -72,12 +72,8 @@ namespace Siren.ViewModels
 
             if (wantToDelete)
             {
-                //If other settings does not use Image, then:
                 setting.DeleteImageFile();
-
-                //If other scenes of other settings does not use Image, then:
                 setting.Scenes.ForEach(x => x.DeleteImageFile());
-
                 setting.Scenes.Clear();
                 setting.Elements.ForEach(x => x.Dispose());
                 setting.Elements.Clear();
@@ -317,17 +313,16 @@ namespace Siren.ViewModels
             get => _selectedSetting;
             set
             {
-                if (value == null)
-                {
-                    return;
-                }
-
                 SetProperty(ref _selectedSetting, value);
-                foreach (SettingViewModel item in Settings)
-                {
-                    item.IsSelected = false;
+
+                if(value != null)
+                { 
+                    foreach (SettingViewModel item in Settings)
+                    {
+                        item.IsSelected = false;
+                    }
+                    SelectedSetting.IsSelected = true;
                 }
-                SelectedSetting.IsSelected = true;
             }
         }
 

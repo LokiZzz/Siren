@@ -31,8 +31,7 @@ namespace Siren.ViewModels
                 _imagePath = value;
                 if (!string.IsNullOrEmpty(_imagePath))
                 {
-                    Stream stream = File.OpenRead(_imagePath);
-                    Image = ImageSource.FromStream(() => stream);
+                    Image = ImageSource.FromStream(() => File.OpenRead(_imagePath));
                 }
                 OnPropertyChanged(nameof(Image));
             }
@@ -40,6 +39,9 @@ namespace Siren.ViewModels
 
         public void DeleteImageFile()
         {
+            Image.Cancel();
+            Image = null;
+
             if (File.Exists(ImagePath))
             {
                 File.Delete(ImagePath);

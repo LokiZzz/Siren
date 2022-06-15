@@ -159,15 +159,15 @@ namespace Siren.Services
             return metadata.Bundle;
         }
 
-        public async Task DeleteBundleFilesAsync(Guid dundleId)
+        public async Task DeleteBundleFilesAsync(Guid bundleId)
         {
             _fileManager = DependencyService.Resolve<IFileManager>();
             string path = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                dundleId.ToString()
+                bundleId.ToString()
             );
 
-            await _fileManager.DeleteFileAsync(path);
+            await _fileManager.DeleteFolderAsync(path);
         }
 
         private async Task<SirenFileMetaData> GetMetadataModel(Stream sourceStream)
