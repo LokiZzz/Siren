@@ -9,6 +9,7 @@ using System.Linq;
 using Xamarin.Forms;
 using Newtonsoft.Json;
 using Siren.Utility;
+using static System.Net.WebRequestMethods;
 
 namespace Siren.Services
 {
@@ -17,6 +18,9 @@ namespace Siren.Services
         Task SaveBundleAsync(Bundle bundle, string filePath);
         Task<Bundle> LoadBundleAsync(string filePath);
         Task DeleteBundleFilesAsync(Guid bundleId);
+
+        event EventHandler<ProcessingProgress> OnCreateProgressUpdate;
+        event EventHandler<ProcessingProgress> OnInstallProgressUpdate;
     }
 
     public class BundleService : IBundleService
@@ -28,7 +32,8 @@ namespace Siren.Services
 
         string SirenTempFile => $"{_sirenFilePath}.temp";
 
-        public event EventHandler<ProcessingProgress> OnProgressUpdate;
+        public event EventHandler<ProcessingProgress> OnCreateProgressUpdate;
+        public event EventHandler<ProcessingProgress> OnInstallProgressUpdate;
 
         public async Task SaveBundleAsync(Bundle bundle, string filePath)
         {
@@ -84,7 +89,7 @@ namespace Siren.Services
                     });
                 }
 
-                OnProgressUpdate(this, new ProcessingProgress(
+                OnCreateProgressUpdate(this, new ProcessingProgress(
                     (filesToCompress.IndexOf(file)+1)/filesToCompress.Count(),
                     "Creating a temp file..."
                 ));
@@ -117,11 +122,13 @@ namespace Siren.Services
 
             //5. Delete temp file
             await _fileManager.DeleteFileAsync(SirenTempFile);
+
+            OnCreateProgressUpdate(this, new ProcessingProgress(1, "Complete!"));
         }
 
         private void UpdateCompressingProgress(object sender, ProgressEventArgs e)
         {
-            OnProgressUpdate(this, new ProcessingProgress(
+            OnCreateProgressUpdate(this, new ProcessingProgress(
                 e.Progress, 
                 "Compressing temp file to the *.siren bundle file..."
             ));

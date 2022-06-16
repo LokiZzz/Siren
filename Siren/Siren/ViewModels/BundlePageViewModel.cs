@@ -23,6 +23,8 @@ namespace Siren.ViewModels
         {
             SceneManager = DependencyService.Get<SceneManager>();
             BundleService = DependencyService.Get<IBundleService>();
+            BundleService.OnCreateProgressUpdate += UpdateCreateProgress;
+            BundleService.OnInstallProgressUpdate += UpdateInstallProgress;
 
             Bundles = SceneManager.GetEnvironment()
                 .Where(x => x.Id != Guid.Empty)
@@ -67,13 +69,14 @@ namespace Siren.ViewModels
             if (result != null)
             {
                 Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath);
+                unpackedBundle.IsActivated = true;
                 Bundles.Add(new BundleViewModel(unpackedBundle));
 
                 List<Bundle> bundles = SceneManager.GetEnvironment();
                 bundles.Add(unpackedBundle);
                 SceneManager.SaveEnvironment(bundles);
 
-                ActivateDeactivateBundle(unpackedBundle.Id);
+                MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
             }
         }
 
@@ -83,6 +86,9 @@ namespace Siren.ViewModels
             Bundle bundleToActivate = bundles.FirstOrDefault(x => x.Id == bundleId);
             bundleToActivate.IsActivated = !bundleToActivate.IsActivated;
             SceneManager.SaveEnvironment(bundles);
+
+            BundleViewModel localBundleVM = Bundles.FirstOrDefault(x => x.Bundle.Id == bundleId);
+            OnPropertyChanged(nameof(localBundleVM.IsActivated));
 
             MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
         }
@@ -129,6 +135,46 @@ namespace Siren.ViewModels
             string name = rgx.Replace(NewBundleName, "");
 
             return $"{name}.siren";
+        }
+
+        private string _installProgressMessage = "Installing progress...";
+        public string InstallProgressMessage
+        {
+            get => _installProgressMessage;
+            set => SetProperty(ref _installProgressMessage, value);
+        }
+
+        private double _installProgress;
+        public double InstallProgress
+        {
+            get => _installProgress;
+            set => SetProperty(ref _installProgress, value);
+        }
+
+        private string _creatingProgressMessage = "Creating progress...";
+        public string CreatingProgressMessage
+        {
+            get => _creatingProgressMessage;
+            set => SetProperty(ref _creatingProgressMessage, value);
+        }
+
+        private double _creatingProgress;
+        public double CreatingProgress
+        {
+            get => _creatingProgress;
+            set => SetProperty(ref _creatingProgress, value);
+        }
+
+        private void UpdateInstallProgress(object sender, ProcessingProgress e)
+        {
+            InstallProgress = e.Progress;
+            InstallProgressMessage = e.Message;
+        }
+
+        private void UpdateCreateProgress(object sender, ProcessingProgress e)
+        {
+            CreatingProgress = e.Progress;
+            CreatingProgressMessage = e.Message;
         }
     }
 

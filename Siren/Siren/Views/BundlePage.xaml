@@ -1,34 +1,70 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
-             xmlns:vm="clr-namespace:Siren.ViewModels" xmlns:behaviors="http://xamarin.com/schemas/2020/toolkit"
+             xmlns:vm="clr-namespace:Siren.ViewModels" xmlns:behaviors="http://xamarin.com/schemas/2020/toolkit" xmlns:converters="clr-namespace:Siren.Views.Converters"
              x:Class="Siren.Views.BundlePage"
              BackgroundColor="{StaticResource Dark}">
 
+    <ContentPage.Resources>
+        <converters:DoubleToPercentStringConverter x:Key="DoubleToPercentStringConverter"></converters:DoubleToPercentStringConverter>
+    </ContentPage.Resources>
+    
     <ContentPage.BindingContext>
         <vm:BundlePageViewModel />
     </ContentPage.BindingContext>
 
     <ContentPage.Content>
-        <Grid RowDefinitions="auto,*">
+        <Grid RowDefinitions="auto,auto,*">
 
-            <StackLayout Grid.Row="0" Orientation="Horizontal" Spacing="5" Margin="0,15">
-                <Button Text="Install" Command="{Binding InstallCommand}" WidthRequest="350"/>
-                <Label Text="If you want to create new bundle, enter the name and press «Create»:"
-                       VerticalOptions="Center" VerticalTextAlignment="Center"/>
-                <Entry Text="{Binding NewBundleName}"/>
-                <Button Text="Create" Command="{Binding CreateCommand}" WidthRequest="350"/>
-            </StackLayout>
+            <Frame Grid.Row="0" BackgroundColor="{StaticResource VeryDark}" Margin="15">
+                <StackLayout Orientation="Vertical" Spacing="5" Margin="0,15">
+
+                    <Label Text="Install Bundle" FontSize="Large"/>
+                    <Label Text="To install bundle using *.siren file, press button «Install»."/>
+                    <Label Text="{Binding InstallProgressMessage}"/>
+                    <ProgressBar HeightRequest="25" Progress="{Binding InstallProgress}"/>
+                    <Button Text="Install" Command="{Binding InstallCommand}" WidthRequest="350" HorizontalOptions="Start" Margin="0,0,0,20"/>
+
+                    <Label Text="Create new Bundle" FontSize="Large"/>
+                    <Label Text="If you want to create new bundle from current settings set, enter the name and press «Create»."/>
+                    <Entry Text="{Binding NewBundleName}" WidthRequest="350" HorizontalOptions="Start"/>
+                    <StackLayout Orientation="Horizontal" Spacing="0">
+                        <Label Text="{Binding CreatingProgress, Converter={StaticResource DoubleToPercentStringConverter}}"/>
+                        <Label Text="{Binding CreatingProgressMessage}"/>
+                    </StackLayout>
+                    <ProgressBar HeightRequest="25" Progress="{Binding CreatingProgress}"/>
+                    <Button Text="Create" Command="{Binding CreateCommand}" WidthRequest="350" HorizontalOptions="Start"/>
+                    
+                </StackLayout>
+            </Frame>
+            
+            
 
             <ScrollView Grid.Row="1" Orientation="Vertical">
-                <StackLayout x:Name="BundlesList" BindableLayout.ItemsSource="{Binding Bundles}" Spacing="15" Margin="15">
+                <FlexLayout x:Name="BundlesList" 
+                            BindableLayout.ItemsSource="{Binding Bundles}" 
+                            Wrap="Wrap" 
+                            Direction="Row" 
+                            JustifyContent="Start"
+                            AlignContent="Start"
+                            AlignItems="Start"
+                            Padding="10">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Frame BackgroundColor="{StaticResource VeryDark}">
-                                <Grid RowDefinitions="*,*,*" ColumnDefinitions="*,*,*">
-                                    <Label Grid.Row="0" Grid.ColumnSpan="3" Text="{Binding Bundle.Name}"/>
+                            <Frame BackgroundColor="{StaticResource VeryDark}" VerticalOptions="Start" Margin="5">
+                                <Grid RowDefinitions="*,*" ColumnDefinitions="200,*" VerticalOptions="Start" RowSpacing="15">
+                                    
+                                    <Label Grid.Row="0" Grid.Column="0" 
+                                           VerticalTextAlignment="Center"
+                                           VerticalOptions="Center"
+                                           Text="{Binding Bundle.Name, StringFormat='{0}.siren'}"
+                                           FontSize="Medium"/>
 
-                                    <Switch Grid.Row="1" Grid.Column="0" IsToggled="{Binding IsActivated}">
+                                    <Switch Grid.Row="0" Grid.Column="1" 
+                                            HorizontalOptions="End"
+                                            VerticalOptions="Start"
+                                            IsToggled="{Binding IsActivated, Mode=OneWay}"
+                                            FlowDirection="RightToLeft" Visual="Material">
                                         <Switch.Behaviors>
                                             <behaviors:EventToCommandBehavior 
                                                 EventName="Toggled" 
@@ -36,23 +72,16 @@
                                                 CommandParameter="{Binding Bundle}"/>
                                         </Switch.Behaviors>
                                     </Switch>
-
-                                    <!--<Button Text="Activate" Grid.Row="1" Grid.Column="0" 
-                                            Command="{Binding BindingContext.ActivateCommand,Source={x:Reference BundlesList}}" 
-                                                CommandParameter="{Binding .}"/>
-                                    <Button Text="Deactivate" Grid.Row="1" Grid.Column="1" 
-                                            Command="{Binding BindingContext.DeactivateCommand,Source={x:Reference BundlesList}}" 
-                                                CommandParameter="{Binding .}"/>-->
-                                    <Button Text="Uninstall" Grid.Row="1" Grid.Column="2" 
+                                    
+                                    <Button Text="Uninstall" Grid.Row="1" Grid.ColumnSpan="2"
                                             Command="{Binding BindingContext.UninstallCommand,Source={x:Reference BundlesList}}" 
                                                 CommandParameter="{Binding Bundle}"/>
 
-                                    <ProgressBar Grid.Row="2" Grid.ColumnSpan="3" Progress="0.75"/>
                                 </Grid>
                             </Frame>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
-                </StackLayout>
+                </FlexLayout>
             </ScrollView>
             
         </Grid>
