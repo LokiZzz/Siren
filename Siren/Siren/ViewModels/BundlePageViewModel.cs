@@ -26,10 +26,11 @@ namespace Siren.ViewModels
 
             Bundles = SceneManager.GetEnvironment()
                 .Where(x => x.Id != Guid.Empty)
+                .Select(x => new BundleViewModel(x))
                 .ToObservableCollection();
         }
 
-        public ObservableCollection<Bundle> Bundles { get; set; } = new ObservableCollection<Bundle>();
+        public ObservableCollection<BundleViewModel> Bundles { get; set; } = new ObservableCollection<BundleViewModel>();
 
         private string _newBundleName;
         public string NewBundleName
@@ -40,8 +41,7 @@ namespace Siren.ViewModels
 
         public Command CreateCommand { get => new Command(async () => await CreateBundle()); }
         public Command InstallCommand { get => new Command(async () => await InstallBundle()); }
-        public Command ActivateCommand { get => new Command<Bundle>((bundle) => ActivateBundle(bundle.Id)); }
-        public Command DeactivateCommand { get => new Command<Bundle>((bundle) => DeactivateBundle(bundle.Id)); }
+        public Command ActivateDeactivateCommand { get => new Command<Bundle>((bundle) => ActivateDeactivateBundle(bundle.Id)); }
         public Command UninstallCommand { get => new Command<Bundle>(async (bundle) => await UninstallBundle(bundle.Id)); }
 
         private async Task CreateBundle()
@@ -67,19 +67,26 @@ namespace Siren.ViewModels
             if (result != null)
             {
                 Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath);
-                Bundles.Add(unpackedBundle);
+                Bundles.Add(new BundleViewModel(unpackedBundle));
 
                 List<Bundle> bundles = SceneManager.GetEnvironment();
                 bundles.Add(unpackedBundle);
                 SceneManager.SaveEnvironment(bundles);
 
-                ActivateBundle(unpackedBundle.Id);
+                ActivateDeactivateBundle(unpackedBundle.Id);
             }
         }
 
-        private void ActivateBundle(Guid bundleId) => SetBundleIsActivatedProperty(bundleId, true);
+        private void ActivateDeactivateBundle(Guid bundleId)
+        {
+            List<Bundle> bundles = SceneManager.GetEnvironment();
+            Bundle bundleToActivate = bundles.FirstOrDefault(x => x.Id == bundleId);
+            bundleToActivate.IsActivated = !bundleToActivate.IsActivated;
+            SceneManager.SaveEnvironment(bundles);
 
-        private void DeactivateBundle(Guid bundleId) => SetBundleIsActivatedProperty(bundleId, false);
+            MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
+        }
+
 
         private async Task UninstallBundle(Guid bundleId)
         {
@@ -96,17 +103,7 @@ namespace Siren.ViewModels
             await BundleService.DeleteBundleFilesAsync(bundleId);
 
             //Delete local VM
-            Bundles.Remove(Bundles.First(x => x.Id == bundleId));
-        }
-
-        private void SetBundleIsActivatedProperty(Guid id, bool isActivated)
-        {
-            List<Bundle> bundles = SceneManager.GetEnvironment();
-            Bundle bundleToActivate = bundles.FirstOrDefault(x => x.Id == id);
-            bundleToActivate.IsActivated = isActivated;
-            SceneManager.SaveEnvironment(bundles);
-
-            MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
+            Bundles.Remove(Bundles.First(x => x.Bundle.Id == bundleId));
         }
 
         private PickOptions GetSirenFilePickOption()
@@ -132,6 +129,27 @@ namespace Siren.ViewModels
             string name = rgx.Replace(NewBundleName, "");
 
             return $"{name}.siren";
+        }
+    }
+
+    public class BundleViewModel : BaseViewModel
+    {
+        public BundleViewModel(Bundle bundle)
+        {
+            Bundle = bundle;
+        }
+
+        public Bundle Bundle { get; set; }
+
+        private bool _isActivated;
+        public bool IsActivated 
+        { 
+            get => Bundle.IsActivated;
+            set
+            {
+                SetProperty(ref _isActivated, value);
+                Bundle.IsActivated = value;
+            }
         }
     }
 }

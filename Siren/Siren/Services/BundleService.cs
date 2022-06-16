@@ -28,6 +28,8 @@ namespace Siren.Services
 
         string SirenTempFile => $"{_sirenFilePath}.temp";
 
+        public event EventHandler<ProcessingProgress> OnProgressUpdate;
+
         public async Task SaveBundleAsync(Bundle bundle, string filePath)
         {
             _fileManager = DependencyService.Resolve<IFileManager>();
@@ -81,6 +83,11 @@ namespace Siren.Services
                         SizeBytesBefore = sourceStream.Length,
                     });
                 }
+
+                OnProgressUpdate(this, new ProcessingProgress(
+                    (filesToCompress.IndexOf(file)+1)/filesToCompress.Count(),
+                    "Creating a temp file..."
+                ));
             }
 
             //3. Add metadata to the created gap
@@ -99,13 +106,25 @@ namespace Siren.Services
                 {
                     using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(SirenTempFile))
                     {
-                        await sourceStream.CopyToAsync(compressionStream);
+                        using (ProgressStream progress = new ProgressStream(sourceStream))
+                        {
+                            progress.UpdateProgress += UpdateCompressingProgress;
+                            await progress.CopyToAsync(compressionStream);
+                        }
                     }
                 }
             }
 
             //5. Delete temp file
             await _fileManager.DeleteFileAsync(SirenTempFile);
+        }
+
+        private void UpdateCompressingProgress(object sender, ProgressEventArgs e)
+        {
+            OnProgressUpdate(this, new ProcessingProgress(
+                e.Progress, 
+                "Compressing temp file to the *.siren bundle file..."
+            ));
         }
 
         public async Task<Bundle> UnpackBundleAsync()
@@ -276,5 +295,17 @@ namespace Siren.Services
     {
         public string Name { get; set; }
         public long SizeBytesBefore { get; set; }
+    }
+
+    public class ProcessingProgress
+    {
+        public ProcessingProgress(double progress, string message)
+        {
+            Progress = progress;
+            Message = message;
+        }
+
+        public double Progress { get; set; }
+        public string Message { get; set; }
     }
 }
