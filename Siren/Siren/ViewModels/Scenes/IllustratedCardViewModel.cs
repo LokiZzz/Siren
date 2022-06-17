@@ -39,7 +39,7 @@ namespace Siren.ViewModels
 
         public void DeleteImageFile()
         {
-            Image.Cancel();
+            Image?.Cancel();
             Image = null;
 
             if (File.Exists(ImagePath))

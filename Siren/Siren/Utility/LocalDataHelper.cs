@@ -28,13 +28,17 @@ namespace Siren.Utility
                     return JsonConvert.DeserializeObject<T>(content);
                 }
             }
-            catch
+            catch(FileNotFoundException ex)
             {
                 return null;
             }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        public static async Task WriteToTheLocalAppFile(object objectToWrite, string filePath)
+        public static async Task WriteToTheLocalAppFile<T>(T objectToWrite, string filePath) where T : class
         {
             string content = JsonConvert.SerializeObject(objectToWrite);
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), filePath);

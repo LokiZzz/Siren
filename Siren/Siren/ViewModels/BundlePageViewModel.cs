@@ -99,8 +99,7 @@ namespace Siren.ViewModels
             bundleToActivate.IsActivated = !bundleToActivate.IsActivated;
             await SceneManager.SaveEnvironment(bundles);
 
-            BundleViewModel localBundleVM = Bundles.FirstOrDefault(x => x.Bundle.Id == bundleId);
-            OnPropertyChanged(nameof(localBundleVM.IsActivated));
+            await InitializeInstalledBundles();
 
             MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
         }
