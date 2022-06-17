@@ -37,22 +37,22 @@ namespace Siren.Services
             MessagingCenter.Send(this, Messages.SceneAdded);
         }
 
-        public void SaveEnvironment(List<Bundle> bundles)
+        public async Task SaveEnvironment(List<Bundle> bundles)
         {
-            LocalDataHelper.WriteToTheLocalAppFile(bundles, _currentEnvironmentFileName);
+            await LocalDataHelper.WriteToTheLocalAppFile(bundles, _currentEnvironmentFileName);
         }
 
-        public List<Bundle> GetEnvironment()
+        public async Task<List<Bundle>> GetEnvironment()
         {
-            List<Bundle> environment = LocalDataHelper.GetObjectFromLocalAppFile<List<Bundle>>(_currentEnvironmentFileName);
+            List<Bundle> environment = await LocalDataHelper.GetObjectFromLocalAppFile<List<Bundle>>(_currentEnvironmentFileName);
             
             return environment ?? new List<Bundle>();
         }
 
-        public List<Setting> GetSettingsFromCurrentEnvironment(bool onlyActivatedBundles = true)
+        public async Task<List<Setting>> GetSettingsFromCurrentEnvironment(bool onlyActivatedBundles = true)
         {
             List<Setting> currentEnvironment = new List<Setting>();
-            List<Bundle> bundles = GetEnvironment();
+            List<Bundle> bundles = await GetEnvironment();
 
             if (bundles != null && bundles.Any())
             {
@@ -67,10 +67,10 @@ namespace Siren.Services
             return currentEnvironment;
         }
 
-        public ObservableCollection<SettingViewModel> GetVMFromCurrentEnvironment(bool onlyActivatedBundles = true)
+        public async Task<ObservableCollection<SettingViewModel>> GetVMFromCurrentEnvironment(bool onlyActivatedBundles = true)
         {
             ObservableCollection<SettingViewModel> currentEnvironment = new ObservableCollection<SettingViewModel>();
-            List<Setting> settings = GetSettingsFromCurrentEnvironment(onlyActivatedBundles);
+            List<Setting> settings = await GetSettingsFromCurrentEnvironment(onlyActivatedBundles);
             
             if(settings != null && settings.Any())
             {
@@ -80,9 +80,9 @@ namespace Siren.Services
             return currentEnvironment;
         }
 
-        public void SaveCurrentEnvironment(ObservableCollection<SettingViewModel> settings)
+        public async Task SaveCurrentEnvironment(ObservableCollection<SettingViewModel> settings)
         {
-            List<Bundle> environment = GetEnvironment();
+            List<Bundle> environment = await GetEnvironment();
 
             if(!environment.Any(x => x.Id == Guid.Empty))
             {
@@ -101,7 +101,7 @@ namespace Siren.Services
                 bundle.Settings = settings.Where(x => x.BundleId == bundle.Id).Select(x => x.ToModel()).ToList();
             }
 
-            SaveEnvironment(environment);
+            await SaveEnvironment(environment);
         }
     }
 }

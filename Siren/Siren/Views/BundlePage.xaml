@@ -21,7 +21,10 @@
 
                     <Label Text="Install Bundle" FontSize="Large"/>
                     <Label Text="To install bundle using *.siren file, press button «Install»."/>
-                    <Label Text="{Binding InstallProgressMessage}"/>
+                    <StackLayout Orientation="Horizontal" Spacing="0">
+                        <Label Text="{Binding InstallProgress, Converter={StaticResource DoubleToPercentStringConverter}}"/>
+                        <Label Text="{Binding InstallProgressMessage}"/>
+                    </StackLayout>
                     <ProgressBar HeightRequest="25" Progress="{Binding InstallProgress}"/>
                     <Button Text="Install" Command="{Binding InstallCommand}" WidthRequest="350" HorizontalOptions="Start" Margin="0,0,0,20"/>
 

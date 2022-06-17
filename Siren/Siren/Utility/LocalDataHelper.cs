@@ -1,34 +1,52 @@
 ﻿using Newtonsoft.Json;
+using Siren.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace Siren.Utility
 {
     public static class LocalDataHelper
     {
-        public static T GetObjectFromLocalAppFile<T>(string fileName) where T : class
+        public static async Task<T> GetObjectFromLocalAppFile<T>(string fileName) where T : class
         {
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName);
-            if (File.Exists(path))
-            {
-                string content = File.ReadAllText(path);
 
-                return JsonConvert.DeserializeObject<T>(content);
+            try
+            {
+                IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+
+                using (Stream stream = await fileManager.GetStreamToReadAsync(path))
+                {
+                    byte[] buffer = new byte[stream.Length];
+                    await stream.ReadAsync(buffer, 0, buffer.Length);
+                    string content = Encoding.UTF8.GetString(buffer);
+
+                    return JsonConvert.DeserializeObject<T>(content);
+                }
             }
-            else
+            catch
             {
                 return null;
             }
         }
 
-        public static void WriteToTheLocalAppFile(object objectToWrite, string filePath)
+        public static async Task WriteToTheLocalAppFile(object objectToWrite, string filePath)
         {
             string content = JsonConvert.SerializeObject(objectToWrite);
-
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), filePath);
-            File.WriteAllText(path, content);
+
+            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+
+            byte[] buffer = Encoding.UTF8.GetBytes(content);
+
+            using (Stream stream = await fileManager.GetStreamToWriteAsync(path))
+            {
+                await stream.WriteAsync(buffer, 0, buffer.Length);
+            }
         }
     }
 }

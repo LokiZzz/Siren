@@ -25,7 +25,7 @@ namespace Siren.ViewModels
         {
             InitializeMessagingCenter();
             SceneManager = DependencyService.Get<SceneManager>();
-            IntializeCollections();
+            Task.Run(async () => { await IntializeCollections(); }).Wait();
         }
 
         private async Task GoToAddSetting()
@@ -154,9 +154,9 @@ namespace Siren.ViewModels
             }
         }
 
-        private void SaveScene(string name)
+        private async Task SaveScene()
         {
-            var playingElements = SelectedSetting.Elements
+            List<TrackSetupViewModel> playingElements = SelectedSetting.Elements
                 .Where(x => x.IsPlaying)
                 .Select(x => new TrackSetupViewModel
                 {
@@ -167,7 +167,7 @@ namespace Siren.ViewModels
 
             SelectedScene.Elements = new ObservableCollection<TrackSetupViewModel>(playingElements);
 
-            SaveCurrentEnvironment();
+            await SaveCurrentEnvironment();
         }
 
         private async Task AddElements()
@@ -246,16 +246,16 @@ namespace Siren.ViewModels
             OnPropertyChanged(nameof(IsScenePlaying));
         }
 
-        private void SaveCurrentEnvironment(object sender, NotifyCollectionChangedEventArgs e) => SaveCurrentEnvironment();
+        private async void SaveCurrentEnvironment(object sender, NotifyCollectionChangedEventArgs e) => await SaveCurrentEnvironment();
 
-        private void SaveCurrentEnvironment()
+        private async Task SaveCurrentEnvironment()
         {
-            SceneManager.SaveCurrentEnvironment(Settings);
+            await SceneManager.SaveCurrentEnvironment(Settings);
         }
 
-        private void IntializeCollections()
+        private async Task IntializeCollections()
         {
-            Settings = SceneManager.GetVMFromCurrentEnvironment();
+            Settings = await SceneManager.GetVMFromCurrentEnvironment();
             SelectedSetting = Settings.FirstOrDefault();
 
             Settings.CollectionChanged += BindNewSettingEvents;
@@ -279,8 +279,8 @@ namespace Siren.ViewModels
             MessagingCenter.Subscribe<SceneComponentViewModel>(this, Messages.ElementPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsScenePlaying)));
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SettingAdded, AddSetting);
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SceneAdded, AddScene);
-            MessagingCenter.Subscribe<AddOrEditComponentViewModel>(this, Messages.IllustratedCardEdited, (manager) => SaveCurrentEnvironment());
-            MessagingCenter.Subscribe<BundlePageViewModel>(this, Messages.NeedToUpdateEnvironment, (manager) => IntializeCollections());
+            MessagingCenter.Subscribe<AddOrEditComponentViewModel>(this, Messages.IllustratedCardEdited, async (manager) => await SaveCurrentEnvironment());
+            MessagingCenter.Subscribe<BundlePageViewModel>(this, Messages.NeedToUpdateEnvironment, async (manager) => await IntializeCollections());
         }
 
         public Command AddSettingCommand { get => new Command(async () => await GoToAddSetting()); }
@@ -297,7 +297,7 @@ namespace Siren.ViewModels
         public Command AddEffectsCommand { get => new Command(async () => await AddEffects()); }
         public Command EditEffectCommand { get => new Command<SceneComponentViewModel>(async (effect) => await GoToEditEffect(effect)); }
         public Command DeleteEffectCommand { get => new Command<SceneComponentViewModel>(DeleteEffect); }
-        public Command SaveSceneCommand { get => new Command<string>(SaveScene); }
+        public Command SaveSceneCommand { get => new Command(async () => await SaveScene()); }
         public Command GlobalPlayCommand { get => new Command(async () => await GlobalPlayStop()); }
 
         private ObservableCollection<SettingViewModel> _settings;
@@ -333,11 +333,15 @@ namespace Siren.ViewModels
             set
             {
                 SetProperty(ref _selectedScene, value);
-                foreach (SceneViewModel item in SelectedSetting.Scenes)
-                {
-                    item.IsSelected = false;
+
+                if (SelectedSetting != null)
+                { 
+                    foreach (SceneViewModel item in SelectedSetting.Scenes)
+                    {
+                        item.IsSelected = false;
+                    }
+                    SelectedScene.IsSelected = true;
                 }
-                SelectedScene.IsSelected = true;
             }
         }
 

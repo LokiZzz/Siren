@@ -4,6 +4,7 @@ using Siren.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,12 @@ namespace Siren.ViewModels
             BundleService.OnCreateProgressUpdate += UpdateCreateProgress;
             BundleService.OnInstallProgressUpdate += UpdateInstallProgress;
 
-            Bundles = SceneManager.GetEnvironment()
+            Task.Run(async () => { await InitializeInstalledBundles(); }).Wait();
+        }
+
+        private async Task InitializeInstalledBundles()
+        {
+            Bundles = (await SceneManager.GetEnvironment())
                 .Where(x => x.Id != Guid.Empty)
                 .Select(x => new BundleViewModel(x))
                 .ToObservableCollection();
@@ -43,15 +49,18 @@ namespace Siren.ViewModels
 
         public Command CreateCommand { get => new Command(async () => await CreateBundle()); }
         public Command InstallCommand { get => new Command(async () => await InstallBundle()); }
-        public Command ActivateDeactivateCommand { get => new Command<Bundle>((bundle) => ActivateDeactivateBundle(bundle.Id)); }
+        public Command ActivateDeactivateCommand { get => new Command<Bundle>(async (bundle) => await ActivateDeactivateBundle(bundle.Id)); }
         public Command UninstallCommand { get => new Command<Bundle>(async (bundle) => await UninstallBundle(bundle.Id)); }
 
         private async Task CreateBundle()
         {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             Bundle bundle = new Bundle 
             {
                 Name = _newBundleName,
-                Settings = SceneManager.GetSettingsFromCurrentEnvironment() 
+                Settings = await SceneManager.GetSettingsFromCurrentEnvironment() 
             };
 
             string fileName = Path.Combine(
@@ -60,6 +69,9 @@ namespace Siren.ViewModels
             );
 
             await BundleService.SaveBundleAsync(bundle, fileName);
+
+            stopWatch.Stop();
+            double elapsed = stopWatch.Elapsed.TotalSeconds;
         }
 
         private async Task InstallBundle()
@@ -72,20 +84,20 @@ namespace Siren.ViewModels
                 unpackedBundle.IsActivated = true;
                 Bundles.Add(new BundleViewModel(unpackedBundle));
 
-                List<Bundle> bundles = SceneManager.GetEnvironment();
+                List<Bundle> bundles = await SceneManager.GetEnvironment();
                 bundles.Add(unpackedBundle);
-                SceneManager.SaveEnvironment(bundles);
+                await SceneManager.SaveEnvironment(bundles);
 
                 MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
             }
         }
 
-        private void ActivateDeactivateBundle(Guid bundleId)
+        private async Task ActivateDeactivateBundle(Guid bundleId)
         {
-            List<Bundle> bundles = SceneManager.GetEnvironment();
+            List<Bundle> bundles = await SceneManager.GetEnvironment();
             Bundle bundleToActivate = bundles.FirstOrDefault(x => x.Id == bundleId);
             bundleToActivate.IsActivated = !bundleToActivate.IsActivated;
-            SceneManager.SaveEnvironment(bundles);
+            await SceneManager.SaveEnvironment(bundles);
 
             BundleViewModel localBundleVM = Bundles.FirstOrDefault(x => x.Bundle.Id == bundleId);
             OnPropertyChanged(nameof(localBundleVM.IsActivated));
@@ -97,10 +109,10 @@ namespace Siren.ViewModels
         private async Task UninstallBundle(Guid bundleId)
         {
             //Delete from environment
-            List<Bundle> bundles = SceneManager.GetEnvironment();
+            List<Bundle> bundles = await SceneManager.GetEnvironment();
             Bundle bundleToRemove = bundles.FirstOrDefault(x => x.Id == bundleId);
             bundles.Remove(bundleToRemove);
-            SceneManager.SaveEnvironment(bundles);
+            await SceneManager.SaveEnvironment(bundles);
 
             //Update MainViewModel
             MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);

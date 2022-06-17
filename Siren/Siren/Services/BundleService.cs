@@ -10,6 +10,7 @@ using Xamarin.Forms;
 using Newtonsoft.Json;
 using Siren.Utility;
 using static System.Net.WebRequestMethods;
+using System.Diagnostics;
 
 namespace Siren.Services
 {
@@ -30,7 +31,7 @@ namespace Siren.Services
         const int _metadataFrameSize = 128 * 1024; //128kB
         string _sirenFilePath = string.Empty;
 
-        string SirenTempFile => $"{_sirenFilePath}.temp";
+        //string SirenTempFile => $"{_sirenFilePath}.temp";
 
         public event EventHandler<ProcessingProgress> OnCreateProgressUpdate;
         public event EventHandler<ProcessingProgress> OnInstallProgressUpdate;
@@ -64,19 +65,16 @@ namespace Siren.Services
             };
             List<string> filesToCompress = GetAllFilesFromBundle(bundleCopy);
 
-            //2. Create a big fused file chunk to give it to the compressor (creating a *.siren.temp)
+            using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+            {
+                await targetStream.WriteAsync(new byte[_metadataFrameSize], 0, _metadataFrameSize);
+            }
+
             foreach (string file in filesToCompress)
             {
-                //2.1 Create a gap for metadata frame
-                using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(SirenTempFile))
-                {
-                    await targetStream.WriteAsync(new byte[_metadataFrameSize], 0, _metadataFrameSize);
-                }
-
-                //2.2 Write actual files
                 using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(file))
                 {
-                    using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(SirenTempFile))
+                    using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
                     {
                         targetStream.Position = targetStream.Length;
                         await sourceStream.CopyToAsync(targetStream);
@@ -89,14 +87,12 @@ namespace Siren.Services
                     });
                 }
 
-                OnCreateProgressUpdate(this, new ProcessingProgress(
-                    (filesToCompress.IndexOf(file)+1)/filesToCompress.Count(),
-                    "Creating a temp file..."
-                ));
+                double progress = (double)(filesToCompress.IndexOf(file) + 1) / (double)filesToCompress.Count();
+                OnCreateProgressUpdate(this, new ProcessingProgress(progress, "Fusing files together..."));
             }
 
             //3. Add metadata to the created gap
-            using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(SirenTempFile))
+            using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
             {
                 byte[] metadataFrame = new byte[_metadataFrameSize];
                 byte[] metadataActualBytes = ConvertToByteArray(metadata);
@@ -105,23 +101,23 @@ namespace Siren.Services
             }
 
             //4. Create a compressed bundle (*.siren) file
-            using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
-            {
-                using (GZipStream compressionStream = new GZipStream(targetStream, CompressionMode.Compress))
-                {
-                    using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(SirenTempFile))
-                    {
-                        using (ProgressStream progress = new ProgressStream(sourceStream))
-                        {
-                            progress.UpdateProgress += UpdateCompressingProgress;
-                            await progress.CopyToAsync(compressionStream);
-                        }
-                    }
-                }
-            }
+            //using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+            //{
+            //    using (GZipStream compressionStream = new GZipStream(targetStream, CompressionLevel.Optimal))
+            //    {
+            //        using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(SirenTempFile))
+            //        {
+            //            using (ProgressStream progress = new ProgressStream(sourceStream))
+            //            {
+            //                progress.UpdateProgress += UpdateCompressingProgress;
+            //                await progress.CopyToAsync(compressionStream);
+            //            }
+            //        }
+            //    }
+            //}
 
             //5. Delete temp file
-            await _fileManager.DeleteFileAsync(SirenTempFile);
+            //await _fileManager.DeleteFileAsync(SirenTempFile);
 
             OnCreateProgressUpdate(this, new ProcessingProgress(1, "Complete!"));
         }
@@ -139,19 +135,19 @@ namespace Siren.Services
             SirenFileMetaData metadata = null;
 
             //1. Unpack big melted chunk (*.siren.temp)
-            using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
-            {
-                using (GZipStream decompressionStream = new GZipStream(sourceStream, CompressionMode.Decompress))
-                {
-                    using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(SirenTempFile))
-                    {
-                        await decompressionStream.CopyToAsync(targetStream);
-                    }
-                }
-            }
+            //using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
+            //{
+            //    using (GZipStream decompressionStream = new GZipStream(sourceStream, CompressionMode.Decompress))
+            //    {
+            //        using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+            //        {
+            //            await decompressionStream.CopyToAsync(targetStream);
+            //        }
+            //    }
+            //}
 
             //2. Divide big chank to separate files and put it to the Bundle folder at LocalApp directory
-            using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(SirenTempFile))
+            using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
             {
                 //2.1 Get the metadata from metadata frame
                 metadata = await GetMetadataModel(sourceStream);
@@ -173,14 +169,19 @@ namespace Siren.Services
                         await sourceStream.ReadAsync(buffer, 0, buffer.Length);
                         await targetStream.WriteAsync(buffer, 0, buffer.Length);
                     }
+
+                    double progress = (double)(metadata.CompressedFiles.IndexOf(file) + 1) / (double)metadata.CompressedFiles.Count();
+                    OnInstallProgressUpdate(this, new ProcessingProgress(progress, "Unpacking elements..."));
                 }
             }
 
             //3. Delete temp file
-            await _fileManager.DeleteFileAsync(SirenTempFile);
+            //await _fileManager.DeleteFileAsync(SirenTempFile);
 
             //4. Bind bundle to brand new unpacked files
             SetFilePathsToLocalAppData(metadata);
+
+            OnInstallProgressUpdate(this, new ProcessingProgress(1, "Complete!"));
 
             return metadata.Bundle;
         }
