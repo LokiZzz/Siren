@@ -27,9 +27,12 @@ namespace Siren.UWP.Services
         public async Task DeleteFileAsync(string filePath)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
-            StorageFile file = await storageFolder.GetFileAsync(Path.GetFileName(filePath));
+            IStorageItem item = await storageFolder.TryGetItemAsync(Path.GetFileName(filePath));
 
-            await file.DeleteAsync();
+            if (item != null)
+            {
+                await item.DeleteAsync();
+            }
         }
 
         public async Task DeleteFolderAsync(string folderPath)

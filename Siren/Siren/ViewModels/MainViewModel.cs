@@ -66,12 +66,13 @@ namespace Siren.ViewModels
         {
             bool wantToDelete = await App.Current.MainPage.DisplayAlert(
                 "Warning",
-                $"Are you really want to delete \"{setting.Name}\" setting?",
+                $"Are you really want to delete «{setting.Name}» setting?",
                 "Yes", "No"
             );
 
             if (wantToDelete)
             {
+                RemoveEvents();
                 setting.DeleteImageFile();
                 setting.Scenes.ForEach(x => x.DeleteImageFile());
                 setting.Scenes.Clear();
@@ -79,6 +80,7 @@ namespace Siren.ViewModels
                 setting.Elements.Clear();
                 setting.Effects.ForEach(x => x.Dispose());
                 setting.Effects.Clear();
+                AddEvents();
                 Settings.Remove(setting);
             }
         }
@@ -144,7 +146,7 @@ namespace Siren.ViewModels
         {
             bool wantToDelete = await App.Current.MainPage.DisplayAlert(
                 "Warning",
-                $"Are you really want to delete \"{scene.Name}\" scene?",
+                $"Are you really want to delete «{scene.Name}» scene?",
                 "Yes", "No"
             );
 
@@ -257,10 +259,21 @@ namespace Siren.ViewModels
         {
             Settings = await SceneManager.GetVMFromCurrentEnvironment();
             SelectedSetting = Settings.FirstOrDefault();
+            AddEvents();
+        }
 
+        private void AddEvents()
+        {
             Settings.CollectionChanged += BindNewSettingEvents;
             Settings.CollectionChanged += SaveCurrentEnvironment;
             Settings.ForEach(x => x.SettingChanged += SaveCurrentEnvironment);
+        }
+
+        private void RemoveEvents()
+        {
+            Settings.CollectionChanged -= BindNewSettingEvents;
+            Settings.CollectionChanged -= SaveCurrentEnvironment;
+            Settings.ForEach(x => x.SettingChanged -= SaveCurrentEnvironment);
         }
 
         private void BindNewSettingEvents(object sender, NotifyCollectionChangedEventArgs e)

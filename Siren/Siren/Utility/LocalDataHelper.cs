@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -38,18 +39,31 @@ namespace Siren.Utility
             }
         }
 
+        static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+
         public static async Task WriteToTheLocalAppFile<T>(T objectToWrite, string filePath) where T : class
         {
-            string content = JsonConvert.SerializeObject(objectToWrite);
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), filePath);
+            await _semaphoreSlim.WaitAsync();
 
-            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
-
-            byte[] buffer = Encoding.UTF8.GetBytes(content);
-
-            using (Stream stream = await fileManager.GetStreamToWriteAsync(path))
+            try
             {
-                await stream.WriteAsync(buffer, 0, buffer.Length);
+                string content = JsonConvert.SerializeObject(objectToWrite);
+                string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), filePath);
+
+                IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+
+                await fileManager.DeleteFileAsync(path);
+
+                byte[] buffer = Encoding.UTF8.GetBytes(content);
+
+                using (Stream stream = await fileManager.GetStreamToWriteAsync(path))
+                {
+                    await stream.WriteAsync(buffer, 0, buffer.Length);
+                }
+            }
+            finally 
+            { 
+                _semaphoreSlim.Release(); 
             }
         }
     }

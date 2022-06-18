@@ -5,6 +5,11 @@
     xmlns:local="using:Siren.UWP">
     <Application.Resources>
         <ResourceDictionary>
+            <Style TargetType="ToggleSwitch">
+                <Setter Property="OffContent" Value="" />
+                <Setter Property="OnContent" Value="" />
+                <Setter Property="Margin" Value="0,0,-110,0" />
+            </Style>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="SystemControlHighlightBaseHighBrush" Color="White" />

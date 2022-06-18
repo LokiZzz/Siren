@@ -68,7 +68,10 @@ namespace Siren.ViewModels
         public event NotifyCollectionChangedEventHandler SettingChanged;
         private void FireSettingChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            SettingChanged(sender, e);
+            if (SettingChanged != null)
+            {
+                SettingChanged(sender, e);
+            }
         }
     }
 }

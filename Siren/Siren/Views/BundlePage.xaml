@@ -40,8 +40,6 @@
                     
                 </StackLayout>
             </Frame>
-            
-            
 
             <ScrollView Grid.Row="1" Orientation="Vertical">
                 <FlexLayout x:Name="BundlesList" 
@@ -67,7 +65,7 @@
                                             HorizontalOptions="End"
                                             VerticalOptions="Start"
                                             IsToggled="{Binding IsActivated, Mode=OneWay}"
-                                            FlowDirection="RightToLeft" Visual="Material">
+                                            OnColor="YellowGreen">
                                         <Switch.Behaviors>
                                             <behaviors:EventToCommandBehavior 
                                                 EventName="Toggled" 
