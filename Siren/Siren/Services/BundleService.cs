@@ -11,13 +11,14 @@ using Newtonsoft.Json;
 using Siren.Utility;
 using static System.Net.WebRequestMethods;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Siren.Services
 {
     public interface IBundleService
     {
-        Task SaveBundleAsync(Bundle bundle, string filePath);
-        Task<Bundle> LoadBundleAsync(string filePath);
+        Task SaveBundleAsync(Bundle bundle, string filePath, CancellationToken cancellationToken);
+        Task<Bundle> LoadBundleAsync(string filePath, CancellationToken cancellationToken);
         Task DeleteBundleFilesAsync(Guid bundleId);
 
         event EventHandler<ProcessingProgress> OnCreateProgressUpdate;
@@ -36,23 +37,31 @@ namespace Siren.Services
         public event EventHandler<ProcessingProgress> OnCreateProgressUpdate;
         public event EventHandler<ProcessingProgress> OnInstallProgressUpdate;
 
-        public async Task SaveBundleAsync(Bundle bundle, string filePath)
+        public async Task SaveBundleAsync(Bundle bundle, string filePath, CancellationToken cancellationToken)
         {
             _fileManager = DependencyService.Resolve<IFileManager>();
             _sirenFilePath = filePath;
 
-            await CreateBundleAsync(bundle);
+            try
+            {
+                await CreateBundleAsync(bundle, cancellationToken);
+            }
+            catch(OperationCanceledException)
+            {
+                OnCreateProgressUpdate(this, new ProcessingProgress(0, "Creating cancelled..."));
+                await _fileManager.DeleteFileAsync(_sirenFilePath);
+            }
         }
 
-        public async Task<Bundle> LoadBundleAsync(string filePath)
+        public async Task<Bundle> LoadBundleAsync(string filePath, CancellationToken cancellationToken)
         {
             _fileManager = DependencyService.Resolve<IFileManager>();
             _sirenFilePath = filePath;
 
-            return await UnpackBundleAsync();
+            return await UnpackBundleAsync(cancellationToken);
         }
 
-        public async Task CreateBundleAsync(Bundle bundle)
+        public async Task CreateBundleAsync(Bundle bundle, CancellationToken cancellationToken)
         {
             //1. Create bundle model for metadata
             Bundle bundleCopy = bundle.GetDeepCopy();
@@ -77,7 +86,7 @@ namespace Siren.Services
                     using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
                     {
                         targetStream.Position = targetStream.Length;
-                        await sourceStream.CopyToAsync(targetStream);
+                        await sourceStream.CopyToAsync(targetStream, 81920, cancellationToken);
                     }
 
                     metadata.CompressedFiles.Add(new CompressedFileInfo
@@ -130,7 +139,7 @@ namespace Siren.Services
             ));
         }
 
-        public async Task<Bundle> UnpackBundleAsync()
+        public async Task<Bundle> UnpackBundleAsync(CancellationToken cancellationToken)
         {
             SirenFileMetaData metadata = null;
 

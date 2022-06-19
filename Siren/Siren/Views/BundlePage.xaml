@@ -26,7 +26,10 @@
                         <Label Text="{Binding InstallProgressMessage}"/>
                     </StackLayout>
                     <ProgressBar HeightRequest="25" Progress="{Binding InstallProgress}"/>
-                    <Button Text="Install" Command="{Binding InstallCommand}" WidthRequest="350" HorizontalOptions="Start" Margin="0,0,0,20"/>
+                    <StackLayout Orientation="Horizontal" Margin="0,0,0,20">
+                        <Button Text="Install" Command="{Binding InstallCommand}" WidthRequest="350" HorizontalOptions="Start"/>
+                        <Button Text="Cancel" Command="{Binding CancelInstallCommand}" WidthRequest="350" HorizontalOptions="Start" />
+                    </StackLayout>
 
                     <Label Text="Create new Bundle" FontSize="Large"/>
                     <Label Text="If you want to create new bundle from current settings set, enter the name and press «Create»."/>
@@ -36,8 +39,11 @@
                         <Label Text="{Binding CreatingProgressMessage}"/>
                     </StackLayout>
                     <ProgressBar HeightRequest="25" Progress="{Binding CreatingProgress}"/>
-                    <Button Text="Create" Command="{Binding CreateCommand}" WidthRequest="350" HorizontalOptions="Start"/>
-                    
+                    <StackLayout Orientation="Horizontal">
+                        <Button Text="Create" Command="{Binding CreateCommand}" WidthRequest="350" HorizontalOptions="Start"/>
+                        <Button Text="Cancel" Command="{Binding CancelCreateCommand}" WidthRequest="350" HorizontalOptions="Start"/>
+                    </StackLayout>
+
                 </StackLayout>
             </Frame>
 

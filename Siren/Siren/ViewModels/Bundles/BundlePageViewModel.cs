@@ -1,14 +1,14 @@
 ﻿using Siren.Messaging;
 using Siren.Models;
 using Siren.Services;
+using Siren.ViewModels.Bundles;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -44,51 +44,58 @@ namespace Siren.ViewModels
         public string NewBundleName
         {
             get { return _newBundleName; }
-            set { _newBundleName = value; }
+            set 
+            { 
+                SetProperty(ref _newBundleName, value);
+                CreateCommand.ChangeCanExecute();
+            }
         }
 
-        public Command CreateCommand { get => new Command(async () => await CreateBundle()); }
-        public Command InstallCommand { get => new Command(async () => await InstallBundle()); }
-        public Command ActivateDeactivateCommand { get => new Command<Bundle>(async (bundle) => await ActivateDeactivateBundle(bundle.Id)); }
-        public Command UninstallCommand { get => new Command<Bundle>(async (bundle) => await UninstallBundle(bundle.Id)); }
+        CancellationTokenSource _creatingCancellationTokenSource;
 
         private async Task CreateBundle()
         {
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
-
-            Bundle bundle = new Bundle 
+            using (_creatingCancellationTokenSource = new CancellationTokenSource())
             {
-                Name = _newBundleName,
-                Settings = await SceneManager.GetSettingsFromCurrentEnvironment() 
-            };
+                BundleSystemState = EBundleSystemState.Creating;
 
-            string fileName = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
-                GetNewBundleFileName()
-            );
+                Bundle bundle = new Bundle
+                {
+                    Name = _newBundleName,
+                    Settings = await SceneManager.GetSettingsFromCurrentEnvironment()
+                };
 
-            await BundleService.SaveBundleAsync(bundle, fileName);
+                string fileName = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    GetNewBundleFileName()
+                );
 
-            stopWatch.Stop();
-            double elapsed = stopWatch.Elapsed.TotalSeconds;
+                await BundleService.SaveBundleAsync(bundle, fileName, _creatingCancellationTokenSource.Token);
+
+                _bundleSystemState = EBundleSystemState.Default;
+            }
         }
+
+        private CancellationTokenSource _installingCancellationTokenSource;
 
         private async Task InstallBundle()
         {
-            FileResult result = await FilePicker.PickAsync(GetSirenFilePickOption());
-
-            if (result != null)
+            using (_installingCancellationTokenSource = new CancellationTokenSource())
             {
-                Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath);
-                unpackedBundle.IsActivated = true;
-                Bundles.Add(new BundleViewModel(unpackedBundle));
+                FileResult result = await FilePicker.PickAsync(GetSirenFilePickOption());
 
-                List<Bundle> bundles = await SceneManager.GetEnvironment();
-                bundles.Add(unpackedBundle);
-                await SceneManager.SaveEnvironment(bundles);
+                if (result != null)
+                {
+                    Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath, _installingCancellationTokenSource.Token);
+                    unpackedBundle.IsActivated = true;
+                    Bundles.Add(new BundleViewModel(unpackedBundle));
 
-                MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
+                    List<Bundle> bundles = await SceneManager.GetEnvironment();
+                    bundles.Add(unpackedBundle);
+                    await SceneManager.SaveEnvironment(bundles);
+
+                    MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
+                }
             }
         }
 
@@ -187,26 +194,38 @@ namespace Siren.ViewModels
             CreatingProgress = e.Progress;
             CreatingProgressMessage = e.Message;
         }
-    }
 
-    public class BundleViewModel : BaseViewModel
-    {
-        public BundleViewModel(Bundle bundle)
+        private EBundleSystemState _bundleSystemState = EBundleSystemState.Default;
+        public EBundleSystemState BundleSystemState
         {
-            Bundle = bundle;
-        }
-
-        public Bundle Bundle { get; set; }
-
-        private bool _isActivated;
-        public bool IsActivated 
-        { 
-            get => Bundle.IsActivated;
+            get => _bundleSystemState;
             set
             {
-                SetProperty(ref _isActivated, value);
-                Bundle.IsActivated = value;
+                SetProperty(ref _bundleSystemState, value);
+                CreateCommand.ChangeCanExecute();
+                CancelCreateCommand.ChangeCanExecute();
+                InstallCommand.ChangeCanExecute();
+                CancelInstallCommand.ChangeCanExecute();
             }
         }
+
+        public Command CreateCommand { get => new Command(async () => await CreateBundle(), () => GetCreateCommandCanExecute());}
+        public Command CancelCreateCommand { get => new Command(() => _creatingCancellationTokenSource.Cancel(), () => BundleSystemState == EBundleSystemState.Creating); }
+        public Command InstallCommand { get => new Command(async () => await InstallBundle(), () => BundleSystemState == EBundleSystemState.Default); }
+        public Command CancelInstallCommand { get => new Command(() => _installingCancellationTokenSource.Cancel(), () => BundleSystemState == EBundleSystemState.Installing); }
+        public Command ActivateDeactivateCommand { get => new Command<Bundle>(async (bundle) => await ActivateDeactivateBundle(bundle.Id)); }
+        public Command UninstallCommand { get => new Command<Bundle>(async (bundle) => await UninstallBundle(bundle.Id)); }
+
+        private bool GetCreateCommandCanExecute()
+        {
+            return BundleSystemState == EBundleSystemState.Default && !string.IsNullOrWhiteSpace(NewBundleName);
+        }
+    }
+
+    public enum EBundleSystemState
+    {
+        Default = 1,
+        Installing = 2,
+        Creating = 3
     }
 }
