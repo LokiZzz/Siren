@@ -58,7 +58,16 @@ namespace Siren.Services
             _fileManager = DependencyService.Resolve<IFileManager>();
             _sirenFilePath = filePath;
 
-            return await UnpackBundleAsync(cancellationToken);
+            try
+            {
+                return await UnpackBundleAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                OnInstallProgressUpdate(this, new ProcessingProgress(0, "Creating cancelled..."));
+
+                return null;
+            }
         }
 
         public async Task CreateBundleAsync(Bundle bundle, CancellationToken cancellationToken)
@@ -174,9 +183,22 @@ namespace Siren.Services
 
                     using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(path))
                     {
-                        byte[] buffer = new byte[file.SizeBytesBefore];
-                        await sourceStream.ReadAsync(buffer, 0, buffer.Length);
-                        await targetStream.WriteAsync(buffer, 0, buffer.Length);
+                        try
+                        {
+                            byte[] buffer = new byte[file.SizeBytesBefore];
+                            await sourceStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                            await targetStream.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
+                        }
+                        catch(OperationCanceledException ex)
+                        {
+                            string folderToDelete = Path.Combine(
+                                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
+                                metadata.Bundle.Id.ToString()
+                            );
+                            await _fileManager.DeleteFolderAsync(folderToDelete);
+
+                            throw ex;
+                        }
                     }
 
                     double progress = (double)(metadata.CompressedFiles.IndexOf(file) + 1) / (double)metadata.CompressedFiles.Count();
