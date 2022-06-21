@@ -29,7 +29,7 @@ namespace Siren.Services
     {
         IFileManager _fileManager;
 
-        const int _metadataFrameSize = 128 * 1024; //128kB
+        const int _metadataFrameSize = 1024 * 1024; //1MB
         string _sirenFilePath = string.Empty;
 
         //string SirenTempFile => $"{_sirenFilePath}.temp";
@@ -152,7 +152,6 @@ namespace Siren.Services
         {
             SirenFileMetaData metadata = null;
 
-            //1. Unpack big melted chunk (*.siren.temp)
             //using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
             //{
             //    using (GZipStream decompressionStream = new GZipStream(sourceStream, CompressionMode.Decompress))
@@ -164,21 +163,23 @@ namespace Siren.Services
             //    }
             //}
 
-            //2. Divide big chank to separate files and put it to the Bundle folder at LocalApp directory
             using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
             {
-                //2.1 Get the metadata from metadata frame
                 metadata = await GetMetadataModel(sourceStream);
+            }
 
-                //2.2 Create bundle folder if it is not exists
-                await _fileManager.CreateFolderIfNotExistsAsync(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    metadata.Bundle.Id.ToString()
-                );
+            await _fileManager.CreateFolderIfNotExistsAsync(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                metadata.Bundle.Id.ToString()
+            );
 
-                //2.3 Divide file
-                foreach (CompressedFileInfo file in metadata.CompressedFiles)
+            long offset = _metadataFrameSize;
+
+            foreach (CompressedFileInfo file in metadata.CompressedFiles)
+            {
+                using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
                 {
+                    sourceStream.Position = offset;
                     string path = GetLocalAppDataBundleFilePath(file.Name, metadata.Bundle.Id);
 
                     using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(path))
@@ -189,10 +190,10 @@ namespace Siren.Services
                             await sourceStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
                             await targetStream.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
                         }
-                        catch(OperationCanceledException ex)
+                        catch (OperationCanceledException ex)
                         {
                             string folderToDelete = Path.Combine(
-                                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
+                                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                                 metadata.Bundle.Id.ToString()
                             );
                             await _fileManager.DeleteFolderAsync(folderToDelete);
@@ -203,13 +204,13 @@ namespace Siren.Services
 
                     double progress = (double)(metadata.CompressedFiles.IndexOf(file) + 1) / (double)metadata.CompressedFiles.Count();
                     OnInstallProgressUpdate(this, new ProcessingProgress(progress, "Unpacking elements..."));
+
+                    offset = sourceStream.Position;
                 }
             }
 
-            //3. Delete temp file
             //await _fileManager.DeleteFileAsync(SirenTempFile);
 
-            //4. Bind bundle to brand new unpacked files
             SetFilePathsToLocalAppData(metadata);
 
             OnInstallProgressUpdate(this, new ProcessingProgress(1, "Complete!"));
