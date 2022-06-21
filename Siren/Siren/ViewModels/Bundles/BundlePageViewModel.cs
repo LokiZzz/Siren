@@ -63,7 +63,7 @@ namespace Siren.ViewModels
 
                 Bundle bundle = new Bundle
                 {
-                    Name = _newBundleName,
+                    Name = NewBundleName,
                     Settings = await SceneManager.GetSettingsFromCurrentEnvironment()
                 };
 
@@ -159,7 +159,7 @@ namespace Siren.ViewModels
 
         private string GetNewBundleFileName()
         {
-            Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+            Regex rgx = new Regex("[^a-zA-Zа-яА-Я0-9 -]");
             string name = rgx.Replace(NewBundleName, "");
 
             return $"{name}.siren";
