@@ -136,6 +136,8 @@ namespace Siren.ViewModels
 
         private async Task UninstallBundle(Guid bundleId)
         {
+            IsBusy = true;
+
             //Delete from environment
             List<Bundle> bundles = await SceneManager.GetEnvironment();
             Bundle bundleToRemove = bundles.FirstOrDefault(x => x.Id == bundleId);
@@ -150,6 +152,8 @@ namespace Siren.ViewModels
 
             //Delete local VM
             Bundles.Remove(Bundles.First(x => x.Bundle.Id == bundleId));
+
+            IsBusy = false;
         }
 
         private PickOptions GetSirenFilePickOption()

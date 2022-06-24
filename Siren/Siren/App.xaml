@@ -47,6 +47,23 @@
                 <Setter Property="LineBreakMode" Value="TailTruncation"/>
             </Style>
 
+            <ControlTemplate x:Key="BusyPageTemplate">
+                <RelativeLayout>
+                    <Grid RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent,Property=Width}"
+                          RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent,Property=Height}">
+                        <ContentPresenter />
+                        <BoxView BackgroundColor="Black" 
+                             Opacity="0.7"
+                             IsVisible="{TemplateBinding BindingContext.IsBusy}"/>
+                        <ActivityIndicator Scale="1.3"  
+                                       IsVisible="{TemplateBinding BindingContext.IsBusy}" 
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" 
+                                       IsRunning="true" 
+                                       Color="White"/>
+                    </Grid>
+                </RelativeLayout>
+            </ControlTemplate>
         </ResourceDictionary>        
     </Application.Resources>
 </Application>

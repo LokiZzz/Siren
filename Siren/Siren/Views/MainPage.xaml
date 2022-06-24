@@ -6,7 +6,8 @@
              xmlns:views="clr-namespace:Siren.Views"
              xmlns:icons="clr-namespace:Siren.Assets"
              Title="{Binding Title}"
-             BackgroundColor="{StaticResource Dark}">
+             BackgroundColor="{StaticResource Dark}"
+             ControlTemplate="{StaticResource BusyPageTemplate}">
 
     <ContentPage.BindingContext>
         <vm:MainViewModel />

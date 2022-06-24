@@ -59,6 +59,8 @@ namespace Siren.ViewModels
         {
             return Task.Run(() =>
             {
+                IsBusy = true;
+
                 SelectedSetting = setting;
 
                 if (SelectedSetting != null)
@@ -70,12 +72,14 @@ namespace Siren.ViewModels
 
                     SelectedSetting.IsSelected = true;
                 }
+
+                IsBusy = false;
             });
         }
 
         private async Task DeleteSetting(SettingViewModel setting)
         {
-            bool wantToDelete = await App.Current.MainPage.DisplayAlert(
+            bool wantToDelete = await Application.Current.MainPage.DisplayAlert(
                 "Warning",
                 $"Are you really want to delete «{setting.Name}» setting?",
                 "Yes", "No"
@@ -183,9 +187,22 @@ namespace Siren.ViewModels
             await SaveCurrentEnvironment();
         }
 
+        private int _maxElementsCount = 30;
+
         private async Task AddElements()
         {
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
+
+            if(result.Count() + SelectedSetting.Elements.Count() > _maxElementsCount)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Too many files!",
+                    $"You have selected too many files, split them into groups and put them in different settings.",
+                    "Ok :("
+                );
+
+                return;
+            }
 
             foreach(FileResult element in result)
             {
@@ -212,9 +229,22 @@ namespace Siren.ViewModels
             component.Dispose();
         }
 
+        private int _maxEffectsCount = 30;
+
         private async Task AddEffects()
         {
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
+
+            if (result.Count() + SelectedSetting.Effects.Count() > _maxEffectsCount)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Too many files!",
+                    $"You have selected too many files, split them into groups and put them in different settings.",
+                    "Ok :("
+                );
+
+                return;
+            }
 
             foreach (FileResult element in result)
             {
