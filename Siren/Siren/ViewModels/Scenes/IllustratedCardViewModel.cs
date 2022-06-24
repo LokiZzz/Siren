@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Siren.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Siren.ViewModels
@@ -31,21 +34,26 @@ namespace Siren.ViewModels
                 _imagePath = value;
                 if (!string.IsNullOrEmpty(_imagePath))
                 {
-                    Image = ImageSource.FromStream(() => File.OpenRead(_imagePath));
+                    Image = ImageSource.FromStream(async (token) => await GetStream(token, _imagePath));
                 }
                 OnPropertyChanged(nameof(Image));
             }
         }
 
-        public void DeleteImageFile()
+        public async Task DeleteImageFileAsync()
         {
             Image?.Cancel();
             Image = null;
 
-            if (File.Exists(ImagePath))
-            {
-                File.Delete(ImagePath);
-            }
+            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+            await fileManager.DeleteFileAsync(ImagePath);
+        }
+
+        private async Task<Stream> GetStream(CancellationToken cancelToken, string path)
+        {
+            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+
+            return await fileManager.GetStreamToReadAsync(path);
         }
     }
 }

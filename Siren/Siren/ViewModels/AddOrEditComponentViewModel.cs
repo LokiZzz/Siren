@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Xamarin.Essentials;
@@ -73,10 +74,10 @@ namespace Siren.ViewModels
             switch(Intent)
             {
                 case EAddOrEditIntent.Add:
-                    await Add();
+                    Add();
                     break;
                 case EAddOrEditIntent.Edit:
-                    await Edit();
+                    Edit();
                     MessagingCenter.Send(this, Messages.IllustratedCardEdited);
                     break;
             }
@@ -84,48 +85,38 @@ namespace Siren.ViewModels
             await Shell.Current.GoToAsync("..");
         }
 
-        private async Task Add()
+        private void Add()
         {
-            string imagePath = await CopyImageToLocalAppFiles();
-
             switch (ComponentType)
             {
                 case EComponentType.Setting:
-                    SceneManager.AddSetting(new SettingViewModel { Name = this.Name, ImagePath = imagePath,Image = this.Image });
+                    SceneManager.AddSetting(new SettingViewModel { Name = this.Name, ImagePath = _imagePath,Image = this.Image });
                     break;
                 case EComponentType.Scene:
-                    SceneManager.AddScene(new SceneViewModel { Name = this.Name, ImagePath = imagePath, Image = this.Image });
+                    SceneManager.AddScene(new SceneViewModel { Name = this.Name, ImagePath = _imagePath, Image = this.Image });
                     break;
             }
         }
 
-        private async Task Edit()
+        private void Edit()
         {
             switch(ComponentType)
             {
                 case EComponentType.Setting:
                 case EComponentType.Scene:
-                    await EditIllustratedCard();
+                    EditIllustratedCard();
                     break;
                 case EComponentType.Element:
                 case EComponentType.Effect:
                     EditSceneComponent();
                     break;
             }
-
-            
         }
 
-        private async Task EditIllustratedCard()
+        private void EditIllustratedCard()
         {
             SceneManager.IllustratedCardToEdit.Name = Name;
-
-            if (SceneManager.IllustratedCardToEdit.ImagePath != _imagePath)
-            {
-                SceneManager.IllustratedCardToEdit.DeleteImageFile();
-                string imagePath = await CopyImageToLocalAppFiles();
-                SceneManager.IllustratedCardToEdit.ImagePath = imagePath;
-            }
+            SceneManager.IllustratedCardToEdit.ImagePath = _imagePath;
         }
 
         private void EditSceneComponent()
@@ -157,8 +148,7 @@ namespace Siren.ViewModels
                     _imagePath = SceneManager.IllustratedCardToEdit.ImagePath;
                     if (!string.IsNullOrEmpty(_imagePath))
                     {
-                        Stream stream = File.OpenRead(_imagePath);
-                        Image = ImageSource.FromStream(() => stream);
+                        Image = ImageSource.FromStream(async (token) => await GetStream(token, _imagePath));
                     }
                     OnPropertyChanged(nameof(Image));
                 }
@@ -167,23 +157,11 @@ namespace Siren.ViewModels
             InitializeVisibilityProperties();
         }
 
-        private async Task<string> CopyImageToLocalAppFiles()
+        private async Task<Stream> GetStream(CancellationToken cancelToken, string path)
         {
-            string imagePath = string.Empty;
+            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
 
-            if (Image != null && _imageFileResult != null)
-            {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(_imageFileResult.FullPath);
-                imagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName);
-                Stream stream = await _imageFileResult.OpenReadAsync();
-                using (FileStream fileStream = File.Create(imagePath))
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-                    stream.CopyTo(fileStream);
-                }
-            }
-
-            return imagePath;
+            return await fileManager.GetStreamToReadAsync(path);
         }
 
         #region Controls visibility

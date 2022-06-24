@@ -88,8 +88,8 @@ namespace Siren.ViewModels
             if (wantToDelete)
             {
                 RemoveEvents();
-                setting.DeleteImageFile();
-                setting.Scenes.ForEach(x => x.DeleteImageFile());
+                await setting.DeleteImageFileAsync();
+                setting.Scenes.ForEach(async (x) => await x.DeleteImageFileAsync());
                 setting.Scenes.Clear();
                 setting.Elements.ForEach(x => x.Dispose());
                 setting.Elements.Clear();
