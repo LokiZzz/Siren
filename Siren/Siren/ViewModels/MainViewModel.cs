@@ -55,11 +55,22 @@ namespace Siren.ViewModels
             );
         }
 
-        private void SelectSetting(SettingViewModel setting)
+        private Task SelectSetting(SettingViewModel setting)
         {
-            SelectedSetting = setting;
-            SceneManager.SelectedSetting = SelectedSetting;
-            SelectedSetting.Scenes.ForEach(x => x.ReloadImage());
+            return Task.Run(() =>
+            {
+                SelectedSetting = setting;
+
+                if (SelectedSetting != null)
+                {
+                    foreach (SettingViewModel item in Settings)
+                    {
+                        item.IsSelected = false;
+                    }
+
+                    SelectedSetting.IsSelected = true;
+                }
+            });
         }
 
         private async Task DeleteSetting(SettingViewModel setting)
@@ -259,6 +270,7 @@ namespace Siren.ViewModels
         {
             Settings = await SceneManager.GetVMFromCurrentEnvironment();
             SelectedSetting = Settings.FirstOrDefault();
+            if(SelectedSetting != null) SelectedSetting.IsSelected = true;
             AddEvents();
         }
 
@@ -298,7 +310,7 @@ namespace Siren.ViewModels
 
         public Command AddSettingCommand { get => new Command(async () => await GoToAddSetting()); }
         public Command EditSettingCommand { get => new Command<SettingViewModel>(async (setting) => await GoToEditSetting(setting)); }
-        public Command SelectSettingCommand { get => new Command<SettingViewModel>(SelectSetting); }
+        public Command SelectSettingCommand { get => new Command<SettingViewModel>(async (setting) => await SelectSetting(setting)); }
         public Command DeleteSettingCommand { get => new Command<SettingViewModel>(async (scetting) => await DeleteSetting(scetting)); }
         public Command AddSceneCommand { get => new Command(async () => await GoToAddScene()); }
         public Command EditSceneCommand { get => new Command<SceneViewModel>(async (scene) => await GoToEditScene(scene)); }
@@ -324,19 +336,7 @@ namespace Siren.ViewModels
         public SettingViewModel SelectedSetting
         {
             get => _selectedSetting;
-            set
-            {
-                SetProperty(ref _selectedSetting, value);
-
-                if(value != null)
-                { 
-                    foreach (SettingViewModel item in Settings)
-                    {
-                        item.IsSelected = false;
-                    }
-                    SelectedSetting.IsSelected = true;
-                }
-            }
+            set => SetProperty(ref _selectedSetting, value);
         }
 
         private SceneViewModel _selectedScene;

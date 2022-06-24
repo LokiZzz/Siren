@@ -88,6 +88,18 @@ namespace Siren.ViewModels
 
                 FileResult result = await FilePicker.PickAsync(GetSirenFilePickOption());
 
+                SirenFileMetaData metadata = await BundleService.GetSirenFileMetaData(result.FullPath);
+                if(Bundles.Any(x => x.Bundle.Id == metadata.Bundle.Id))
+                {
+                    await App.Current.MainPage.DisplayAlert(
+                        "Bundle already installed",
+                        $"Bundle you want to install is already installed.",
+                        "Ok"
+                    );
+
+                    return;
+                }
+
                 if (result != null)
                 {
                     Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath, _installingCancellationTokenSource.Token);

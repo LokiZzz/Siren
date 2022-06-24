@@ -90,7 +90,7 @@ namespace Siren.ViewModels
         {
             lock (_timerLocker)
             {
-                double step = 0.5;
+                double step = 1;
 
                 if (_targetVolume > Volume)
                 {

@@ -42,6 +42,7 @@ namespace Siren.ViewModels
             }
         }
 
+
         private ObservableCollection<SceneComponentViewModel> _elements;
         public ObservableCollection<SceneComponentViewModel> Elements
         {

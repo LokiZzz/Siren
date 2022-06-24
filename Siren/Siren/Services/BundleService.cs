@@ -20,6 +20,7 @@ namespace Siren.Services
         Task SaveBundleAsync(Bundle bundle, string filePath, CancellationToken cancellationToken);
         Task<Bundle> LoadBundleAsync(string filePath, CancellationToken cancellationToken);
         Task DeleteBundleFilesAsync(Guid bundleId);
+        Task<SirenFileMetaData> GetSirenFileMetaData(string filePath);
 
         event EventHandler<ProcessingProgress> OnCreateProgressUpdate;
         event EventHandler<ProcessingProgress> OnInstallProgressUpdate;
@@ -218,6 +219,19 @@ namespace Siren.Services
             return metadata.Bundle;
         }
 
+        public async Task<SirenFileMetaData> GetSirenFileMetaData(string path)
+        {
+            SirenFileMetaData metadata = null;
+            _fileManager = DependencyService.Resolve<IFileManager>();
+
+            using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(path))
+            {
+                metadata = await GetMetadataModel(sourceStream);
+            }
+
+            return metadata;
+        }
+
         public async Task DeleteBundleFilesAsync(Guid bundleId)
         {
             _fileManager = DependencyService.Resolve<IFileManager>();
@@ -269,11 +283,18 @@ namespace Siren.Services
 
         private string GetLocalAppDataBundleFilePath(string fileName, Guid bundleId)
         {
-            return Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                bundleId.ToString(),
-                fileName
-            );
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    bundleId.ToString(),
+                    fileName
+                );
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private byte[] ConvertToByteArray<T>(T objectToSerialize)

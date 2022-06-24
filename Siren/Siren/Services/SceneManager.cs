@@ -22,7 +22,6 @@ namespace Siren.Services
         public IllustratedCardViewModel IllustratedCardToEdit { get; set; }
         public SceneComponentViewModel ComponentToEdit { get; set; }
         public SettingViewModel SettingToAdd { get; private set; }
-        public SettingViewModel SelectedSetting { get; set; }
         public SceneViewModel SceneToAdd { get; private set; }
 
         public void AddSetting(SettingViewModel setting)
