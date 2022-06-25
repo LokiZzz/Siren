@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:vm="clr-namespace:Siren.ViewModels" 
+             xmlns:converters="clr-namespace:Siren.Views.Converters"
+             x:Class="Siren.Views.CheckPermissionPage"
+             Shell.PresentationMode="ModalAnimated"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource Dark}"
+             ControlTemplate="{StaticResource BusyPageTemplate}">
+    <ContentPage.BindingContext>
+        <vm:CheckPermissionViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Resources>
+        <converters:NotConverter x:Key="NotConverter"></converters:NotConverter>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <Grid ColumnDefinitions="500" VerticalOptions="Center" HorizontalOptions="Center">
+            <Frame BackgroundColor="{StaticResource Medium}">
+                <StackLayout Orientation="Vertical" 
+                             IsVisible="{Binding ShowMessage}"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Margin="15,0,15,15">
+                    
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="End" Spacing="10" Margin="0,0,0,20">
+                        <Label Text="ENG" VerticalOptions="Center" VerticalTextAlignment="Center"/>
+                        <Switch IsToggled="{Binding IsRUS}"/>
+                        <Label Text="RUS" VerticalOptions="Center" VerticalTextAlignment="Center"/>
+                    </StackLayout>
+
+                    <Grid IsVisible="{Binding IsRUS, Converter={StaticResource NotConverter}}">
+                        <StackLayout>
+                            <Label FontSize="Medium" Text="Need to give required permission!" Margin="0,0,0,10"/>
+                            <Label LineBreakMode="WordWrap" 
+                               Text="Application does not have required file system permission! Please, open the privacy settings and give the Siren app access to your file system, then press the «Refresh» button."
+                               Margin="0,0,0,20"/>
+                        </StackLayout>
+                    </Grid>
+
+                    <Grid IsVisible="{Binding IsRUS}">
+                        <StackLayout>
+                            <Label FontSize="Medium" Text="Необходимо дать разрешения!" Margin="0,0,0,10"/>
+                            <Label LineBreakMode="WordWrap" 
+                               Text="У приложения нет доступа к файловой системе! Пожалуйста, откройте настройки приватности и дайте доступ приложению Siren к файловой системе, после чего нажмите кнопку «Refresh»."
+                               Margin="0,0,0,20"/>
+                        </StackLayout>
+                    </Grid>
+
+                    <Button Text="Open privacy settings" Command="{Binding CheckCommand}"/>
+                    <Button Text="Refresh" Command="{Binding CheckCommand}"/>
+                </StackLayout>
+            </Frame>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

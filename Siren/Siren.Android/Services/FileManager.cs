@@ -49,5 +49,10 @@ namespace Siren.Droid.Services
         {
             return await Task.FromResult(new FileStream(filePath, FileMode.Create));
         }
+
+        public Task<bool> TestFileManagerAsync()
+        {
+            return Task.Run(() => true);
+        }
     }
 }

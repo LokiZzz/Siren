@@ -57,5 +57,40 @@ namespace Siren.UWP.Services
 
             return await file.OpenStreamForWriteAsync();
         }
+
+        public async Task<bool> TestFileManagerAsync()
+        {
+            try
+            {
+                string fileName = "permission_test.txt";
+                string fileContent = "Swift as a shadow...";
+
+                //Create
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(path));
+                StorageFile createFile = await storageFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+
+                //Write
+                await FileIO.WriteTextAsync(createFile, fileContent);
+
+                //Read
+                StorageFile readFile = await storageFolder.GetFileAsync(fileName);
+                string text = await Windows.Storage.FileIO.ReadTextAsync(readFile);
+                if (!text.Equals(fileContent))
+                {
+                    throw new Exception("Test file content is not valid.");
+                }
+
+                //Delete
+                StorageFile deleteFile = await storageFolder.GetFileAsync(fileName);
+                await deleteFile.DeleteAsync();
+
+                return true;
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+        }
     }
 }

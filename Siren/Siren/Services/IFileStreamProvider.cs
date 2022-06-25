@@ -13,5 +13,6 @@ namespace Siren.Services
         Task CreateFolderIfNotExistsAsync(string folderPath, string folderName);
         Task DeleteFileAsync(string filePath);
         Task DeleteFolderAsync(string folderPath);
+        Task<bool> TestFileManagerAsync();
     }
 }
