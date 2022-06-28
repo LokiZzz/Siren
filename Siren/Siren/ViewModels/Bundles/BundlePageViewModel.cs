@@ -88,20 +88,21 @@ namespace Siren.ViewModels
 
                 FileResult result = await FilePicker.PickAsync(GetSirenFilePickOption());
 
-                SirenFileMetaData metadata = await BundleService.GetSirenFileMetaData(result.FullPath);
-                if(Bundles.Any(x => x.Bundle.Id == metadata.Bundle.Id))
-                {
-                    await App.Current.MainPage.DisplayAlert(
-                        "Bundle already installed",
-                        $"Bundle you want to install is already installed.",
-                        "Ok"
-                    );
-
-                    return;
-                }
-
                 if (result != null)
                 {
+                    SirenFileMetaData metadata = await BundleService.GetSirenFileMetaData(result.FullPath);
+                    if (Bundles.Any(x => x.Bundle.Id == metadata.Bundle.Id))
+                    {
+                        await App.Current.MainPage.DisplayAlert(
+                            "Bundle already installed",
+                            $"Bundle you want to install is already installed.",
+                            "Ok"
+                        );
+                        BundleSystemState = EBundleSystemState.Default;
+
+                        return;
+                    }
+
                     Bundle unpackedBundle = await BundleService.LoadBundleAsync(result.FullPath, _installingCancellationTokenSource.Token);
 
                     if (unpackedBundle != null)
@@ -138,19 +139,15 @@ namespace Siren.ViewModels
         {
             IsBusy = true;
 
-            //Delete from environment
             List<Bundle> bundles = await SceneManager.GetEnvironment();
             Bundle bundleToRemove = bundles.FirstOrDefault(x => x.Id == bundleId);
             bundles.Remove(bundleToRemove);
             await SceneManager.SaveEnvironment(bundles);
 
-            //Update MainViewModel
             MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
 
-            //Delete files
             await BundleService.DeleteBundleFilesAsync(bundleId);
 
-            //Delete local VM
             Bundles.Remove(Bundles.First(x => x.Bundle.Id == bundleId));
 
             IsBusy = false;

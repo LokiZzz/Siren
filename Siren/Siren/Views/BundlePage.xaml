@@ -60,14 +60,14 @@
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
                             <Frame BackgroundColor="{StaticResource VeryDark}" VerticalOptions="Start" Margin="5">
-                                <Grid RowDefinitions="*,*" ColumnDefinitions="200,*" VerticalOptions="Start" RowSpacing="15">
+                                <Grid RowDefinitions="auto,*,auto" ColumnDefinitions="auto,*" VerticalOptions="Start" RowSpacing="15">
                                     
                                     <Label Grid.Row="0" Grid.Column="0" 
-                                           VerticalTextAlignment="Center"
-                                           VerticalOptions="Center"
+                                           VerticalTextAlignment="Start"
+                                           VerticalOptions="Start"
                                            Text="{Binding Bundle.Name, StringFormat='{0}.siren'}"
                                            FontSize="Medium"/>
-
+                                    
                                     <Switch Grid.Row="0" Grid.Column="1" 
                                             HorizontalOptions="End"
                                             VerticalOptions="Start"
@@ -80,8 +80,30 @@
                                                 CommandParameter="{Binding Bundle}"/>
                                         </Switch.Behaviors>
                                     </Switch>
-                                    
-                                    <Button Text="Uninstall" Grid.Row="1" Grid.ColumnSpan="2"
+
+                                    <Grid Grid.Row="1" Grid.ColumnSpan="2" 
+                                          ColumnDefinitions="auto,auto,auto,auto" RowDefinitions="*,*"
+                                          ColumnSpacing="10">
+                                        <Grid.Resources>
+                                            <Style TargetType="Label">
+                                                <Setter Property="HorizontalOptions" Value="Start"/>
+                                                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                                            </Style>
+                                        </Grid.Resources>
+                                        <Label Grid.Row="0" Grid.Column="0" Text="Settings: "/>
+                                        <Label Grid.Row="1" Grid.Column="0" Text="Scenes: "/>
+                                        <Label Grid.Row="0" Grid.Column="2" Text="Elements: "/>
+                                        <Label Grid.Row="1" Grid.Column="2" Text="Effects: "/>
+
+                                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding SettingsCount}"/>
+                                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding ScenesCount}"/>
+                                        <Label Grid.Row="0" Grid.Column="3" Text="{Binding ElementsCount}"/>
+                                        <Label Grid.Row="1" Grid.Column="3" Text="{Binding EffectsCount}"/>
+                                    </Grid>
+
+                                    <Label Grid.Row="2" Grid.Column="0" Text="{Binding Bundle.SizeWithSuffix}" FontSize="Medium" Margin="0,0,15,0"/>
+
+                                    <Button Text="Uninstall" Grid.Row="2" Grid.Column="1"
                                             Command="{Binding BindingContext.UninstallCommand,Source={x:Reference BundlesList}}" 
                                                 CommandParameter="{Binding Bundle}"/>
 

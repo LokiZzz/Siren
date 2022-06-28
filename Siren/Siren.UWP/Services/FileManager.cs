@@ -58,6 +58,11 @@ namespace Siren.UWP.Services
             return await file.OpenStreamForWriteAsync();
         }
 
+        public async Task RequestFileSystemPermissionAsync()
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-broadfilesystemaccess"));
+        }
+
         public async Task<bool> TestFileManagerAsync()
         {
             try

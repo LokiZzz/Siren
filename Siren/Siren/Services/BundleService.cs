@@ -97,6 +97,7 @@ namespace Siren.Services
                     {
                         targetStream.Position = targetStream.Length;
                         await sourceStream.CopyToAsync(targetStream, 81920, cancellationToken);
+                        metadata.Bundle.Size = targetStream.Length;
                     }
 
                     metadata.CompressedFiles.Add(new CompressedFileInfo

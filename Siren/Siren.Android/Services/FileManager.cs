@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 [assembly: Dependency(typeof(FileManager))]
@@ -48,6 +49,11 @@ namespace Siren.Droid.Services
         public async ValueTask<Stream> GetStreamToWriteAsync(string filePath)
         {
             return await Task.FromResult(new FileStream(filePath, FileMode.Create));
+        }
+
+        public async Task RequestFileSystemPermissionAsync()
+        {
+            await Permissions.RequestAsync<Permissions.StorageWrite>();
         }
 
         public Task<bool> TestFileManagerAsync()

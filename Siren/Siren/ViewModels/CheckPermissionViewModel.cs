@@ -13,22 +13,19 @@ namespace Siren.ViewModels
     {
         public CheckPermissionViewModel()
         {
-            CheckCommand = new Command(async () => await TryCheck());
-            //Task.Run(async () => await Check());
+            RequestPermissionCommand = new Command(async () => await Request());
+            RefreshCommand = new Command(async () => await Refresh());
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                await Check();
+                await Refresh();
             });
         }
 
-        public Command CheckCommand { get; set; }
+        public Command RequestPermissionCommand { get; set; }
+        public Command RefreshCommand { get; set; }
 
-        private async Task TryCheck()
-        {
-            await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
-        }
-
-        private async Task Check()
+        private async Task Refresh()
         {
             IsBusy = true;
 
@@ -43,6 +40,13 @@ namespace Siren.ViewModels
             ShowMessage = !allIsFine;
 
             IsBusy = false;
+        }
+
+        private async Task Request()
+        {
+            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+
+            await fileManager.RequestFileSystemPermissionAsync();
         }
 
         private bool _showMessage = false;

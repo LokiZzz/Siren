@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Siren.Utility;
 
 namespace Siren.Models
 {
@@ -10,6 +11,8 @@ namespace Siren.Models
         public string Name { get; set; }
         public List<Setting> Settings { get; set; }
         public bool IsActivated { get; set; }
+        public long Size { get; set; }
+        public string SizeWithSuffix => Size.ToFileSize();
     }
 
     public class Setting

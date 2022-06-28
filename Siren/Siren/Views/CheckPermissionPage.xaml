@@ -17,10 +17,9 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <Grid ColumnDefinitions="500" VerticalOptions="Center" HorizontalOptions="Center">
+        <Grid ColumnDefinitions="500" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="{Binding ShowMessage}">
             <Frame BackgroundColor="{StaticResource Medium}">
                 <StackLayout Orientation="Vertical" 
-                             IsVisible="{Binding ShowMessage}"
                              VerticalOptions="Center"
                              HorizontalOptions="Center"
                              Margin="15,0,15,15">
@@ -35,7 +34,7 @@
                         <StackLayout>
                             <Label FontSize="Medium" Text="Need to give required permission!" Margin="0,0,0,10"/>
                             <Label LineBreakMode="WordWrap" 
-                               Text="Application does not have required file system permission! Please, open the privacy settings and give the Siren app access to your file system, then press the «Refresh» button."
+                               Text="Open the privacy settings and give the application permission to work with the file system. After changing the privacy settings, the application will close and need to be launched again."
                                Margin="0,0,0,20"/>
                         </StackLayout>
                     </Grid>
@@ -44,13 +43,13 @@
                         <StackLayout>
                             <Label FontSize="Medium" Text="Необходимо дать разрешения!" Margin="0,0,0,10"/>
                             <Label LineBreakMode="WordWrap" 
-                               Text="У приложения нет доступа к файловой системе! Пожалуйста, откройте настройки приватности и дайте доступ приложению Siren к файловой системе, после чего нажмите кнопку «Refresh»."
+                               Text="Откройте настройки приватности и дайте приложению разрешение работать с файловой системой. После изменения настроек приватности приложение закроется и его нужно будет запустить снова."
                                Margin="0,0,0,20"/>
                         </StackLayout>
                     </Grid>
 
-                    <Button Text="Open privacy settings" Command="{Binding CheckCommand}"/>
-                    <Button Text="Refresh" Command="{Binding CheckCommand}"/>
+                    <Button Text="Open privacy settings" Command="{Binding RequestPermissionCommand}"/>
+                    <!--<Button Text="Refresh" Command="{Binding RefreshCommand}"/>-->
                 </StackLayout>
             </Frame>
         </Grid>
