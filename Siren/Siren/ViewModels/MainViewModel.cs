@@ -73,6 +73,8 @@ namespace Siren.ViewModels
                     SelectedSetting.IsSelected = true;
                 }
 
+                ShowSettingEditTools = SelectedSetting != null;
+
                 IsBusy = false;
             });
         }
@@ -88,8 +90,6 @@ namespace Siren.ViewModels
             if (wantToDelete)
             {
                 RemoveEvents();
-                await setting.DeleteImageFileAsync();
-                setting.Scenes.ForEach(async (x) => await x.DeleteImageFileAsync());
                 setting.Scenes.Clear();
                 setting.Elements.ForEach(x => x.Dispose());
                 setting.Elements.Clear();
@@ -97,6 +97,12 @@ namespace Siren.ViewModels
                 setting.Effects.Clear();
                 AddEvents();
                 Settings.Remove(setting);
+
+                if(!Settings.Any())
+                {
+                    await SelectScene(null);
+                    await SelectSetting(null);
+                }
             }
         }
 
@@ -133,7 +139,7 @@ namespace Siren.ViewModels
 
             foreach (SceneComponentViewModel element in Settings.SelectMany(x => x.Elements))
             {
-                TrackSetupViewModel existingElement = SelectedScene.Elements
+                TrackSetupViewModel existingElement = SelectedScene?.Elements?
                     .FirstOrDefault(x => x.FilePath.Equals(element.FilePath));
 
                 if (existingElement != null)
@@ -155,6 +161,8 @@ namespace Siren.ViewModels
             OnPropertyChanged(nameof(IsScenePlaying));
             OnPropertyChanged(nameof(CurrentSceneText));
             Settings.ForEach(x => x.UpdateHasSelectedScene());
+
+            ShowSceneEditTools = SelectedScene != null;
         }
 
         private async Task DeleteScene(SceneViewModel scene)
@@ -212,6 +220,8 @@ namespace Siren.ViewModels
                     SelectedSetting.Elements.Add(player);
                 }
             }
+
+            OnPropertyChanged(nameof(CurrentElementsCountString));
         }
 
         private async Task GoToEditElement(SceneComponentViewModel element)
@@ -227,6 +237,7 @@ namespace Siren.ViewModels
         {
             SelectedSetting.Elements.Remove(component);
             component.Dispose();
+            OnPropertyChanged(nameof(CurrentElementsCountString));
         }
 
         private int _maxEffectsCount = 30;
@@ -254,6 +265,8 @@ namespace Siren.ViewModels
                     SelectedSetting.Effects.Add(player);
                 }
             }
+
+            OnPropertyChanged(nameof(CurrentEffectsCountString));
         }
 
         private async Task GoToEditEffect(SceneComponentViewModel effect)
@@ -269,6 +282,7 @@ namespace Siren.ViewModels
         {
             SelectedSetting.Effects.Remove(component);
             component.Dispose();
+            OnPropertyChanged(nameof(CurrentEffectsCountString));
         }
 
         private async Task GlobalPlayStop()
@@ -299,9 +313,14 @@ namespace Siren.ViewModels
         private async Task IntializeCollections()
         {
             Settings = await SceneManager.GetVMFromCurrentEnvironment();
-            SelectedSetting = Settings.FirstOrDefault();
-            if(SelectedSetting != null) SelectedSetting.IsSelected = true;
+            await SelectSetting(Settings.FirstOrDefault());
             AddEvents();
+
+            if (!Settings.Any())
+            {
+                await SelectScene(null);
+                await SelectSetting(null);
+            }
         }
 
         private void AddEvents()
@@ -383,7 +402,10 @@ namespace Siren.ViewModels
                     {
                         item.IsSelected = false;
                     }
-                    SelectedScene.IsSelected = true;
+                    if (SelectedScene != null)
+                    {
+                        SelectedScene.IsSelected = true;
+                    }
                 }
             }
         }
@@ -410,5 +432,48 @@ namespace Siren.ViewModels
             }
         }
 
+        private bool _showSettingEditTools;
+        public bool ShowSettingEditTools
+        {
+            get =>  _showSettingEditTools;
+            set => SetProperty(ref _showSettingEditTools, value);
+        }
+
+        private bool _showSceneEditTools;
+        public bool ShowSceneEditTools
+        {
+            get => _showSceneEditTools;
+            set => SetProperty(ref _showSceneEditTools, value);
+        }
+
+        public string CurrentElementsCountString
+        {
+            get
+            {
+                int current = SelectedSetting?.Elements?.Count ?? 0;
+                int max = _maxElementsCount;
+
+                OnPropertyChanged(nameof(FreeElementsSpace));
+
+                return $"{current}/{max}";
+            }
+        }
+
+        public double FreeElementsSpace => ((double?)SelectedSetting?.Elements?.Count ?? 0) / _maxElementsCount;
+
+        public string CurrentEffectsCountString
+        {
+            get
+            {
+                int current = SelectedSetting?.Effects?.Count ?? 0;
+                int max = _maxElementsCount;
+
+                OnPropertyChanged(nameof(FreeEffectsSpace));
+
+                return $"{current}/{max}";
+            }
+        }
+
+        public double FreeEffectsSpace => ((double?)SelectedSetting?.Effects?.Count ?? 0) / _maxElementsCount;
     }
 }
