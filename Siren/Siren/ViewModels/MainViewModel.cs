@@ -35,7 +35,7 @@ namespace Siren.ViewModels
             );
         }
 
-        private void AddSetting(SceneManager manager)
+        private async Task AddSetting(SceneManager manager)
         {
             SettingViewModel newSetting = new SettingViewModel
             {
@@ -43,7 +43,7 @@ namespace Siren.ViewModels
                 ImagePath = SceneManager.SettingToAdd.ImagePath,
             };
             Settings.Add(newSetting);
-            SelectedSetting = newSetting;
+            await SelectSetting(newSetting);
         }
 
         private async Task GoToEditSetting(SettingViewModel setting)
@@ -74,6 +74,8 @@ namespace Siren.ViewModels
                 }
 
                 ShowSettingEditTools = SelectedSetting != null;
+                OnPropertyChanged(nameof(CurrentElementsCountString));
+                OnPropertyChanged(nameof(CurrentEffectsCountString));
 
                 IsBusy = false;
             });
@@ -351,7 +353,7 @@ namespace Siren.ViewModels
         private void InitializeMessagingCenter()
         {
             MessagingCenter.Subscribe<SceneComponentViewModel>(this, Messages.ElementPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsScenePlaying)));
-            MessagingCenter.Subscribe<SceneManager>(this, Messages.SettingAdded, AddSetting);
+            MessagingCenter.Subscribe<SceneManager>(this, Messages.SettingAdded, async (setting) => await AddSetting(setting));
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SceneAdded, AddScene);
             MessagingCenter.Subscribe<AddOrEditComponentViewModel>(this, Messages.IllustratedCardEdited, async (manager) => await SaveCurrentEnvironment());
             MessagingCenter.Subscribe<BundlePageViewModel>(this, Messages.NeedToUpdateEnvironment, async (manager) => await IntializeCollections());

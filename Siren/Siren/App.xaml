@@ -13,9 +13,15 @@
             <Color x:Key="Dark">#2f3136</Color>
             <Color x:Key="Medium">#36393f</Color>
             <Color x:Key="Light">#40444b</Color>
+            <Color x:Key="VeryLight">#b9bbbe</Color>
 
-            <Color x:Key="Primary">#2f3136</Color>
-            <Color x:Key="WeakPrimary">#77FF6978</Color>
+            <Color x:Key="Green">#CCFF66</Color>
+            <Color x:Key="DarkGreen">#b0da5c</Color>
+            <Color x:Key="Red">#E75A7C</Color>
+            <Color x:Key="Blue">#6C91BF</Color>
+            <Color x:Key="Orange">#F3D8C7</Color>
+            
+            <Color x:Key="Disabled">#77E75A7C</Color>
 
             <Style TargetType="Button">
                 <Setter Property="TextColor" Value="{StaticResource TextColor}"></Setter>
@@ -24,12 +30,12 @@
                         <VisualStateGroup x:Name="CommonStates">
                             <VisualState x:Name="Normal">
                                 <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="#40444b" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource Light}" />
                                 </VisualState.Setters>
                             </VisualState>
                             <VisualState x:Name="Disabled">
                                 <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="{StaticResource WeakPrimary}" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource Disabled}" />
                                 </VisualState.Setters>
                             </VisualState>
                         </VisualStateGroup>

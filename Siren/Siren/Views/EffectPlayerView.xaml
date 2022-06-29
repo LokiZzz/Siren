@@ -29,12 +29,12 @@
                         Style="{StaticResource PlayerControlButton}" 
                         Text="{x:Static icons:FAFont.CirclePlay}" 
                         Command="{Binding PlayCommand}"
-                        BackgroundColor="LightGreen"
+                        BackgroundColor="{StaticResource DarkGreen}"
                         Margin="0,0,10,0">
                     <Button.Triggers>
                         <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
                             <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
-                            <Setter Property="BackgroundColor" Value="HotPink"/>
+                            <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
                             <Setter Property="Command" Value="{Binding StopCommand}"/>
                         </DataTrigger>
                     </Button.Triggers>
@@ -59,7 +59,7 @@
                     Text="{x:Static icons:FAFont.CircleXmark}" 
                     Command="{Binding BindingContext.DeleteEffectCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
                     CommandParameter="{Binding .}"
-                    BackgroundColor="HotPink"/>
+                    BackgroundColor="{StaticResource Red}"/>
                 <Button Grid.Row="1" VerticalOptions="Fill"
                     CornerRadius="3"
                     FontSize="18"
@@ -67,7 +67,7 @@
                     Text="{x:Static icons:FAFont.PenToSquare}" 
                     Command="{Binding BindingContext.EditEffectCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
                     CommandParameter="{Binding .}"
-                    BackgroundColor="DeepSkyBlue"/>
+                    BackgroundColor="{StaticResource Blue}"/>
             </Grid>
         </Grid>
     </Grid>

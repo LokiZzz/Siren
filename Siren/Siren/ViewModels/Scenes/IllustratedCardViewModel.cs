@@ -22,7 +22,11 @@ namespace Siren.ViewModels
         public ImageSource Image
         {
             get => _image;
-            set => SetProperty(ref _image, value);
+            set
+            {
+                SetProperty(ref _image, value);
+                OnPropertyChanged(nameof(HasImage));
+            }
         }
 
         private string _imagePath;
@@ -39,6 +43,8 @@ namespace Siren.ViewModels
                 OnPropertyChanged(nameof(Image));
             }
         }
+
+        public bool HasImage => Image != null;
 
         public async Task DeleteImageFileAsync()
         {

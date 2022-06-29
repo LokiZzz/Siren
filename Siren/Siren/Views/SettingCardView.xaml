@@ -4,59 +4,67 @@
              xmlns:icons="clr-namespace:Siren.Assets"
              x:Class="Siren.Views.SettingCardView">
 
-    <Grid Padding="10" RowDefinitions="80" ColumnDefinitions="300">
-        <Grid.Triggers>
+    <Grid RowDefinitions="80" ColumnDefinitions="300" Padding="10,0">
+        <!--<Grid.Triggers>
             <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
-                <Setter Property="BackgroundColor" Value="LightGreen" />
+                <Setter Property="BackgroundColor" Value="{StaticResource VeryLight}" />
             </DataTrigger>
-        </Grid.Triggers>
+        </Grid.Triggers>-->
 
-        <Frame BackgroundColor="{StaticResource Light}" Padding="10">
-            <Grid RowDefinitions="*,auto" ColumnDefinitions="*,auto">
+        <!--<Frame Margin="5" Padding="5" CornerRadius="17">
+            <Frame.Triggers>
+                <DataTrigger TargetType="Frame" Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="BackgroundColor" Value="{StaticResource Green}" />
+                </DataTrigger>
+            </Frame.Triggers>-->
+            
+            <Frame BackgroundColor="{StaticResource Light}" Padding="10" CornerRadius="12">
+                <Grid RowDefinitions="*,auto" ColumnDefinitions="*,auto">
                 
-                <Image Source="{Binding Image}" Aspect="AspectFill" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10"/>
+                    <Image Source="{Binding Image}" Aspect="AspectFill" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10"/>
 
-                <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10" Opacity="0.4">
-                    <Rectangle.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Color="Black" Offset="0" />
-                            <GradientStop Color="White" Offset="1" />
-                        </LinearGradientBrush>
-                    </Rectangle.Background>
-                </Rectangle>
+                    <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10" Opacity="0.4" IsVisible="{Binding HasImage}">
+                        <Rectangle.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="Black" Offset="0" />
+                                <GradientStop Color="White" Offset="1" />
+                            </LinearGradientBrush>
+                        </Rectangle.Background>
+                    </Rectangle>
 
-                <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" 
-                           Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10"
-                           IsVisible="{Binding HasSelectedScene}">
-                    <Rectangle.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                            <GradientStop Color="Transparent" Offset="0" />
-                            <GradientStop Color="White" Offset="1" />
-                        </LinearGradientBrush>
-                    </Rectangle.Background>
-                </Rectangle>
+                    <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" 
+                               Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10"
+                               IsVisible="{Binding IsSelected}">
+                        <Rectangle.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="Transparent" Offset="0" />
+                                <GradientStop Color="{StaticResource Green}" Offset="1" />
+                            </LinearGradientBrush>
+                        </Rectangle.Background>
+                    </Rectangle>
 
-                <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}" TextColor="White"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}" TextColor="White"/>
                 
-                <Label Grid.Row="1" Grid.Column="0" IsVisible="{Binding HasSelectedScene}"
-                       FontSize="24" FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}"
-                       VerticalOptions="End" VerticalTextAlignment="End"
-                       HorizontalOptions="Start" HorizontalTextAlignment="Start"
-                       TextColor="Black"/>
+                    <Label Grid.Row="1" Grid.Column="0" IsVisible="{Binding HasSelectedScene}"
+                           FontSize="24" FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}"
+                           VerticalOptions="End" VerticalTextAlignment="End"
+                           HorizontalOptions="Start" HorizontalTextAlignment="Start"
+                           TextColor="{StaticResource Green}"/>
                 
-                <Button Grid.Row="0" Grid.Column="1" CornerRadius="3" WidthRequest="30" HeightRequest="30"
-                        FontSize="12" FontFamily="FA" Text="{x:Static icons:FAFont.CircleXmark}" 
-                        Command="{Binding BindingContext.DeleteSettingCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
-                        CommandParameter="{Binding .}"
-                        BackgroundColor="HotPink"/>
+                    <Button Grid.Row="0" Grid.Column="1" CornerRadius="3" WidthRequest="30" HeightRequest="30"
+                            FontSize="12" FontFamily="FA" Text="{x:Static icons:FAFont.CircleXmark}" 
+                            Command="{Binding BindingContext.DeleteSettingCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            CommandParameter="{Binding .}"
+                            BackgroundColor="{StaticResource Red}"/>
 
-                <Button Grid.Row="1" Grid.Column="1" CornerRadius="3" WidthRequest="30" HeightRequest="30"
-                        FontSize="12" FontFamily="FA" Text="{x:Static icons:FAFont.PenToSquare}" 
-                        Command="{Binding BindingContext.EditSettingCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
-                        CommandParameter="{Binding .}"
-                        BackgroundColor="DodgerBlue"/>
-            </Grid>
-        </Frame>
+                    <Button Grid.Row="1" Grid.Column="1" CornerRadius="3" WidthRequest="30" HeightRequest="30"
+                            FontSize="12" FontFamily="FA" Text="{x:Static icons:FAFont.PenToSquare}" 
+                            Command="{Binding BindingContext.EditSettingCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            CommandParameter="{Binding .}"
+                            BackgroundColor="{StaticResource Blue}"/>
+                </Grid>
+            </Frame>
+        <!--</Frame>-->
     </Grid>
 
 </ContentView>

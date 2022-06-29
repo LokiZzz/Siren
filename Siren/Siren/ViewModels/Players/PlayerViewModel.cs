@@ -38,14 +38,25 @@ namespace Siren.ViewModels
 
         public virtual async Task PlayPause()
         {
-            if(!_loaded)
+            try
             {
-                await Load(FilePath);
-                _loaded = true;
-            }
+                if (!_loaded)
+                {
+                    await Load(FilePath);
+                    _loaded = true;
+                }
 
-            Player.PlayPause();
-            OnPropertyChanged(nameof(IsPlaying));
+                Player.PlayPause();
+                OnPropertyChanged(nameof(IsPlaying));
+            }
+            catch (FileNotFoundException)
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Error",
+                    $"File {FilePath} is missing. Try to restore file to this path or delete the element and add it again.",
+                    "Oh? Ok..."
+                );
+            }
         }
 
         public async Task SmoothPlay(double targetVolume)
@@ -90,7 +101,7 @@ namespace Siren.ViewModels
         {
             lock (_timerLocker)
             {
-                double step = 1;
+                double step = 0.5;
 
                 if (_targetVolume > Volume)
                 {
