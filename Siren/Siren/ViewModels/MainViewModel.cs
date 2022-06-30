@@ -100,7 +100,7 @@ namespace Siren.ViewModels
                 AddEvents();
                 Settings.Remove(setting);
 
-                if(!Settings.Any())
+                if (!Settings.Any())
                 {
                     await SelectScene(null);
                     await SelectSetting(null);
@@ -203,7 +203,7 @@ namespace Siren.ViewModels
         {
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
-            if(result.Count() + SelectedSetting.Elements.Count() > _maxElementsCount)
+            if (result.Count() + SelectedSetting.Elements.Count() > _maxElementsCount)
             {
                 await Application.Current.MainPage.DisplayAlert(
                     "Too many files!",
@@ -214,7 +214,7 @@ namespace Siren.ViewModels
                 return;
             }
 
-            foreach(FileResult element in result)
+            foreach (FileResult element in result)
             {
                 if (!SelectedSetting.Elements.Any(x => x.FilePath.Equals(element.FullPath)))
                 {
@@ -287,10 +287,20 @@ namespace Siren.ViewModels
             OnPropertyChanged(nameof(CurrentEffectsCountString));
         }
 
+        private bool _globalPlayActivityIndicatorIsVisible = false;
+        public bool GlobalPlayActivityIndicatorIsVisible
+        {
+            get => _globalPlayActivityIndicatorIsVisible;
+            set => SetProperty(ref _globalPlayActivityIndicatorIsVisible, value);
+        }
+
+
         private async Task GlobalPlayStop()
         {
-            if(IsScenePlaying)
+            if (IsScenePlaying)
             {
+                GlobalPlayActivityIndicatorIsVisible = true;
+
                 Settings.SelectMany(x => x.Elements)
                     .Where(x => x.IsPlaying)
                     .ForEach(x => x.SmoothStop());
@@ -341,9 +351,9 @@ namespace Siren.ViewModels
 
         private void BindNewSettingEvents(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if(e.Action == NotifyCollectionChangedAction.Add)
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach(SettingViewModel item in e.NewItems)
+                foreach (SettingViewModel item in e.NewItems)
                 {
                     item.SettingChanged += SaveCurrentEnvironment;
                 }
@@ -399,7 +409,7 @@ namespace Siren.ViewModels
                 SetProperty(ref _selectedScene, value);
 
                 if (SelectedSetting != null)
-                { 
+                {
                     foreach (SceneViewModel item in SelectedSetting.Scenes)
                     {
                         item.IsSelected = false;
@@ -412,7 +422,20 @@ namespace Siren.ViewModels
             }
         }
 
-        public bool IsScenePlaying => Settings.SelectMany(x => x.Elements).Any(x => x.IsPlaying) == true;
+        public bool IsScenePlaying
+        {
+            get
+            {
+                bool isScenePlaying = Settings.SelectMany(x => x.Elements).Any(x => x.IsPlaying);
+                
+                if(GlobalPlayActivityIndicatorIsVisible && !isScenePlaying)
+                {
+                    GlobalPlayActivityIndicatorIsVisible = false;
+                }
+
+                return isScenePlaying;
+            }
+        }
 
         public string CurrentSceneText
         {

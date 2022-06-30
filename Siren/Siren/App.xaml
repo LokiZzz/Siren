@@ -29,11 +29,6 @@
                 <Setter Property="VisualStateManager.VisualStateGroups">
                     <VisualStateGroupList>
                         <VisualStateGroup x:Name="CommonStates">
-                            <VisualState x:Name="Normal">
-                                <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="{StaticResource Light}" />
-                                </VisualState.Setters>
-                            </VisualState>
                             <VisualState x:Name="Disabled">
                                 <VisualState.Setters>
                                     <Setter Property="BackgroundColor" Value="{StaticResource Disabled}" />
@@ -42,6 +37,7 @@
                         </VisualStateGroup>
                     </VisualStateGroupList>
                 </Setter>
+                <Setter Property="BackgroundColor" Value="{StaticResource Light}"></Setter>
             </Style>
 
             <Style TargetType="Grid">
@@ -67,6 +63,20 @@
             <Style TargetType="Button" x:Key="EditButton" BasedOn="{StaticResource DeleteButton}">
                 <Setter Property="Text" Value="{x:Static icons:FAFont.PenToSquare}"/>
                 <Setter Property="BackgroundColor" Value="{StaticResource Blue}"/>
+            </Style>
+
+            <Style TargetType="Button" x:Key="EditAliasButton">
+                <Setter Property="FontFamily" Value="FA"/>
+                <Setter Property="Text" Value="{x:Static icons:FAFont.PenToSquare}"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+            </Style>
+
+            <Style x:Key="PlayerControlButton" TargetType="Button">
+                <Setter Property="HeightRequest" Value="50"/>
+                <Setter Property="WidthRequest" Value="50"/>
+                <Setter Property="CornerRadius" Value="25"/>
+                <Setter Property="FontFamily" Value="FA"/>
+                <Setter Property="FontSize" Value="26"/>
             </Style>
 
             <ControlTemplate x:Key="BusyPageTemplate">

@@ -140,21 +140,25 @@
 
         <Grid Grid.Row="3" Grid.ColumnSpan="2">
             <StackLayout Orientation="Horizontal" Margin="10" Spacing="10">
-                <Button FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" FontSize="32"
-                        Command="{Binding GlobalPlayCommand}"
-                        BackgroundColor="{StaticResource DarkGreen}"
-                        WidthRequest="300"
-                        HeightRequest="50"
-                        CornerRadius="12"
-                        HorizontalOptions="Center">
-                    <Button.Triggers>
-                        <DataTrigger TargetType="Button" Binding="{Binding IsScenePlaying}" Value="True">
-                            <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
-                            <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
-                        </DataTrigger>
-                    </Button.Triggers>
-                </Button>
-
+                <Grid WidthRequest="300" HeightRequest="50">
+                    <Button FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" FontSize="32"
+                            Command="{Binding GlobalPlayCommand}"
+                            BackgroundColor="{StaticResource DarkGreen}"
+                            HorizontalOptions="Fill"
+                            CornerRadius="12">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsScenePlaying}" Value="True">
+                                <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
+                                <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Button" Binding="{Binding GlobalPlayActivityIndicatorIsVisible}" Value="True">
+                                <Setter Property="Text" Value=""/>
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    <ActivityIndicator IsVisible="{Binding GlobalPlayActivityIndicatorIsVisible}" IsRunning="True" Color="White"/>
+                </Grid>
+                
                 <Label Text="{Binding CurrentSceneText}" 
                        HorizontalOptions="Start" 
                        FontSize="24" 
