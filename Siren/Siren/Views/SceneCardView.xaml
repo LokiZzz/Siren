@@ -6,9 +6,9 @@
              x:Class="Siren.Views.SceneCardView"
              LayoutChanged="ContentView_LayoutChanged">
 
-    <Grid Padding="0,10" RowDefinitions="80" ColumnDefinitions="300">
+    <Grid Padding="0,10" RowDefinitions="85" ColumnDefinitions="230">
 
-        <Frame BackgroundColor="{StaticResource Light}" Padding="10" CornerRadius="12">
+        <Frame BackgroundColor="{StaticResource Light}" Padding="10" CornerRadius="{StaticResource CornerRadiusOuter}">
             <Grid ColumnDefinitions="*,auto">
 
                 <ff:CachedImage x:Name="Image" Source="{Binding Image}" Aspect="AspectFill" Grid.ColumnSpan="2" Margin="-10"/>
@@ -35,13 +35,20 @@
 
                 <Label Grid.Column="0" VerticalOptions="End" VerticalTextAlignment="End" Text="{Binding Name}" TextColor="White"/>
 
-                <Grid Grid.Column="1">
-                    <Button Grid.Row="0"
+                <Grid Grid.Column="1" RowDefinitions="*,*" ColumnDefinitions="*,*" ColumnSpacing="5" RowSpacing="5">
+                    <Button Grid.Row="0" Grid.Column="0"
+                            Command="{Binding BindingContext.SaveSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            CommandParameter="{Binding .}"
+                            Style="{StaticResource DeleteButton}"
+                            BackgroundColor="{StaticResource VeryDark}"
+                            Text="{x:Static icons:FAFont.FloppyDisk}"/>
+                    
+                    <Button Grid.Row="0" Grid.Column="1"
                             Command="{Binding BindingContext.DeleteSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource DeleteButton}"/>
 
-                    <Button Grid.Row="1" 
+                    <Button Grid.Row="1" Grid.Column="1"
                             Command="{Binding BindingContext.EditSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource EditButton}"/>

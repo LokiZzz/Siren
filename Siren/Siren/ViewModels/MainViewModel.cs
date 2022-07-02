@@ -181,7 +181,7 @@ namespace Siren.ViewModels
             }
         }
 
-        private async Task SaveScene()
+        private async Task SaveScene(SceneViewModel scene)
         {
             List<TrackSetupViewModel> playingElements = SelectedSetting.Elements
                 .Where(x => x.IsPlaying)
@@ -192,7 +192,7 @@ namespace Siren.ViewModels
                 })
                 .ToList();
 
-            SelectedScene.Elements = new ObservableCollection<TrackSetupViewModel>(playingElements);
+            scene.Elements = new ObservableCollection<TrackSetupViewModel>(playingElements);
 
             await SaveCurrentEnvironment();
         }
@@ -374,6 +374,7 @@ namespace Siren.ViewModels
         public Command SelectSettingCommand { get => new Command<SettingViewModel>(async (setting) => await SelectSetting(setting)); }
         public Command DeleteSettingCommand { get => new Command<SettingViewModel>(async (scetting) => await DeleteSetting(scetting)); }
         public Command AddSceneCommand { get => new Command(async () => await GoToAddScene()); }
+        public Command SaveSceneCommand { get => new Command<SceneViewModel>(async (scene) => await SaveScene(scene)); }
         public Command EditSceneCommand { get => new Command<SceneViewModel>(async (scene) => await GoToEditScene(scene)); }
         public Command SelectSceneCommand { get => new Command<SceneViewModel>(async (scene) => await SelectScene(scene)); }
         public Command DeleteSceneCommand { get => new Command<SceneViewModel>(async (scene) => await DeleteScene(scene)); }
@@ -383,7 +384,6 @@ namespace Siren.ViewModels
         public Command AddEffectsCommand { get => new Command(async () => await AddEffects()); }
         public Command EditEffectCommand { get => new Command<SceneComponentViewModel>(async (effect) => await GoToEditEffect(effect)); }
         public Command DeleteEffectCommand { get => new Command<SceneComponentViewModel>(DeleteEffect); }
-        public Command SaveSceneCommand { get => new Command(async () => await SaveScene()); }
         public Command GlobalPlayCommand { get => new Command(async () => await GlobalPlayStop()); }
 
         private ObservableCollection<SettingViewModel> _settings;

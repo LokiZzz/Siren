@@ -14,14 +14,15 @@
     </ContentPage.BindingContext>
 
     <ContentPage.Resources>
-        <Style TargetType="Button" x:Key="AddButton">
+        <Style x:Key="AddButton" TargetType="Button">
             <Setter Property="FontFamily" Value="FA"/>
             <Setter Property="Text" Value="{x:Static icons:FAFont.SquarePlus}"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="HorizontalOptions" Value="Start"/>
-            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusInner}"/>
             <Setter Property="HeightRequest" Value="35"/>
             <Setter Property="WidthRequest" Value="35"/>
+            <Setter Property="TextColor" Value="{StaticResource VeryDark}"/>
         </Style>
         <Style x:Key="FreeSpaceProgressBar" TargetType="ProgressBar">
             <Setter Property="VerticalOptions" Value="Center"/>
@@ -34,20 +35,20 @@
             <Setter Property="Text" Value="{x:Static icons:FAFont.SquarePlus}"/>
             <Setter Property="FontSize" Value="36"/>
             <Setter Property="TextColor" Value="{StaticResource VeryDark}"/>
-            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusOuter}"/>
             <Setter Property="BackgroundColor" Value="{StaticResource Light}"/>
         </Style>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="auto,*,*,auto" ColumnDefinitions="320,*" ColumnSpacing="0" RowSpacing="0">
+    <Grid RowDefinitions="auto,*,1.03*,auto" ColumnDefinitions="320,*" ColumnSpacing="0" RowSpacing="0">
 
         <!--Settings-->
         <Grid Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" RowDefinitions="auto,*" >
-            <Grid Grid.Row="0" Padding="10" RowDefinitions="80" ColumnDefinitions="300">
+            <Grid Grid.Row="0" Padding="10" RowDefinitions="85" ColumnDefinitions="300">
                 <Button Style="{StaticResource AddSettingButton}" Command="{Binding AddSettingCommand}"/>
             </Grid>
-            <ScrollView Grid.Row="1" Orientation="Vertical">
-                <StackLayout x:Name="SettingsList" Grid.Row="0" BindableLayout.ItemsSource="{Binding Settings}" Spacing="10" HorizontalOptions="Center">
+            <ScrollView Grid.Row="1" Orientation="Vertical" VerticalScrollBarVisibility="Never">
+                <StackLayout x:Name="SettingsList" Grid.Row="0" BindableLayout.ItemsSource="{Binding Settings}" Spacing="10" HorizontalOptions="Center" Padding="0">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
                             <views:SettingCardView>
@@ -64,11 +65,12 @@
 
         <!--Scenes-->
         <Grid Grid.Row="0" Grid.Column="1" HeightRequest="100" ColumnDefinitions="auto,*">
-            <Grid Grid.Column="0" Padding="0,10,10,10" RowDefinitions="80" ColumnDefinitions="80">
+            <Grid Grid.Column="0" Padding="0,10,10,10" RowDefinitions="85" ColumnDefinitions="85">
                 <Button Style="{StaticResource AddSettingButton}" Command="{Binding AddSceneCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
             </Grid>
             <ScrollView Orientation="Horizontal" Grid.Column="1">
-                <StackLayout x:Name="ScenesList" Grid.Row="0" BindableLayout.ItemsSource="{Binding SelectedSetting.Scenes}" Orientation="Horizontal" Spacing="10">
+                <StackLayout x:Name="ScenesList" Grid.Row="0" BindableLayout.ItemsSource="{Binding SelectedSetting.Scenes}" 
+                             Orientation="Horizontal" Spacing="10" Padding="0,0,10,0">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
                             <views:SceneCardView>
@@ -84,44 +86,47 @@
         </Grid>
 
         <!--Elements-->
-        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="auto,*" BackgroundColor="{StaticResource Dark}">
-            <StackLayout Grid.Row="0" Orientation="Horizontal" Padding="0,10" Spacing="10"  BackgroundColor="{StaticResource VeryDark}">
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="auto,*" Margin="0,0,-15,0">
+            <StackLayout Grid.Row="0" Orientation="Horizontal" Padding="0,10" Spacing="10">
                 <Button Style="{StaticResource AddButton}" Command="{Binding AddElementsCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
                 <StackLayout Orientation="Vertical" VerticalOptions="Center">
                     <Label Text="{Binding CurrentElementsCountString}" VerticalOptions="Center" VerticalTextAlignment="Center"/>
                     <ProgressBar Style="{StaticResource FreeSpaceProgressBar}" Progress="{Binding FreeElementsSpace}"/>
                 </StackLayout>
-                <Button Style="{StaticResource AddButton}" Command="{Binding SaveSceneCommand}" IsVisible="{Binding ShowSceneEditTools}" Text="{x:Static icons:FAFont.FloppyDisk}"/>
+                <!--<Button Style="{StaticResource AddButton}" Command="{Binding SaveSceneCommand}" IsVisible="{Binding ShowSceneEditTools}" Text="{x:Static icons:FAFont.FloppyDisk}"/>-->
             </StackLayout>
-            <ScrollView Grid.Row="1">
-                <FlexLayout x:Name="ElementsList" 
-                            BindableLayout.ItemsSource="{Binding SelectedSetting.Elements}" 
-                            Wrap="Wrap" 
-                            Direction="Row" 
-                            JustifyContent="Start"
-                            AlignContent="Start"
-                            AlignItems="Start"
-                            Padding="5">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate>
-                            <views:ElementPlayerView/>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </FlexLayout>
-            </ScrollView>
+            <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
+                <ScrollView>
+                    <FlexLayout x:Name="ElementsList" 
+                                BindableLayout.ItemsSource="{Binding SelectedSetting.Elements}" 
+                                Wrap="Wrap" 
+                                Direction="Row" 
+                                JustifyContent="Start"
+                                AlignContent="Start"
+                                AlignItems="Start"
+                                Padding="5">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <views:ElementPlayerView/>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </ScrollView>
+            </Frame>
         </Grid>
 
         <!--Effects-->
-        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*"  BackgroundColor="{StaticResource Dark}">
-            <StackLayout Grid.Row="0" Orientation="Horizontal" Padding="0,15,10,10" Spacing="10"  BackgroundColor="{StaticResource VeryDark}">
+        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*"  Margin="0,0,-15,0">
+            <StackLayout Grid.Row="0" Orientation="Horizontal" Padding="0,15,10,10" Spacing="10">
                 <Button Style="{StaticResource AddButton}" Command="{Binding AddEffectsCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
                 <StackLayout Orientation="Vertical" VerticalOptions="Center">
                     <Label Text="{Binding CurrentEffectsCountString}" VerticalOptions="Center" VerticalTextAlignment="Center"/>
                     <ProgressBar Style="{StaticResource FreeSpaceProgressBar}" Progress="{Binding FreeEffectsSpace}"/>
                 </StackLayout>
             </StackLayout>
-            <ScrollView Grid.Row="1" Padding="0" Margin="0">
-                <FlexLayout x:Name="EffectsList" 
+            <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
+                <ScrollView Grid.Row="1" Padding="0" Margin="0">
+                    <FlexLayout x:Name="EffectsList" 
                             BindableLayout.ItemsSource="{Binding SelectedSetting.Effects}" 
                             Wrap="Wrap" 
                             Direction="Row" 
@@ -129,13 +134,14 @@
                             AlignContent="Start"
                             AlignItems="Start"
                             Padding="5">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate>
-                            <views:EffectPlayerView/>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </FlexLayout>
-            </ScrollView>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <views:EffectPlayerView/>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </ScrollView>
+            </Frame>
         </Grid>
 
         <Grid Grid.Row="3" Grid.ColumnSpan="2">
@@ -145,7 +151,7 @@
                             Command="{Binding GlobalPlayCommand}"
                             BackgroundColor="{StaticResource DarkGreen}"
                             HorizontalOptions="Fill"
-                            CornerRadius="12">
+                            CornerRadius="{StaticResource CornerRadiusOuter}">
                         <Button.Triggers>
                             <DataTrigger TargetType="Button" Binding="{Binding IsScenePlaying}" Value="True">
                                 <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
