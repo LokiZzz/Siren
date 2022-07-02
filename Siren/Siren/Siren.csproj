@@ -7,10 +7,18 @@
 
   <ItemGroup>
     <None Remove="Assets\Font Awesome 6 Free-Regular-400.otf" />
+    <None Remove="Assets\LibreBaskerville-Regular.ttf" />
+    <None Remove="Assets\SourceSansPro-Regular.ttf" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\Font Awesome 6 Free-Regular-400.otf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\LibreBaskerville-Regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SourceSansPro-Regular.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

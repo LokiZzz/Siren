@@ -6,7 +6,7 @@
              x:Class="Siren.Views.SceneCardView"
              LayoutChanged="ContentView_LayoutChanged">
 
-    <Grid Padding="0,10" RowDefinitions="85" ColumnDefinitions="230">
+    <Grid Padding="0,10" RowDefinitions="85" ColumnDefinitions="260">
 
         <Frame BackgroundColor="{StaticResource Light}" Padding="10" CornerRadius="{StaticResource CornerRadiusOuter}">
             <Grid ColumnDefinitions="*,auto">
@@ -33,14 +33,15 @@
                     </Rectangle.Background>
                 </Rectangle>
 
-                <Label Grid.Column="0" VerticalOptions="End" VerticalTextAlignment="End" Text="{Binding Name}" TextColor="White"/>
+                <Label Grid.Column="0" VerticalOptions="End" VerticalTextAlignment="End" Text="{Binding Name}" 
+                       Style="{StaticResource IllustratedCardTitle}" FontSize="16"/>
 
                 <Grid Grid.Column="1" RowDefinitions="*,*" ColumnDefinitions="*,*" ColumnSpacing="5" RowSpacing="5">
                     <Button Grid.Row="0" Grid.Column="0"
                             Command="{Binding BindingContext.SaveSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource DeleteButton}"
-                            BackgroundColor="{StaticResource VeryDark}"
+                            BackgroundColor="{StaticResource TransparentMedium}"
                             Text="{x:Static icons:FAFont.FloppyDisk}"/>
                     
                     <Button Grid.Row="0" Grid.Column="1"

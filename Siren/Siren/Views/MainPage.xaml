@@ -19,7 +19,7 @@
             <Setter Property="Text" Value="{x:Static icons:FAFont.SquarePlus}"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="HorizontalOptions" Value="Start"/>
-            <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusInner}"/>
+            <Setter Property="CornerRadius" Value="5"/>
             <Setter Property="HeightRequest" Value="35"/>
             <Setter Property="WidthRequest" Value="35"/>
             <Setter Property="TextColor" Value="{StaticResource VeryDark}"/>
@@ -35,7 +35,7 @@
             <Setter Property="Text" Value="{x:Static icons:FAFont.SquarePlus}"/>
             <Setter Property="FontSize" Value="36"/>
             <Setter Property="TextColor" Value="{StaticResource VeryDark}"/>
-            <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusOuter}"/>
+            <Setter Property="CornerRadius" Value="15"/>
             <Setter Property="BackgroundColor" Value="{StaticResource Light}"/>
         </Style>
     </ContentPage.Resources>
@@ -151,7 +151,7 @@
                             Command="{Binding GlobalPlayCommand}"
                             BackgroundColor="{StaticResource DarkGreen}"
                             HorizontalOptions="Fill"
-                            CornerRadius="{StaticResource CornerRadiusOuter}">
+                            CornerRadius="15">
                         <Button.Triggers>
                             <DataTrigger TargetType="Button" Binding="{Binding IsScenePlaying}" Value="True">
                                 <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
