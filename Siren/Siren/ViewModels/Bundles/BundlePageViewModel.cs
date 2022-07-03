@@ -59,6 +59,7 @@ namespace Siren.ViewModels
         {
             using (_creatingCancellationTokenSource = new CancellationTokenSource())
             {
+                CreatingProgress = 0;
                 BundleSystemState = EBundleSystemState.Creating;
 
                 Bundle bundle = new Bundle
@@ -84,6 +85,7 @@ namespace Siren.ViewModels
         {
             using (_installingCancellationTokenSource = new CancellationTokenSource())
             {
+                InstallProgress = 0;
                 BundleSystemState = EBundleSystemState.Installing;
 
                 FileResult result = await FilePicker.PickAsync(GetSirenFilePickOption());
