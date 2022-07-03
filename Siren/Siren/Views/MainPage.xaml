@@ -169,7 +169,8 @@
                        HorizontalOptions="Start" 
                        FontSize="24" 
                        VerticalOptions="Center" VerticalTextAlignment="Center"
-                       Margin="10,0,0,0"/>
+                       Margin="10,0,0,0"
+                       FontFamily="Lora"/>
                 
             </StackLayout>
         </Grid>

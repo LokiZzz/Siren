@@ -11,9 +11,12 @@
                 <Setter Property="OnContent" Value="" />
                 <Setter Property="Margin" Value="0,0,-110,0" />
             </Style>
+            
+            <SolidColorBrush x:Key="SystemControlHighlightBaseHighBrush" Color="White" />
+            <Color x:Key="SystemAccentColor">#FFFFFF</Color>
             <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="SystemControlHighlightBaseHighBrush" Color="White" />
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="SystemControlHighlightBaseHighBrush" Color="Green" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>

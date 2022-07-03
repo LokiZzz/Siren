@@ -23,10 +23,10 @@
 
                 <Label Grid.Row="1" Grid.Column="0" 
                        IsVisible="{Binding HasSelectedScene}"
-                       FontSize="35" FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" TextColor="{StaticResource Green}"
+                       FontSize="30" FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" TextColor="{StaticResource Green}"
                        VerticalOptions="Center" HorizontalOptions="Start"
                        VerticalTextAlignment="Center" HorizontalTextAlignment="Start"
-                       Opacity="0.6"/>
+                       Opacity="0.8"/>
                 
                 <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" 
                            Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10"
@@ -34,12 +34,13 @@
                     <Rectangle.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                             <GradientStop Color="Transparent" Offset="0" />
-                            <GradientStop Color="{StaticResource Green}" Offset="1" />
+                            <GradientStop Color="{StaticResource Green}" Offset="1.2" />
                         </LinearGradientBrush>
                     </Rectangle.Background>
                 </Rectangle>
 
-                <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}" Style="{StaticResource IllustratedCardTitle}"/>
+                <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}" Style="{StaticResource IllustratedCardTitle}"
+                       VerticalOptions="Start" VerticalTextAlignment="Start" />
 
                 <Grid Grid.Column="1" Grid.RowSpan="2" RowDefinitions="*,*" ColumnDefinitions="*,*" ColumnSpacing="5" RowSpacing="5">
                     <Button Grid.Row="0" Grid.Column="1"

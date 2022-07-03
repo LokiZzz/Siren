@@ -165,6 +165,8 @@ namespace Siren.ViewModels
             Settings.ForEach(x => x.UpdateHasSelectedScene());
 
             ShowSceneEditTools = SelectedScene != null;
+
+            GlobalPlayActivityIndicatorIsVisible = false;
         }
 
         private async Task DeleteScene(SceneViewModel scene)

@@ -17,22 +17,16 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <Grid ColumnDefinitions="500" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="{Binding ShowMessage}">
-            <Frame BackgroundColor="{StaticResource Medium}" CornerRadius="15">
+        <Grid ColumnDefinitions="570" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="{Binding ShowMessage}" Margin="0,-40,0,0">
+            <Frame BackgroundColor="{StaticResource Medium}" CornerRadius="15" Padding="10,30,10,10">
                 <StackLayout Orientation="Vertical" 
                              VerticalOptions="Center"
                              HorizontalOptions="Center"
                              Margin="15,0,15,15">
-                    
-                    <StackLayout Orientation="Horizontal" HorizontalOptions="End" Spacing="10" Margin="0,0,0,20">
-                        <Label Text="ENG" VerticalOptions="Center" VerticalTextAlignment="Center"/>
-                        <Switch IsToggled="{Binding IsRUS}"/>
-                        <Label Text="RUS" VerticalOptions="Center" VerticalTextAlignment="Center"/>
-                    </StackLayout>
 
                     <Grid IsVisible="{Binding IsRUS, Converter={StaticResource NotConverter}}">
                         <StackLayout>
-                            <Label FontSize="Medium" Text="Need to give required permission!" Margin="0,0,0,10" FontFamily="Baskerville"/>
+                            <Label FontSize="Medium" Text="Need to give required permission!" Margin="0,0,0,10" FontFamily="Playfair"/>
                             <Label LineBreakMode="WordWrap" 
                                Text="Open the privacy settings and give the application permission to work with the file system. After changing the privacy settings, the application will close and need to be launched again."
                                Margin="0,0,0,20"/>
@@ -41,15 +35,27 @@
 
                     <Grid IsVisible="{Binding IsRUS}">
                         <StackLayout>
-                            <Label FontSize="Medium" Text="Необходимо дать разрешения!" Margin="0,0,0,10"  FontFamily="Baskerville"/>
+                            <Label FontSize="Medium" Text="Необходимо дать разрешения!" Margin="0,0,0,10"  FontFamily="Playfair"/>
                             <Label LineBreakMode="WordWrap" 
                                Text="Откройте настройки приватности и дайте приложению разрешение работать с файловой системой. После изменения настроек приватности приложение закроется и его нужно будет запустить снова."
                                Margin="0,0,0,20"/>
                         </StackLayout>
                     </Grid>
 
-                    <Button Text="Open privacy settings" Command="{Binding RequestPermissionCommand}"/>
-                    <!--<Button Text="Refresh" Command="{Binding RefreshCommand}"/>-->
+                    <Grid ColumnDefinitions="*,auto" >
+                        <StackLayout Grid.Column="1" Orientation="Horizontal" VerticalOptions="End" Spacing="10">
+                            <Label Text="ENG" VerticalOptions="Center" VerticalTextAlignment="Center"/>
+                            <Switch IsToggled="{Binding IsRUS}" OnColor="{StaticResource Green}"/>
+                            <Label Text="RUS" VerticalOptions="Center" VerticalTextAlignment="Center"/>
+                        </StackLayout>
+
+                        <Button Grid.Column="0" Text="Open privacy settings" 
+                                Command="{Binding RequestPermissionCommand}" 
+                                CornerRadius="5"
+                                BackgroundColor="{StaticResource DarkGreen}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="End"/>
+                    </Grid>
                 </StackLayout>
             </Frame>
         </Grid>

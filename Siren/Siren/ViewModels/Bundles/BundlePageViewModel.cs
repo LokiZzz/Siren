@@ -229,6 +229,8 @@ namespace Siren.ViewModels
                 CancelCreateCommand.ChangeCanExecute();
                 InstallCommand.ChangeCanExecute();
                 CancelInstallCommand.ChangeCanExecute();
+                ShowCreateProgress = value == EBundleSystemState.Creating;
+                ShowInstallProgress = value == EBundleSystemState.Installing;
             }
         }
 
@@ -252,6 +254,20 @@ namespace Siren.ViewModels
              CancelInstallCommand = new Command(() => _installingCancellationTokenSource.Cancel(), () => BundleSystemState == EBundleSystemState.Installing); 
              ActivateDeactivateCommand = new Command<Bundle>(async (bundle) => await ActivateDeactivateBundle(bundle.Id)); 
              UninstallCommand = new Command<Bundle>(async (bundle) => await UninstallBundle(bundle.Id)); 
+        }
+
+        private bool _showCreateProgress;
+        public bool ShowCreateProgress
+        {
+            get => _showCreateProgress;
+            set => SetProperty(ref _showCreateProgress, value);
+        }
+
+        private bool _showInstallProgress;
+        public bool ShowInstallProgress
+        {
+            get => _showInstallProgress;
+            set => SetProperty(ref _showInstallProgress, value);
         }
     }
 

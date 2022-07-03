@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -24,6 +25,8 @@ namespace Siren.UWP
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
 
             LoadApplication(new Siren.App());
+
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(1500, 1500));
         }
     }
 }

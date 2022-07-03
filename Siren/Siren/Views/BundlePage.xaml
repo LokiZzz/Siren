@@ -3,11 +3,79 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              xmlns:vm="clr-namespace:Siren.ViewModels" xmlns:behaviors="http://xamarin.com/schemas/2020/toolkit" xmlns:converters="clr-namespace:Siren.Views.Converters"
              x:Class="Siren.Views.BundlePage"
-             BackgroundColor="{StaticResource Dark}"
+             BackgroundColor="{StaticResource VeryDark}"
              ControlTemplate="{StaticResource BusyPageTemplate}">
 
     <ContentPage.Resources>
         <converters:DoubleToPercentStringConverter x:Key="DoubleToPercentStringConverter"></converters:DoubleToPercentStringConverter>
+        <converters:NotConverter x:Key="NotConverter"></converters:NotConverter>
+
+        <Style TargetType="Label" x:Key="Header">
+            <Setter Property="FontSize" Value="Large"/>
+            <Setter Property="FontFamily" Value="Lora"/>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="BackgroundColor" Value="{StaticResource DarkGreen}"/>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+
+        <Style TargetType="Button" x:Key="BundleActionButton">
+            <Setter Property="WidthRequest" Value="200"/>
+            <Setter Property="HorizontalOptions" Value="Start"/>
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource DarkGreen}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource TransparentMedium}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+
+        <Style TargetType="Button" x:Key="BundleCancelButton">
+            <Setter Property="WidthRequest" Value="200"/>
+            <Setter Property="HorizontalOptions" Value="Start"/>
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource Red}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource Disabled}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+
+        <Style TargetType="Frame">
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="BackgroundColor" Value="{StaticResource Light}"/>
+        </Style>
+
+        <Style TargetType="ProgressBar">
+            <Setter Property="HeightRequest" Value="20"/>
+            <Setter Property="ProgressColor" Value="{StaticResource Green}"/>
+            <Setter Property="BackgroundColor" Value="{StaticResource Dark}"/>
+            <Setter Property="WidthRequest" Value="405"/>
+            <Setter Property="HorizontalOptions" Value="Start"/>
+        </Style>
     </ContentPage.Resources>
     
     <ContentPage.BindingContext>
@@ -15,75 +83,93 @@
     </ContentPage.BindingContext>
 
     <ContentPage.Content>
-        <Grid RowDefinitions="auto,auto,*">
 
-            <Frame Grid.Row="0" BackgroundColor="{StaticResource VeryDark}" Margin="15">
-                <StackLayout Orientation="Vertical" Spacing="5" Margin="0,15">
-
-                    <Label Text="Install Bundle" FontSize="Large"/>
-                    <Label Text="To install bundle using *.siren file, press button «Install»."/>
-                    <StackLayout Orientation="Horizontal" Spacing="0">
-                        <Label Text="{Binding InstallProgress, Converter={StaticResource DoubleToPercentStringConverter}}"/>
-                        <Label Text="{Binding InstallProgressMessage}"/>
+        <Grid RowDefinitions="auto,auto" Margin="10,0,10,10" Padding="10" RowSpacing="5">
+            <Grid Grid.Row="0" RowDefinitions="auto" ColumnDefinitions="*,*" ColumnSpacing="10" VerticalOptions="Start" HorizontalOptions="Fill">
+                <Frame Grid.Column="0">
+                    <StackLayout Spacing="10" HorizontalOptions="Fill">
+                        <Label Style="{StaticResource Header}"
+                               Text="Create new Bundle" />
+                        <Label LineBreakMode="WordWrap"
+                               Text="If you want to create new bundle from current settings set, enter the preferred bundle file name and press «Create»."/>
+                        <Entry Text="{Binding NewBundleName}" WidthRequest="300" HorizontalOptions="Start"/>
+                        <StackLayout Orientation="Vertical" Spacing="5">
+                            <StackLayout Orientation="Horizontal" Spacing="5" IsVisible="{Binding ShowCreateProgress}">
+                                <Label Text="{Binding CreatingProgressMessage}"/>
+                                <Label Text="{Binding CreatingProgress, Converter={StaticResource DoubleToPercentStringConverter}, StringFormat='{0}'}"/>
+                            </StackLayout>
+                            <ProgressBar Progress="{Binding CreatingProgress}" HorizontalOptions="Fill" IsVisible="{Binding ShowCreateProgress}"/>
+                        </StackLayout>
+                        <Button Text="Create" 
+                                Command="{Binding CreateCommand}" 
+                                Style="{StaticResource BundleActionButton}" 
+                                IsVisible="{Binding ShowCreateProgress, Converter={StaticResource NotConverter}}"
+                                HorizontalOptions="End"/>
+                        <Button Text="Cancel" 
+                                Command="{Binding CancelCreateCommand}" 
+                                Style="{StaticResource BundleCancelButton}" 
+                                IsVisible="{Binding ShowCreateProgress}"
+                                HorizontalOptions="End"/>
                     </StackLayout>
-                    <ProgressBar HeightRequest="25" Progress="{Binding InstallProgress}"/>
-                    <StackLayout Orientation="Horizontal" Margin="0,0,0,20">
-                        <Button Text="Install" Command="{Binding InstallCommand}" WidthRequest="350" HorizontalOptions="Start"/>
-                        <Button Text="Cancel" Command="{Binding CancelInstallCommand}" WidthRequest="350" HorizontalOptions="Start" />
-                    </StackLayout>
+                </Frame>
+                
+                <Frame Grid.Column="1">
+                    <Grid RowDefinitions="auto,auto,auto,*" RowSpacing="10" >
+                        <Label Grid.Row="0" Text="Install Bundle" Style="{StaticResource Header}"/>
+                        <Label Grid.Row="1" LineBreakMode="WordWrap" Text="To install bundle using *.siren file, press button «Install»."/>
 
-                    <Label Text="Create new Bundle" FontSize="Large"/>
-                    <Label Text="If you want to create new bundle from current settings set, enter the name and press «Create»."/>
-                    <Entry Text="{Binding NewBundleName}" WidthRequest="350" HorizontalOptions="Start"/>
-                    <StackLayout Orientation="Horizontal" Spacing="0">
-                        <Label Text="{Binding CreatingProgress, Converter={StaticResource DoubleToPercentStringConverter}}"/>
-                        <Label Text="{Binding CreatingProgressMessage}"/>
-                    </StackLayout>
-                    <ProgressBar HeightRequest="25" Progress="{Binding CreatingProgress}"/>
-                    <StackLayout Orientation="Horizontal">
-                        <Button Text="Create" Command="{Binding CreateCommand}" WidthRequest="350" HorizontalOptions="Start"/>
-                        <Button Text="Cancel" Command="{Binding CancelCreateCommand}" WidthRequest="350" HorizontalOptions="Start"/>
-                    </StackLayout>
+                        <StackLayout Grid.Row="2" Orientation="Vertical" Spacing="5">
+                            <StackLayout Orientation="Horizontal" Spacing="0"  IsVisible="{Binding ShowInstallProgress}">
+                                <Label Text="{Binding InstallProgress, Converter={StaticResource DoubleToPercentStringConverter}}"/>
+                                <Label Text="{Binding InstallProgressMessage}"/>
+                            </StackLayout>
+                            <ProgressBar Progress="{Binding InstallProgress}" IsVisible="{Binding ShowInstallProgress}" HorizontalOptions="Fill"/>
+                        </StackLayout>
 
-                </StackLayout>
-            </Frame>
+                        <Button Grid.Row="3" Text="Install" 
+                                Command="{Binding InstallCommand}" 
+                                Style="{StaticResource BundleActionButton}" 
+                                IsVisible="{Binding ShowInstallProgress, Converter={StaticResource NotConverter}}"
+                                HorizontalOptions="End"
+                                VerticalOptions="End"/>
+                        <Button Grid.Row="3" Text="Cancel" 
+                                Command="{Binding CancelInstallCommand}" 
+                                Style="{StaticResource BundleCancelButton}" 
+                                IsVisible="{Binding ShowInstallProgress}"
+                                HorizontalOptions="End"
+                                VerticalOptions="End"/>
+                    </Grid>
+                </Frame>
+            </Grid>
 
-            <ScrollView Grid.Row="1" Orientation="Vertical">
-                <FlexLayout x:Name="BundlesList" 
-                            BindableLayout.ItemsSource="{Binding Bundles}" 
-                            Wrap="Wrap" 
-                            Direction="Row" 
-                            JustifyContent="Start"
-                            AlignContent="Start"
-                            AlignItems="Start"
-                            Padding="10">
+            <ScrollView Orientation="Vertical" Grid.Row="1" Margin="-5,10,-5,-5">
+                <FlexLayout x:Name="BundlesList" BindableLayout.ItemsSource="{Binding Bundles}" 
+                            Wrap="Wrap" Direction="Row" JustifyContent="Start" AlignContent="Start" AlignItems="Start">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Frame BackgroundColor="{StaticResource VeryDark}" VerticalOptions="Start" Margin="5">
+                            <Frame VerticalOptions="Start" CornerRadius="15" Margin="5" BackgroundColor="{StaticResource Dark}">
                                 <Grid RowDefinitions="auto,*,auto" ColumnDefinitions="auto,*" VerticalOptions="Start" RowSpacing="15">
-                                    
+
                                     <Label Grid.Row="0" Grid.Column="0" 
-                                           VerticalTextAlignment="Start"
-                                           VerticalOptions="Start"
-                                           Text="{Binding Bundle.Name, StringFormat='{0}.siren'}"
-                                           FontSize="Medium"/>
-                                    
+                                               VerticalTextAlignment="Start"
+                                               VerticalOptions="Start"
+                                               Text="{Binding Bundle.Name}"
+                                               Style="{StaticResource Header}" FontSize="Medium"/>
+
                                     <Switch Grid.Row="0" Grid.Column="1" 
-                                            HorizontalOptions="End"
-                                            VerticalOptions="Start"
+                                            HorizontalOptions="End" VerticalOptions="Start"
                                             IsToggled="{Binding IsActivated, Mode=OneWay}"
-                                            OnColor="YellowGreen">
+                                            OnColor="{StaticResource Green}">
                                         <Switch.Behaviors>
-                                            <behaviors:EventToCommandBehavior 
-                                                EventName="Toggled" 
-                                                Command="{Binding BindingContext.ActivateDeactivateCommand,Source={x:Reference BundlesList}}"
-                                                CommandParameter="{Binding Bundle}"/>
+                                            <behaviors:EventToCommandBehavior EventName="Toggled" 
+                                                    Command="{Binding BindingContext.ActivateDeactivateCommand,Source={x:Reference BundlesList}}"
+                                                    CommandParameter="{Binding Bundle}"/>
                                         </Switch.Behaviors>
                                     </Switch>
 
                                     <Grid Grid.Row="1" Grid.ColumnSpan="2" 
-                                          ColumnDefinitions="auto,auto,auto,auto" RowDefinitions="*,*"
-                                          ColumnSpacing="10">
+                                              ColumnDefinitions="auto,auto,auto,auto" RowDefinitions="*,*"
+                                              ColumnSpacing="10">
                                         <Grid.Resources>
                                             <Style TargetType="Label">
                                                 <Setter Property="HorizontalOptions" Value="Start"/>
@@ -104,9 +190,8 @@
                                     <Label Grid.Row="2" Grid.Column="0" Text="{Binding Bundle.SizeWithSuffix}" FontSize="Medium" Margin="0,0,15,0"/>
 
                                     <Button Text="Uninstall" Grid.Row="2" Grid.Column="1"
-                                            Command="{Binding BindingContext.UninstallCommand,Source={x:Reference BundlesList}}" 
-                                                CommandParameter="{Binding Bundle}"/>
-
+                                                Command="{Binding BindingContext.UninstallCommand,Source={x:Reference BundlesList}}" 
+                                                    CommandParameter="{Binding Bundle}"/>
                                 </Grid>
                             </Frame>
                         </DataTemplate>

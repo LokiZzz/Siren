@@ -6,16 +6,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Alegreya-VariableFont_wght.ttf" />
     <None Remove="Assets\Font Awesome 6 Free-Regular-400.otf" />
-    <None Remove="Assets\LibreBaskerville-Regular.ttf" />
+    <None Remove="Assets\Lora-VariableFont_wght.ttf" />
+    <None Remove="Assets\PlayfairDisplay-VariableFont_wght.ttf" />
     <None Remove="Assets\SourceSansPro-Regular.ttf" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Assets\Alegreya-VariableFont_wght.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Assets\Font Awesome 6 Free-Regular-400.otf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Assets\LibreBaskerville-Regular.ttf">
+    <EmbeddedResource Include="Assets\Lora-VariableFont_wght.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\PlayfairDisplay-VariableFont_wght.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\SourceSansPro-Regular.ttf">

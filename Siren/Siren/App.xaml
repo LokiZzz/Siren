@@ -32,17 +32,6 @@
 
             <Style TargetType="Button">
                 <Setter Property="TextColor" Value="{StaticResource TextColor}"></Setter>
-                <Setter Property="VisualStateManager.VisualStateGroups">
-                    <VisualStateGroupList>
-                        <VisualStateGroup x:Name="CommonStates">
-                            <VisualState x:Name="Disabled">
-                                <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="{StaticResource Disabled}" />
-                                </VisualState.Setters>
-                            </VisualState>
-                        </VisualStateGroup>
-                    </VisualStateGroupList>
-                </Setter>
                 <Setter Property="BackgroundColor" Value="{StaticResource Light}"></Setter>
             </Style>
 
@@ -58,7 +47,7 @@
             </Style>
 
             <Style TargetType="Label" x:Key="IllustratedCardTitle">
-                <Setter Property="FontFamily" Value="Baskerville"/>
+                <Setter Property="FontFamily" Value="Lora"/>
                 <Setter Property="FontSize" Value="20"/>
             </Style>
 
