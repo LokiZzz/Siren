@@ -17,7 +17,7 @@
         </Style>
         <Style TargetType="Button" x:Key="ChangeImageButton">
             <Setter Property="BackgroundColor" Value="{StaticResource TransparentMedium}"/>
-            <Setter Property="TextColor" Value="{StaticResource TextColor}"/>
+            <Setter Property="TextColor" Value="{StaticResource VeryDark}"/>
             <Setter Property="FontFamily" Value="FA"/>
             <Setter Property="FontSize" Value="40"/>
             <Setter Property="WidthRequest" Value="65"/>
@@ -45,17 +45,37 @@
                             <Grid ColumnDefinitions="*,auto">
                                 <Image Grid.ColumnSpan="2" Source="{Binding Image}" Aspect="AspectFill" Margin="-10"/>
 
-                                <Rectangle Grid.ColumnSpan="2" HorizontalOptions="Fill" VerticalOptions="Fill" Margin="-10" Opacity="0.5" IsVisible="{Binding HasImage}">
+                                <Rectangle Grid.ColumnSpan="2" 
+                                           HorizontalOptions="Fill" VerticalOptions="Fill" 
+                                           Margin="-10" Opacity="0.5" 
+                                           IsVisible="{Binding ShowSettingGradient}">
                                     <Rectangle.Background>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                             <GradientStop Color="Black" Offset="0" />
-                                            <GradientStop Color="White" Offset="1" />
+                                            <GradientStop Color="Transparent" Offset="1" />
                                         </LinearGradientBrush>
                                     </Rectangle.Background>
                                 </Rectangle>
 
                                 <Label Grid.Column="0" Text="{Binding Name}" Style="{StaticResource IllustratedCardTitle}"
-                                       VerticalOptions="Start" VerticalTextAlignment="Start" />
+                                       VerticalOptions="Start" VerticalTextAlignment="Start" 
+                                       IsVisible="{Binding ShowSettingTitle}"/>
+
+                                <Rectangle Grid.ColumnSpan="2" 
+                                           HorizontalOptions="Fill" VerticalOptions="Fill" 
+                                           Margin="-10" Opacity="0.5" 
+                                           IsVisible="{Binding ShowSceneGradient}">
+                                    <Rectangle.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="Transparent" Offset="0" />
+                                            <GradientStop Color="Black" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Background>
+                                </Rectangle>
+
+                                <Label Grid.Column="0" Text="{Binding Name}" Style="{StaticResource IllustratedCardTitle}"
+                                       VerticalOptions="End" VerticalTextAlignment="End" 
+                                       IsVisible="{Binding ShowSceneTitle}" FontSize="16"/>
 
                                 <Button Grid.Column="1" Text="{x:Static icons:FAFont.SquarePlus}" 
                                         Command="{Binding SelectImageCommand}" 

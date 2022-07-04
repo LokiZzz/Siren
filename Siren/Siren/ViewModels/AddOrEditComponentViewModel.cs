@@ -61,6 +61,19 @@ namespace Siren.ViewModels
         }
 
         public bool HasImage => Image != null;
+        public bool ShowSettingGradient => HasImage && ComponentType == EComponentType.Setting;
+        public bool ShowSceneGradient => HasImage && ComponentType == EComponentType.Scene;
+        public bool ShowSettingTitle => ComponentType == EComponentType.Setting;
+        public bool ShowSceneTitle => ComponentType == EComponentType.Scene;
+
+        private void UpdateVisibility()
+        {
+            OnPropertyChanged(nameof(HasImage));
+            OnPropertyChanged(nameof(ShowSettingGradient));
+            OnPropertyChanged(nameof(ShowSceneGradient));
+            OnPropertyChanged(nameof(ShowSettingTitle));
+            OnPropertyChanged(nameof(ShowSceneTitle));
+        }
 
         private async void SelectImage()
         {
@@ -73,7 +86,7 @@ namespace Siren.ViewModels
                 Image = ImageSource.FromStream(() => stream);
             }
 
-            OnPropertyChanged(nameof(HasImage));
+            UpdateVisibility();
         }
 
         private bool ValidateSave() => !string.IsNullOrWhiteSpace(_name);
@@ -167,7 +180,7 @@ namespace Siren.ViewModels
 
             InitializeVisibilityProperties();
             InitializeActionTitle();
-            OnPropertyChanged(nameof(HasImage));
+            UpdateVisibility();
         }
 
         private async Task<Stream> GetStream(CancellationToken cancelToken, string path)

@@ -18,6 +18,22 @@ namespace Siren.UWP.Services
 {
     public class FileManager : IFileManager
     {
+        public async Task<string> ChoosePlaceToSaveFileAsync(string fileName = null)
+        {
+            Windows.Storage.Pickers.FileSavePicker savePicker = new Windows.Storage.Pickers.FileSavePicker();
+            savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+
+            // Dropdown of file types the user can save the file as
+            savePicker.FileTypeChoices.Add("Siren file", new List<string>() { ".siren" });
+
+            // Default file name if the user does not type one in or select a file to replace
+            savePicker.SuggestedFileName = fileName;
+
+            StorageFile result = await savePicker.PickSaveFileAsync();
+
+            return result != null ? result.Path : null;
+        }
+
         public async Task CreateFolderIfNotExistsAsync(string folderPath, string folderName)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(folderPath);

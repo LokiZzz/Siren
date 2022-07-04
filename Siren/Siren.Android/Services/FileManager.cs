@@ -20,6 +20,13 @@ namespace Siren.Droid.Services
 {
     public class FileManager : IFileManager
     {
+        public async Task<string> ChoosePlaceToSaveFileAsync(string fileName = null)
+        {
+            return await Task.FromResult(
+                Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), fileName)
+            );
+        }
+
         public Task CreateFolderIfNotExistsAsync(string folderPath, string folderName)
         {
             return Task.Run(() => 

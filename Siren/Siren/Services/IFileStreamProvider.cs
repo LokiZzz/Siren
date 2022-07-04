@@ -15,5 +15,6 @@ namespace Siren.Services
         Task DeleteFolderAsync(string folderPath);
         Task<bool> TestFileManagerAsync();
         Task RequestFileSystemPermissionAsync();
+        Task<string> ChoosePlaceToSaveFileAsync(string fileName = null);
     }
 }

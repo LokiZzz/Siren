@@ -62,18 +62,25 @@ namespace Siren.ViewModels
                 CreatingProgress = 0;
                 BundleSystemState = EBundleSystemState.Creating;
 
-                Bundle bundle = new Bundle
+                IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+                string fileName = await fileManager.ChoosePlaceToSaveFileAsync(GetNewBundleFileName());
+
+                if (!string.IsNullOrEmpty(fileName))
                 {
-                    Name = NewBundleName,
-                    Settings = await SceneManager.GetSettingsFromCurrentEnvironment()
-                };
+                    Bundle bundle = new Bundle
+                    {
+                        Name = NewBundleName,
+                        Settings = await SceneManager.GetSettingsFromCurrentEnvironment()
+                    };
 
-                string fileName = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    GetNewBundleFileName()
-                );
+                    await BundleService.SaveBundleAsync(bundle, fileName, _creatingCancellationTokenSource.Token);
 
-                await BundleService.SaveBundleAsync(bundle, fileName, _creatingCancellationTokenSource.Token);
+                    await App.Current.MainPage.DisplayAlert(
+                        "Bundle creation complete",
+                        $"The bundle has been successfully created and placed at {fileName}",
+                        "Nice!"
+                    );
+                }
 
                 BundleSystemState = EBundleSystemState.Default;
             }
