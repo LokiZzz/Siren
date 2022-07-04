@@ -53,6 +53,15 @@ namespace Siren.ViewModels
 
         private FileResult _imageFileResult;
 
+        private string _actionTitle;
+        public string ActionTitle
+        {
+            get => _actionTitle;
+            set => SetProperty(ref _actionTitle, value);
+        }
+
+        public bool HasImage => Image != null;
+
         private async void SelectImage()
         {
             _imageFileResult = await FilePicker.PickAsync(PickOptions.Images);
@@ -63,6 +72,8 @@ namespace Siren.ViewModels
                 Stream stream = await _imageFileResult.OpenReadAsync();
                 Image = ImageSource.FromStream(() => stream);
             }
+
+            OnPropertyChanged(nameof(HasImage));
         }
 
         private bool ValidateSave() => !string.IsNullOrWhiteSpace(_name);
@@ -155,6 +166,8 @@ namespace Siren.ViewModels
             }
 
             InitializeVisibilityProperties();
+            InitializeActionTitle();
+            OnPropertyChanged(nameof(HasImage));
         }
 
         private async Task<Stream> GetStream(CancellationToken cancelToken, string path)
@@ -162,6 +175,11 @@ namespace Siren.ViewModels
             IFileManager fileManager = DependencyService.Resolve<IFileManager>();
 
             return await fileManager.GetStreamToReadAsync(path);
+        }
+
+        private void InitializeActionTitle()
+        {
+            ActionTitle = $"{Intent.ToString("G")} {ComponentType.ToString("G")}";
         }
 
         #region Controls visibility

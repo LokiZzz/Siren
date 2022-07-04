@@ -2,38 +2,84 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
              xmlns:vm="clr-namespace:Siren.ViewModels"
-             xmlns:icons="clr-namespace:Siren.Assets"
+             xmlns:icons="clr-namespace:Siren.Assets" xmlns:converters="clr-namespace:Siren.Views.Converters"
              x:Class="Siren.Views.AddOrEditComponentPage"
-             BackgroundColor="{StaticResource Dark}">
+             BackgroundColor="{StaticResource VeryDark}">
     <ContentPage.BindingContext>
         <vm:AddOrEditComponentViewModel/>
     </ContentPage.BindingContext>
 
-    <ContentPage.Content>
-        <StackLayout Spacing="3" Padding="15">
+    <ContentPage.Resources>
+        <Style TargetType="Button">
+            <Setter Property="BackgroundColor" Value="{StaticResource DarkGreen}"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="HorizontalOptions" Value="Fill"/>
+        </Style>
+        <Style TargetType="Button" x:Key="ChangeImageButton">
+            <Setter Property="BackgroundColor" Value="{StaticResource TransparentMedium}"/>
+            <Setter Property="TextColor" Value="{StaticResource TextColor}"/>
+            <Setter Property="FontFamily" Value="FA"/>
+            <Setter Property="FontSize" Value="40"/>
+            <Setter Property="WidthRequest" Value="65"/>
+            <Setter Property="HeightRequest" Value="65"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="HorizontalOptions" Value="End"/>
+        </Style>
+        <converters:NotConverter x:Key="NotConverter"></converters:NotConverter>
+    </ContentPage.Resources>
 
-            <Label Text="Name"/>
-            <Entry Text="{Binding Name}"/>
-            
-            <Label Text="Image" IsVisible="{Binding IsImagePickerVisible}"/>
-            <Frame BackgroundColor="White" IsVisible="{Binding IsImagePickerVisible}">
-                <Grid Padding="0">
-                    <Label VerticalOptions="Center" VerticalTextAlignment="Center"
-                           HorizontalOptions="Center" HorizontalTextAlignment="Center"
-                           FontFamily="FA" Text="{x:Static icons:FAFont.SquarePlus}" TextColor="Black" FontSize="40"
-                           InputTransparent="True"/>
-                    <Image Source="{Binding Image}" Aspect="AspectFit" />
-                </Grid>
-                <Frame.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding SelectImageCommand}"/>
-                </Frame.GestureRecognizers>
+    <ContentPage.Content>
+        <Grid ColumnDefinitions="500" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="{Binding ShowMessage}" Margin="0,-40,0,0">
+            <Frame BackgroundColor="{StaticResource Medium}" CornerRadius="15" Padding="20">
+                <StackLayout Spacing="10">
+
+                    <Label Text="{Binding ActionTitle}" FontFamily="Lora" FontSize="Large" Margin="0,15,0,15"/>
+
+                    <Label Text="Name"/>
+                    <Entry Text="{Binding Name}"/>
+
+                    <Label Text="Image" IsVisible="{Binding IsImagePickerVisible}"/>
+                    
+                    <Grid RowDefinitions="85" ColumnDefinitions="300" IsVisible="{Binding IsImagePickerVisible}">
+                        <Frame BackgroundColor="{StaticResource Light}" Padding="10" CornerRadius="{StaticResource CornerRadiusOuter}">
+                            <Grid ColumnDefinitions="*,auto">
+                                <Image Grid.ColumnSpan="2" Source="{Binding Image}" Aspect="AspectFill" Margin="-10"/>
+
+                                <Rectangle Grid.ColumnSpan="2" HorizontalOptions="Fill" VerticalOptions="Fill" Margin="-10" Opacity="0.5" IsVisible="{Binding HasImage}">
+                                    <Rectangle.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="Black" Offset="0" />
+                                            <GradientStop Color="White" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Background>
+                                </Rectangle>
+
+                                <Label Grid.Column="0" Text="{Binding Name}" Style="{StaticResource IllustratedCardTitle}"
+                                       VerticalOptions="Start" VerticalTextAlignment="Start" />
+
+                                <Button Grid.Column="1" Text="{x:Static icons:FAFont.SquarePlus}" 
+                                        Command="{Binding SelectImageCommand}" 
+                                        Style="{StaticResource ChangeImageButton}"
+                                        IsVisible="{Binding HasImage, Converter={StaticResource NotConverter}}"/>
+                                <Button Grid.Column="1" Text="{x:Static icons:FAFont.PenToSquare}" 
+                                        Command="{Binding SelectImageCommand}" 
+                                        Style="{StaticResource ChangeImageButton}"
+                                        IsVisible="{Binding HasImage}"/>
+                            </Grid>
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectImageCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,15,0,0">
+                        <Button Grid.Column="0" Text="Save" Command="{Binding SaveCommand}" />
+                        <Button Grid.Column="1" Text="Cancel" Command="{Binding CancelCommand}" BackgroundColor="{StaticResource Red}"/>
+                    </Grid>
+
+                </StackLayout>
             </Frame>
-            
-            <StackLayout Orientation="Horizontal">
-                <Button Text="Cancel" Command="{Binding CancelCommand}" HorizontalOptions="FillAndExpand"></Button>
-                <Button Text="Save" Command="{Binding SaveCommand}" HorizontalOptions="FillAndExpand"></Button>
-            </StackLayout>
-            
-        </StackLayout>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

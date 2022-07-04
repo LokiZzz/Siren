@@ -11,14 +11,24 @@
                 <Setter Property="OnContent" Value="" />
                 <Setter Property="Margin" Value="0,0,-110,0" />
             </Style>
+
+            <Style TargetType="TextBox">
+                <Setter Property="SelectionHighlightColor">
+                    <Setter.Value>
+                        <SolidColorBrush Color="#b0da5c"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
             
             <SolidColorBrush x:Key="SystemControlHighlightBaseHighBrush" Color="White" />
             <Color x:Key="SystemAccentColor">#FFFFFF</Color>
+
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="SystemControlHighlightBaseHighBrush" Color="Green" />
+                    <SolidColorBrush x:Key="TextSelectionHighlightColorThemeBrush" Color="#b0da5c" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

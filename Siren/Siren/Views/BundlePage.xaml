@@ -85,6 +85,7 @@
     <ContentPage.Content>
 
         <Grid RowDefinitions="auto,*" Margin="10,0,10,10" Padding="10" RowSpacing="5">
+            
             <Grid Grid.Row="0" RowDefinitions="auto" ColumnDefinitions="*,*" ColumnSpacing="10" VerticalOptions="Start" HorizontalOptions="Fill">
                 <Frame Grid.Column="0">
                     <StackLayout Spacing="10" HorizontalOptions="Fill">
@@ -104,12 +105,12 @@
                                 Command="{Binding CreateCommand}" 
                                 Style="{StaticResource BundleActionButton}" 
                                 IsVisible="{Binding ShowCreateProgress, Converter={StaticResource NotConverter}}"
-                                HorizontalOptions="End"/>
+                                HorizontalOptions="Start"/>
                         <Button Text="Cancel" 
                                 Command="{Binding CancelCreateCommand}" 
                                 Style="{StaticResource BundleCancelButton}" 
                                 IsVisible="{Binding ShowCreateProgress}"
-                                HorizontalOptions="End"/>
+                                HorizontalOptions="Start"/>
                     </StackLayout>
                 </Frame>
                 
@@ -130,13 +131,13 @@
                                 Command="{Binding InstallCommand}" 
                                 Style="{StaticResource BundleActionButton}" 
                                 IsVisible="{Binding ShowInstallProgress, Converter={StaticResource NotConverter}}"
-                                HorizontalOptions="End"
+                                HorizontalOptions="Start"
                                 VerticalOptions="End"/>
                         <Button Grid.Row="3" Text="Cancel" 
                                 Command="{Binding CancelInstallCommand}" 
                                 Style="{StaticResource BundleCancelButton}" 
                                 IsVisible="{Binding ShowInstallProgress}"
-                                HorizontalOptions="End"
+                                HorizontalOptions="Start"
                                 VerticalOptions="End"/>
                     </Grid>
                 </Frame>
