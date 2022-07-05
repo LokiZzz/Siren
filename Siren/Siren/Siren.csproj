@@ -6,24 +6,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assets\Alegreya-VariableFont_wght.ttf" />
+    <None Remove="Assets\ElegantIcons.ttf" />
     <None Remove="Assets\Font Awesome 6 Free-Regular-400.otf" />
+    <None Remove="Assets\Font Awesome 6 Free-Solid-900.otf" />
     <None Remove="Assets\Lora-VariableFont_wght.ttf" />
-    <None Remove="Assets\PlayfairDisplay-VariableFont_wght.ttf" />
     <None Remove="Assets\SourceSansPro-Regular.ttf" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Alegreya-VariableFont_wght.ttf">
+    <EmbeddedResource Include="Assets\ElegantIcons.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\Font Awesome 6 Free-Regular-400.otf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Assets\Lora-VariableFont_wght.ttf">
+    <EmbeddedResource Include="Assets\Font Awesome 6 Free-Solid-900.otf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Assets\PlayfairDisplay-VariableFont_wght.ttf">
+    <EmbeddedResource Include="Assets\Lora-VariableFont_wght.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\SourceSansPro-Regular.ttf">
@@ -74,6 +74,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\SettingCardView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\SimplePlayer\SimplePlayerPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

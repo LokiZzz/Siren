@@ -2,6 +2,7 @@
 <Shell xmlns="http://xamarin.com/schemas/2014/forms" 
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:local="clr-namespace:Siren.Views"
+       xmlns:sp="clr-namespace:Siren.Views.SimplePlayer"
        Title="Siren"
        x:Class="Siren.AppShell">
 
@@ -71,6 +72,11 @@
         <ShellContent Route="BundlePage" ContentTemplate="{DataTemplate local:BundlePage}" />
     </FlyoutItem>
 
+    <FlyoutItem Title="Player">
+        <!--Icon="icon_about.png"-->
+        <ShellContent Route="SimplePlayerPage" ContentTemplate="{DataTemplate sp:SimplePlayerPage}" />
+    </FlyoutItem>
+    
     <!-- When the Flyout is visible this will be a menu item you can tie a click behavior to  -->
     <!--<MenuItem Text="Logout" StyleClass="MenuItemLayoutStyle" Clicked="OnMenuItemClicked">
     </MenuItem>-->

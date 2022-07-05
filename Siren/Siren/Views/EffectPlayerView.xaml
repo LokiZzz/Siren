@@ -24,6 +24,15 @@
               RowDefinitions="auto,auto"
               ColumnDefinitions="auto,*,auto">
 
+                <ProgressBar Grid.RowSpan="2" Grid.ColumnSpan="3"
+                             VerticalOptions="Fill"
+                             HorizontalOptions="Fill"
+                             Progress="{Binding PositionPercent}" 
+                             ProgressColor="{StaticResource DarkGreen}" 
+                             BackgroundColor="Transparent"
+                             Margin="-15"
+                             IsVisible="{Binding IsPlaying}"/>
+
                 <Button Grid.Row="0" Grid.Column="0"
                     VerticalOptions="Center"
                     Style="{StaticResource PlayerControlButton}" 

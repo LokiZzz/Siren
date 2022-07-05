@@ -26,7 +26,7 @@
                        FontSize="30" FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" TextColor="{StaticResource Green}"
                        VerticalOptions="Center" HorizontalOptions="Start"
                        VerticalTextAlignment="Center" HorizontalTextAlignment="Start"
-                       Opacity="0.8"/>
+                       Opacity="1"/>
                 
                 <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" 
                            Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10"
