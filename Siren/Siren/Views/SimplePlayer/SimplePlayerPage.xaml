@@ -91,6 +91,7 @@
                     <Button Style="{StaticResource ListControlButton}"/>
                     <Button Style="{StaticResource ListControlButton}" Text="{x:Static assets:FAFont.CircleDown}"/>
                     <Button Style="{StaticResource ListControlButton}" Text="{x:Static assets:FAFont.CircleUp}"/>
+                    <Button Style="{StaticResource ListControlButton}" Text="{x:Static assets:FAFont.CircleXmark}"/>
                 </StackLayout>
                 <ScrollView Grid.Row="1" Orientation="Vertical" VerticalScrollBarVisibility="Never">
                     <StackLayout x:Name="Playlists" Grid.Row="0" 
