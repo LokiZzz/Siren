@@ -28,6 +28,21 @@ namespace Siren.ViewModels
             Task.Run(async () => { await IntializeCollections(); }).Wait();
         }
 
+        #region Settings
+        private ObservableCollection<SettingViewModel> _settings;
+        public ObservableCollection<SettingViewModel> Settings
+        {
+            get => _settings;
+            set => SetProperty(ref _settings, value);
+        }
+
+        private SettingViewModel _selectedSetting;
+        public SettingViewModel SelectedSetting
+        {
+            get => _selectedSetting;
+            set => SetProperty(ref _selectedSetting, value);
+        }
+
         private async Task GoToAddSetting()
         {
             await Shell.Current.GoToAsync(
@@ -104,6 +119,37 @@ namespace Siren.ViewModels
                 {
                     await SelectScene(null);
                     await SelectSetting(null);
+                }
+            }
+        }
+
+        private bool _showSettingEditTools;
+        public bool ShowSettingEditTools
+        {
+            get => _showSettingEditTools;
+            set => SetProperty(ref _showSettingEditTools, value);
+        }
+        #endregion
+
+        #region Scene
+        private SceneViewModel _selectedScene;
+        public SceneViewModel SelectedScene
+        {
+            get => _selectedScene;
+            set
+            {
+                SetProperty(ref _selectedScene, value);
+
+                if (SelectedSetting != null)
+                {
+                    foreach (SceneViewModel item in SelectedSetting.Scenes)
+                    {
+                        item.IsSelected = false;
+                    }
+                    if (SelectedScene != null)
+                    {
+                        SelectedScene.IsSelected = true;
+                    }
                 }
             }
         }
@@ -199,19 +245,23 @@ namespace Siren.ViewModels
             await SaveCurrentEnvironment();
         }
 
-        private int _maxElementsCount = 30;
+        private bool _showSceneEditTools;
+        public bool ShowSceneEditTools
+        {
+            get => _showSceneEditTools;
+            set => SetProperty(ref _showSceneEditTools, value);
+        }
+        #endregion
 
+        #region Elements
+        private int _maxElementsCount = 30;
         private async Task AddElements()
         {
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
             if (result.Count() + SelectedSetting.Elements.Count() > _maxElementsCount)
             {
-                await Application.Current.MainPage.DisplayAlert(
-                    "Too many files!",
-                    $"You have selected too many files, split them into groups and put them in different settings.",
-                    "Ok :("
-                );
+                await AlertTooManyFiles();
 
                 return;
             }
@@ -244,19 +294,31 @@ namespace Siren.ViewModels
             OnPropertyChanged(nameof(CurrentElementsCountString));
         }
 
-        private int _maxEffectsCount = 30;
+        public string CurrentElementsCountString
+        {
+            get
+            {
+                int current = SelectedSetting?.Elements?.Count ?? 0;
+                int max = _maxElementsCount;
 
+                OnPropertyChanged(nameof(FreeElementsSpace));
+
+                return $"{current}/{max}";
+            }
+        }
+
+        public double FreeElementsSpace => ((double?)SelectedSetting?.Elements?.Count ?? 0) / _maxElementsCount;
+        #endregion
+
+        #region Effects
+        private int _maxEffectsCount = 30;
         private async Task AddEffects()
         {
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
             if (result.Count() + SelectedSetting.Effects.Count() > _maxEffectsCount)
             {
-                await Application.Current.MainPage.DisplayAlert(
-                    "Too many files!",
-                    $"You have selected too many files, split them into groups and put them in different settings.",
-                    "Ok :("
-                );
+                await AlertTooManyFiles();
 
                 return;
             }
@@ -289,34 +351,80 @@ namespace Siren.ViewModels
             OnPropertyChanged(nameof(CurrentEffectsCountString));
         }
 
-        private bool _globalPlayActivityIndicatorIsVisible = false;
-        public bool GlobalPlayActivityIndicatorIsVisible
+        public string CurrentEffectsCountString
         {
-            get => _globalPlayActivityIndicatorIsVisible;
-            set => SetProperty(ref _globalPlayActivityIndicatorIsVisible, value);
+            get
+            {
+                int current = SelectedSetting?.Effects?.Count ?? 0;
+                int max = _maxElementsCount;
+
+                OnPropertyChanged(nameof(FreeEffectsSpace));
+
+                return $"{current}/{max}";
+            }
         }
 
+        public double FreeEffectsSpace => ((double?)SelectedSetting?.Effects?.Count ?? 0) / _maxElementsCount;
+        #endregion
 
-        private async Task GlobalPlayStop()
+        #region Music
+        private int _maxMusicTracksCount = 30;
+        private async Task AddMusic()
         {
-            if (IsScenePlaying)
-            {
-                GlobalPlayActivityIndicatorIsVisible = true;
+            IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
-                Settings.SelectMany(x => x.Elements)
-                    .Where(x => x.IsPlaying)
-                    .ForEach(x => x.SmoothStop());
-            }
-            else
+            if (result.Count() + SelectedSetting.Music.Count() > _maxMusicTracksCount)
             {
-                if (SelectedScene != null)
+                await AlertTooManyFiles();
+
+                return;
+            }
+
+            foreach (FileResult element in result)
+            {
+                if (!SelectedSetting.Music.Any(x => x.FilePath.Equals(element.FullPath)))
                 {
-                    await SelectScene(SelectedScene);
+                    SceneComponentViewModel player = new SceneComponentViewModel { FilePath = element.FullPath };
+                    SelectedSetting.Music.Add(player);
                 }
             }
-            OnPropertyChanged(nameof(IsScenePlaying));
+
+            OnPropertyChanged(nameof(CurrentMusicTracksCountString));
         }
 
+        private async Task GoToEditMusicTrack(SceneComponentViewModel musicTrack)
+        {
+            SceneManager.ComponentToEdit = musicTrack;
+
+            await Shell.Current.GoToAsync(
+                $"{nameof(AddOrEditComponentPage)}?intent={EAddOrEditIntent.Edit}&component={EComponentType.MusicTrack}"
+            );
+        }
+
+        private void DeleteMusicTrack(SceneComponentViewModel component)
+        {
+            SelectedSetting.Music.Remove(component);
+            component.Dispose();
+            OnPropertyChanged(nameof(CurrentMusicTracksCountString));
+        }
+
+        public string CurrentMusicTracksCountString
+        {
+            get
+            {
+                int current = SelectedSetting?.Music?.Count ?? 0;
+                int max = _maxMusicTracksCount;
+
+                OnPropertyChanged(nameof(FreeMusicTracksSpace));
+
+                return $"{current}/{max}";
+            }
+        }
+
+        public double FreeMusicTracksSpace => ((double?)SelectedSetting?.Music?.Count ?? 0) / _maxMusicTracksCount;
+        #endregion
+
+        #region Environment
         private async void SaveCurrentEnvironment(object sender, NotifyCollectionChangedEventArgs e) => await SaveCurrentEnvironment();
 
         private async Task SaveCurrentEnvironment()
@@ -336,7 +444,9 @@ namespace Siren.ViewModels
                 await SelectSetting(null);
             }
         }
+        #endregion
 
+        #region Events
         private void AddEvents()
         {
             Settings.CollectionChanged += BindNewSettingEvents;
@@ -370,7 +480,9 @@ namespace Siren.ViewModels
             MessagingCenter.Subscribe<AddOrEditComponentViewModel>(this, Messages.IllustratedCardEdited, async (manager) => await SaveCurrentEnvironment());
             MessagingCenter.Subscribe<BundlePageViewModel>(this, Messages.NeedToUpdateEnvironment, async (manager) => await IntializeCollections());
         }
+        #endregion
 
+        #region Commands
         public Command AddSettingCommand { get => new Command(async () => await GoToAddSetting()); }
         public Command EditSettingCommand { get => new Command<SettingViewModel>(async (setting) => await GoToEditSetting(setting)); }
         public Command SelectSettingCommand { get => new Command<SettingViewModel>(async (setting) => await SelectSetting(setting)); }
@@ -386,42 +498,38 @@ namespace Siren.ViewModels
         public Command AddEffectsCommand { get => new Command(async () => await AddEffects()); }
         public Command EditEffectCommand { get => new Command<SceneComponentViewModel>(async (effect) => await GoToEditEffect(effect)); }
         public Command DeleteEffectCommand { get => new Command<SceneComponentViewModel>(DeleteEffect); }
+        public Command AddMusicCommand { get => new Command(async () => await AddMusic()); }
+        public Command EditMusicCommand { get => new Command<SceneComponentViewModel>(async (music) => await GoToEditMusicTrack(music)); }
+        public Command DeleteMusicCommand { get => new Command<SceneComponentViewModel>(DeleteMusicTrack); }
         public Command GlobalPlayCommand { get => new Command(async () => await GlobalPlayStop()); }
+        #endregion
 
-        private ObservableCollection<SettingViewModel> _settings;
-        public ObservableCollection<SettingViewModel> Settings
+        #region Global Play/Stop
+        private bool _globalPlayActivityIndicatorIsVisible = false;
+        public bool GlobalPlayActivityIndicatorIsVisible
         {
-            get => _settings;
-            set => SetProperty(ref _settings, value);
+            get => _globalPlayActivityIndicatorIsVisible;
+            set => SetProperty(ref _globalPlayActivityIndicatorIsVisible, value);
         }
 
-        private SettingViewModel _selectedSetting;
-        public SettingViewModel SelectedSetting
+        private async Task GlobalPlayStop()
         {
-            get => _selectedSetting;
-            set => SetProperty(ref _selectedSetting, value);
-        }
-
-        private SceneViewModel _selectedScene;
-        public SceneViewModel SelectedScene
-        {
-            get => _selectedScene;
-            set
+            if (IsScenePlaying)
             {
-                SetProperty(ref _selectedScene, value);
+                GlobalPlayActivityIndicatorIsVisible = true;
 
-                if (SelectedSetting != null)
+                Settings.SelectMany(x => x.Elements)
+                    .Where(x => x.IsPlaying)
+                    .ForEach(x => x.SmoothStop());
+            }
+            else
+            {
+                if (SelectedScene != null)
                 {
-                    foreach (SceneViewModel item in SelectedSetting.Scenes)
-                    {
-                        item.IsSelected = false;
-                    }
-                    if (SelectedScene != null)
-                    {
-                        SelectedScene.IsSelected = true;
-                    }
+                    await SelectScene(SelectedScene);
                 }
             }
+            OnPropertyChanged(nameof(IsScenePlaying));
         }
 
         public bool IsScenePlaying
@@ -458,49 +566,17 @@ namespace Siren.ViewModels
                 return $"Current scene: {current}";
             }
         }
+        #endregion
 
-        private bool _showSettingEditTools;
-        public bool ShowSettingEditTools
+        #region Private utility
+        private async Task AlertTooManyFiles()
         {
-            get =>  _showSettingEditTools;
-            set => SetProperty(ref _showSettingEditTools, value);
+            await Application.Current.MainPage.DisplayAlert(
+                "Too many files!",
+                $"You have selected too many files, split them into groups and put them in different settings.",
+                "Ok :("
+            );
         }
-
-        private bool _showSceneEditTools;
-        public bool ShowSceneEditTools
-        {
-            get => _showSceneEditTools;
-            set => SetProperty(ref _showSceneEditTools, value);
-        }
-
-        public string CurrentElementsCountString
-        {
-            get
-            {
-                int current = SelectedSetting?.Elements?.Count ?? 0;
-                int max = _maxElementsCount;
-
-                OnPropertyChanged(nameof(FreeElementsSpace));
-
-                return $"{current}/{max}";
-            }
-        }
-
-        public double FreeElementsSpace => ((double?)SelectedSetting?.Elements?.Count ?? 0) / _maxElementsCount;
-
-        public string CurrentEffectsCountString
-        {
-            get
-            {
-                int current = SelectedSetting?.Effects?.Count ?? 0;
-                int max = _maxElementsCount;
-
-                OnPropertyChanged(nameof(FreeEffectsSpace));
-
-                return $"{current}/{max}";
-            }
-        }
-
-        public double FreeEffectsSpace => ((double?)SelectedSetting?.Effects?.Count ?? 0) / _maxElementsCount;
+        #endregion
     }
 }

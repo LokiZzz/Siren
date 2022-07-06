@@ -2,6 +2,7 @@
 using Siren.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
@@ -132,6 +133,7 @@ namespace Siren.ViewModels
                     break;
                 case EComponentType.Element:
                 case EComponentType.Effect:
+                case EComponentType.MusicTrack:
                     EditSceneComponent();
                     break;
             }
@@ -160,7 +162,9 @@ namespace Siren.ViewModels
 
             if(intent == EAddOrEditIntent.Edit)
             {
-                if (component == EComponentType.Element || component == EComponentType.Effect)
+                if (component == EComponentType.Element 
+                    || component == EComponentType.Effect 
+                    || component == EComponentType.MusicTrack)
                 {
                     Name = string.IsNullOrEmpty(SceneManager.ComponentToEdit.Alias)
                         ? SceneManager.ComponentToEdit.Name
@@ -224,6 +228,8 @@ namespace Siren.ViewModels
         Setting = 1,
         Scene = 2,
         Element = 3,
-        Effect = 4
+        Effect = 4,
+        [Description("Music track")]
+        MusicTrack = 5
     }
 }

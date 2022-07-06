@@ -279,6 +279,10 @@ namespace Siren.Services
                 setting.Effects.ForEach(effect => {
                     effect.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(effect.FilePath), bundleId);
                 });
+
+                setting.Music.ForEach(musicTrack => {
+                    musicTrack.FilePath = GetLocalAppDataBundleFilePath(Path.GetFileName(musicTrack.FilePath), bundleId);
+                });
             }
         }
 
@@ -312,12 +316,13 @@ namespace Siren.Services
         {
             IEnumerable<string> elements = bundle.Settings.SelectMany(x => x.Elements).Select(x => x.FilePath);
             IEnumerable<string> effects = bundle.Settings.SelectMany(x => x.Effects).Select(x => x.FilePath);
+            IEnumerable<string> music = bundle.Settings.SelectMany(x => x.Music).Select(x => x.FilePath);
             IEnumerable<string> settingsImages = bundle.Settings.Select(x => x.ImagePath)
                 .Where(x => !string.IsNullOrEmpty(x));
             IEnumerable<string> scenesImages = bundle.Settings.SelectMany(x => x.Scenes).Select(x => x.ImagePath)
                 .Where(x => !string.IsNullOrEmpty(x)); ;
 
-            return elements.Union(effects).Union(settingsImages).Union(scenesImages).ToList();
+            return elements.Union(effects).Union(music).Union(settingsImages).Union(scenesImages).ToList();
         }
 
         private async Task<string> GetProba(Stream stream, int from, int size)

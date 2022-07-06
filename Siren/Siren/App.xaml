@@ -80,6 +80,10 @@
                 <Setter Property="FontSize" Value="26"/>
             </Style>
 
+            <Style TargetType="Switch">
+                <Setter Property="ThumbColor" Value="{StaticResource Medium}"></Setter>
+            </Style>
+            
             <ControlTemplate x:Key="BusyPageTemplate">
                 <RelativeLayout>
                     <Grid RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent,Property=Width}"

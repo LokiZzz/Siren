@@ -12,13 +12,6 @@ namespace Siren.ViewModels
 {
     public class SettingViewModel : IllustratedCardViewModel
     {
-        public SettingViewModel()
-        {
-            Scenes = new ObservableCollection<SceneViewModel>();
-            Elements = new ObservableCollection<SceneComponentViewModel>();
-            Effects = new ObservableCollection<SceneComponentViewModel>();
-        }
-
         public Guid BundleId { get; set; }
 
         public bool _isSelected;
@@ -31,7 +24,7 @@ namespace Siren.ViewModels
         public void UpdateHasSelectedScene() => OnPropertyChanged(nameof(HasSelectedScene));
         public bool HasSelectedScene => Scenes?.Any(x => x.IsSelected) == true;
 
-        private ObservableCollection<SceneViewModel> _scenes;
+        private ObservableCollection<SceneViewModel> _scenes = new ObservableCollection<SceneViewModel>();
         public ObservableCollection<SceneViewModel> Scenes
         {
             get => _scenes;
@@ -43,7 +36,7 @@ namespace Siren.ViewModels
         }
 
 
-        private ObservableCollection<SceneComponentViewModel> _elements;
+        private ObservableCollection<SceneComponentViewModel> _elements = new ObservableCollection<SceneComponentViewModel>();
         public ObservableCollection<SceneComponentViewModel> Elements
         {
             get => _elements;
@@ -54,7 +47,7 @@ namespace Siren.ViewModels
             }
         }
 
-        private ObservableCollection<SceneComponentViewModel> _effects;
+        private ObservableCollection<SceneComponentViewModel> _effects = new ObservableCollection<SceneComponentViewModel>();
         public ObservableCollection<SceneComponentViewModel> Effects
         {
             get => _effects;
@@ -62,6 +55,17 @@ namespace Siren.ViewModels
             {
                 SetProperty(ref _effects, value);
                 _effects.CollectionChanged += FireSettingChanged;
+            }
+        }
+
+        private ObservableCollection<SceneComponentViewModel> _music = new ObservableCollection<SceneComponentViewModel>();
+        public ObservableCollection<SceneComponentViewModel> Music
+        {
+            get => _music;
+            set
+            {
+                SetProperty(ref _music, value);
+                _music.CollectionChanged += FireSettingChanged;
             }
         }
 

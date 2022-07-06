@@ -16,6 +16,20 @@ namespace Siren.ViewModels
             set => SetProperty(ref _isSelected, value);
         }
 
+        public bool _isMusicEnabled;
+        public bool IsMusicEnabled
+        {
+            get => _isMusicEnabled;
+            set => SetProperty(ref _isMusicEnabled, value);
+        }
+
+        public bool _isMusicShuffled;
+        public bool IsMusicShuffled
+        {
+            get => _isMusicShuffled;
+            set => SetProperty(ref _isMusicShuffled, value);
+        }
+
         public ObservableCollection<TrackSetupViewModel> Elements { get; set; } = new ObservableCollection<TrackSetupViewModel>();
 
         public void ReloadImage()

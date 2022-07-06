@@ -30,5 +30,6 @@ namespace Siren.ViewModels.Bundles
         public int ScenesCount => Bundle?.Settings?.SelectMany(x => x.Scenes)?.Count() ?? 0;
         public int ElementsCount => Bundle?.Settings?.SelectMany(x => x.Elements)?.Count() ?? 0;
         public int EffectsCount => Bundle?.Settings?.SelectMany(x => x.Effects)?.Count() ?? 0;
+        public int MusicCount => Bundle?.Settings?.SelectMany(x => x.Music)?.Count() ?? 0;
     }
 }

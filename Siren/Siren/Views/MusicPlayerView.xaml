@@ -12,12 +12,13 @@
                                  Progress="{Binding PositionPercent}" 
                                  ProgressColor="{StaticResource DarkGreen}" 
                                  BackgroundColor="Transparent"
-                                 Margin="-15"/>
+                                 Margin="-15"
+                                 IsVisible="{Binding IsPlaying}"/>
                     
                     <Grid Grid.Column="2" RowDefinitions="30" ColumnDefinitions="30">
                         <Button Grid.Row="0" 
                             Style="{StaticResource DeleteButton}"
-                            Command="{Binding BindingContext.DeleteElementCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
+                            Command="{Binding BindingContext.DeleteMusicCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
                             CommandParameter="{Binding .}"/>
                     </Grid>
 
@@ -42,7 +43,7 @@
                            VerticalTextAlignment="Center"
                            LineBreakMode="TailTruncation"/>
                         <Button Style="{StaticResource EditAliasButton}"
-                            Command="{Binding BindingContext.EditElementCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
+                            Command="{Binding BindingContext.EditMusicCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
                             CommandParameter="{Binding .}"/>
                     </StackLayout>
                 </Grid>

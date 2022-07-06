@@ -19,7 +19,8 @@ namespace Siren.Models
                 ImagePath = vm.ImagePath,
                 Scenes = vm.Scenes.Select(x => x.ToModel()).ToList(),
                 Elements = vm.Elements.Select(x => x.ToModel()).ToList(),
-                Effects = vm.Effects.Select(x => x.ToModel()).ToList()
+                Effects = vm.Effects.Select(x => x.ToModel()).ToList(),
+                Music = vm.Music.Select(x => x.ToModel()).ToList(),
             };
         }
 
@@ -29,7 +30,9 @@ namespace Siren.Models
             {
                 Name = vm.Name,
                 ImagePath = vm.ImagePath,
-                ElementsSetup = vm.Elements.Select(x => x.ToModel()).ToList()
+                ElementsSetup = vm.Elements.Select(x => x.ToModel()).ToList(),
+                IsMusicEnabled = vm.IsMusicEnabled,
+                IsMusicShuffled = vm.IsMusicShuffled
             };
         }
 
@@ -60,7 +63,8 @@ namespace Siren.Models
                 ImagePath = m.ImagePath,
                 Scenes = m.Scenes.Select(x => x.ToVM()).ToObservableCollection(),
                 Elements = m.Elements.Select(x => x.ToVM(true)).ToObservableCollection(),
-                Effects = m.Effects.Select(x => x.ToVM(false)).ToObservableCollection()
+                Effects = m.Effects.Select(x => x.ToVM(false)).ToObservableCollection(),
+                Music = m.Music.Select(x => x.ToVM(false)).ToObservableCollection()
             };
         }
 
@@ -70,7 +74,9 @@ namespace Siren.Models
             {
                 Name = m.Name,
                 ImagePath = m.ImagePath,
-                Elements = m.ElementsSetup.Select(x => x.ToVM()).ToObservableCollection()
+                Elements = m.ElementsSetup.Select(x => x.ToVM()).ToObservableCollection(),
+                IsMusicShuffled = m.IsMusicShuffled,
+                IsMusicEnabled = m.IsMusicEnabled
             };
         }
 

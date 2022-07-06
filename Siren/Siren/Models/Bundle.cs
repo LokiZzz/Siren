@@ -9,7 +9,7 @@ namespace Siren.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public List<Setting> Settings { get; set; }
+        public List<Setting> Settings { get; set; } = new List<Setting>();
         public bool IsActivated { get; set; }
         public long Size { get; set; }
         public string SizeWithSuffix => Size.ToFileSize();
@@ -20,16 +20,19 @@ namespace Siren.Models
         public Guid BundleId { get; set; }
         public string Name { get; set; }
         public string ImagePath { get; set; }
-        public List<Scene> Scenes { get; set; }
-        public List<Track> Elements { get; set; }
-        public List<Track> Effects { get; set; }
+        public List<Scene> Scenes { get; set; } = new List<Scene>();
+        public List<Track> Elements { get; set; } = new List<Track>();
+        public List<Track> Effects { get; set; } = new List<Track>();
+        public List<Track> Music { get; set; } = new List<Track>();
     }
 
     public class Scene
     {
         public string Name { get; set; }
         public string ImagePath { get; set; }
-        public List<TrackSetup> ElementsSetup { get; set; }
+        public List<TrackSetup> ElementsSetup { get; set; } = new List<TrackSetup>();
+        public bool IsMusicEnabled { get; set; }
+        public bool IsMusicShuffled { get; set; }
     }
 
     public class TrackSetup : Track
