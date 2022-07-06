@@ -490,41 +490,34 @@ namespace Siren.ViewModels
 
         private async Task PlayNextTrack()
         {
-            try
+            SceneComponentViewModel track = SelectedSetting.Music.ElementAtOrDefault(_currentMusicTrackIndex);
+
+            if (track != null)
             {
-                SceneComponentViewModel track = SelectedSetting.Music.ElementAtOrDefault(_currentMusicTrackIndex);
+                track.OnPlayingStatusChanged += PlayNextTrack;
+                await track.JustPlay(volume: MusicVolume);
 
-                if (track != null)
+                if (Shuffle)
                 {
-                    track.OnPlayingStatusChanged += PlayNextTrack;
-                    await track.JustPlay(volume: MusicVolume);
-
-                    if (Shuffle)
+                    if (!_stillNotPlayedMusicTracks.Any())
                     {
-                        if (!_stillNotPlayedMusicTracks.Any())
-                        {
-                            _stillNotPlayedMusicTracks = SelectedSetting.Music.Select(x => SelectedSetting.Music.IndexOf(x)).ToList();
-                        }
+                        _stillNotPlayedMusicTracks = SelectedSetting.Music.Select(x => SelectedSetting.Music.IndexOf(x)).ToList();
+                    }
 
-                        int randomIndex = new Random().Next(0, _stillNotPlayedMusicTracks.Count());
-                        _currentMusicTrackIndex = _stillNotPlayedMusicTracks[randomIndex];
+                    int randomIndex = new Random().Next(0, _stillNotPlayedMusicTracks.Count());
+                    _currentMusicTrackIndex = _stillNotPlayedMusicTracks[randomIndex];
+                }
+                else
+                {
+                    if (_currentMusicTrackIndex + 1 == SelectedSetting.Music.Count)
+                    {
+                        _currentMusicTrackIndex = 0;
                     }
                     else
                     {
-                        if (_currentMusicTrackIndex + 1 == SelectedSetting.Music.Count)
-                        {
-                            _currentMusicTrackIndex = 0;
-                        }
-                        else
-                        {
-                            _currentMusicTrackIndex++;
-                        }
+                        _currentMusicTrackIndex++;
                     }
                 }
-            }
-            catch(Exception)
-            {
-                _semaphoreSlim.Release();
             }
         }
 
