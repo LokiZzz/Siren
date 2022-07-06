@@ -32,7 +32,8 @@ namespace Siren.Models
                 ImagePath = vm.ImagePath,
                 ElementsSetup = vm.Elements.Select(x => x.ToModel()).ToList(),
                 IsMusicEnabled = vm.IsMusicEnabled,
-                IsMusicShuffled = vm.IsMusicShuffled
+                IsMusicShuffled = vm.IsMusicShuffled,
+                MusicVolume = vm.MusicVolume,
             };
         }
 
@@ -76,7 +77,8 @@ namespace Siren.Models
                 ImagePath = m.ImagePath,
                 Elements = m.ElementsSetup.Select(x => x.ToVM()).ToObservableCollection(),
                 IsMusicShuffled = m.IsMusicShuffled,
-                IsMusicEnabled = m.IsMusicEnabled
+                IsMusicEnabled = m.IsMusicEnabled,
+                MusicVolume = m.MusicVolume,
             };
         }
 

@@ -42,16 +42,36 @@ namespace Siren.ViewModels
             }
         }
 
+        public event EventHandler<PlayingStatusChangedEventArgs> OnPlayingStatusChanged;
+
         public override async Task PlayPause()
         {
             await base.PlayPause();
             MessagingCenter.Send(this, Messages.ElementPlayingStatusChanged);
+            if (OnPlayingStatusChanged != null)
+            {
+                OnPlayingStatusChanged(this, new PlayingStatusChangedEventArgs(true));
+            }
         }
 
         public override void Stop()
         {
             base.Stop();
             MessagingCenter.Send(this, Messages.ElementPlayingStatusChanged);
+            if (OnPlayingStatusChanged != null)
+            {
+                OnPlayingStatusChanged(this, new PlayingStatusChangedEventArgs(false));
+            }
         }
+    }
+
+    public class PlayingStatusChangedEventArgs : EventArgs
+    {
+        public PlayingStatusChangedEventArgs(bool isPlayingNow)
+        {
+            IsPlayingNow = isPlayingNow;
+        }
+
+        public bool IsPlayingNow { get; set; }
     }
 }

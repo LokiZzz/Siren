@@ -30,6 +30,13 @@ namespace Siren.ViewModels
             set => SetProperty(ref _isMusicShuffled, value);
         }
 
+        public double _musicVolume;
+        public double MusicVolume
+        {
+            get => _musicVolume;
+            set => SetProperty(ref _musicVolume, value);
+        }
+
         public ObservableCollection<TrackSetupViewModel> Elements { get; set; } = new ObservableCollection<TrackSetupViewModel>();
 
         public void ReloadImage()

@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Xml.Linq;
@@ -422,6 +423,111 @@ namespace Siren.ViewModels
         }
 
         public double FreeMusicTracksSpace => ((double?)SelectedSetting?.Music?.Count ?? 0) / _maxMusicTracksCount;
+
+        //All about playing «Music» components
+
+        private bool _isMusicPlaying;
+        public bool IsMusicPlaying
+        {
+            get => _isMusicPlaying;
+            set => SetProperty(ref _isMusicPlaying, value);
+        }
+
+        private bool _shuffle = true;
+        public bool Shuffle
+        {
+            get => _shuffle;
+            set => SetProperty(ref _shuffle, value);
+        }
+
+        private bool _musicIsOn = true;
+        public bool MusicIsOn
+        {
+            get => _musicIsOn;
+            set => SetProperty(ref _musicIsOn, value);
+        }
+
+        private double _musicVolume = 100;
+        public double MusicVolume
+        {
+            get => _musicVolume;
+            set => SetProperty(ref _musicVolume, value);
+        }
+
+        private int _currentMusicTrackIndex = 0;
+
+        private async Task PlayMusic()
+        {
+            if(IsMusicPlaying)
+            {
+                foreach (var track in SelectedSetting.Music)
+                {
+                    track.SmoothStop();
+                    track.OnPlayingStatusChanged -= PlayNextTrack;
+                }
+
+                _currentMusicTrackIndex = 0;
+            }
+            else
+            {
+                await PlayNextTrack();
+            }
+
+            IsMusicPlaying = !IsMusicPlaying;
+        }
+
+        private async void PlayNextTrack(object sender, PlayingStatusChangedEventArgs e)
+        {
+            if (e.IsPlayingNow)
+            {
+                return;
+            }
+
+            await PlayNextTrack();
+        }
+
+        private List<int> _stillNotPlayedMusicTracks = new List<int>();
+
+        private async Task PlayNextTrack()
+        {
+            try
+            {
+                SceneComponentViewModel track = SelectedSetting.Music.ElementAtOrDefault(_currentMusicTrackIndex);
+
+                if (track != null)
+                {
+                    track.OnPlayingStatusChanged += PlayNextTrack;
+                    await track.JustPlay(volume: MusicVolume);
+
+                    if (Shuffle)
+                    {
+                        if (!_stillNotPlayedMusicTracks.Any())
+                        {
+                            _stillNotPlayedMusicTracks = SelectedSetting.Music.Select(x => SelectedSetting.Music.IndexOf(x)).ToList();
+                        }
+
+                        int randomIndex = new Random().Next(0, _stillNotPlayedMusicTracks.Count());
+                        _currentMusicTrackIndex = _stillNotPlayedMusicTracks[randomIndex];
+                    }
+                    else
+                    {
+                        if (_currentMusicTrackIndex + 1 == SelectedSetting.Music.Count)
+                        {
+                            _currentMusicTrackIndex = 0;
+                        }
+                        else
+                        {
+                            _currentMusicTrackIndex++;
+                        }
+                    }
+                }
+            }
+            catch(Exception)
+            {
+                _semaphoreSlim.Release();
+            }
+        }
+
         #endregion
 
         #region Environment
@@ -501,6 +607,7 @@ namespace Siren.ViewModels
         public Command AddMusicCommand { get => new Command(async () => await AddMusic()); }
         public Command EditMusicCommand { get => new Command<SceneComponentViewModel>(async (music) => await GoToEditMusicTrack(music)); }
         public Command DeleteMusicCommand { get => new Command<SceneComponentViewModel>(DeleteMusicTrack); }
+        public Command PlayMusicCommand { get => new Command(async () => await PlayMusic()); }
         public Command GlobalPlayCommand { get => new Command(async () => await GlobalPlayStop()); }
         #endregion
 

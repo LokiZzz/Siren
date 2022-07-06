@@ -25,8 +25,6 @@ namespace Siren.UWP
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init();
 
             LoadApplication(new Siren.App());
-
-            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(1500, 1500));
         }
     }
 }

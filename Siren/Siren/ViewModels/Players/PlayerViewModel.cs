@@ -59,6 +59,15 @@ namespace Siren.ViewModels
             }
         }
 
+        public async Task JustPlay(double volume = 100)
+        {
+            if (!IsPlaying)
+            {
+                Volume = volume;
+                await PlayPause();
+            }
+        }
+
         public async Task SmoothPlay(double targetVolume)
         {
             if (!IsPlaying)

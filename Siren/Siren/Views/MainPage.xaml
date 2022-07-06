@@ -139,7 +139,19 @@
                 <Grid RowDefinitions="auto,*,auto" RowSpacing="0">
                     <Grid Grid.Row="0" Margin="10,10,10,0" ColumnDefinitions="*,*,*" ColumnSpacing="10">
                         <Button Grid.Column="0" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleLeft}"/>
-                        <Button Grid.Column="1" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CirclePlay}"/>
+                        <Button Grid.Column="1" 
+                                Style="{StaticResource MusicControlButton}" 
+                                Text="{x:Static icons:FAFont.CirclePlay}" 
+                                BackgroundColor="{StaticResource Green}"
+                                TextColor="{StaticResource TextColor}"
+                                Command="{Binding PlayMusicCommand}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding IsMusicPlaying}" Value="True">
+                                    <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
+                                    <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
                         <Button Grid.Column="2" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleRight}"/>
                     </Grid>
                     <ScrollView Grid.Row="1" Padding="0" Margin="0"  VerticalScrollBarVisibility="Never">
@@ -158,7 +170,8 @@
                                 <Label FontFamily="FAEX" Text="{x:Static icons:FAEXFont.Shuffle}" FontSize="28"
                                        VerticalOptions="Center" VerticalTextAlignment="Center"
                                        TextColor="{StaticResource Green}"/>
-                                <Switch OnColor="{StaticResource Green}" VerticalOptions="Center"/>
+                                <Switch OnColor="{StaticResource Green}" VerticalOptions="Center"
+                                        IsToggled="{Binding Shuffle}"/>
                             </StackLayout>
                             <Grid Grid.Column="1" ColumnDefinitions="auto,*" ColumnSpacing="10" Margin="15,0">
                                 <Label Grid.Column="0" FontFamily="FAEX" Text="{x:Static icons:FAEXFont.VolumeHigh}" 
@@ -167,13 +180,17 @@
                                 <Slider Grid.Column="1" VerticalOptions="Center"
                                         MinimumTrackColor="{StaticResource Green}" 
                                         MaximumTrackColor="{StaticResource Dark}" 
-                                        ThumbColor="{StaticResource Green}"/>
+                                        ThumbColor="{StaticResource Green}"
+                                        Minimum="0"
+                                        Maximum="100"
+                                        Value="{Binding MusicVolume}"/>
                             </Grid>
                             <StackLayout Grid.Column="2" Orientation="Horizontal" Spacing="10">
                                 <Label FontFamily="FAEX" Text="{x:Static icons:FAEXFont.PowerOff}" FontSize="28"
                                        VerticalOptions="Center" VerticalTextAlignment="Center"
                                        TextColor="{StaticResource Green}"/>
-                                <Switch OnColor="{StaticResource Green}" VerticalOptions="Center"/>
+                                <Switch OnColor="{StaticResource Green}" VerticalOptions="Center"
+                                        IsToggled="{Binding MusicIsOn}"/>
                             </StackLayout>
                         </Grid>
                     </Frame>
