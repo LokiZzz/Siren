@@ -461,16 +461,21 @@ namespace Siren.ViewModels
             if (IsMusicPlaying)
             {
                 MessagingCenter.Unsubscribe<MusicTrackViewModel>(this, Messages.MusicTrackPlayingStatusChanged);
+                _currentMusicTrackIndex = 0;
+                _stillNotPlayedMusicTracks.Clear();
 
                 foreach (var track in SelectedSetting.Music)
                 {
                     track.SmoothStop();
                 }
-
-                _currentMusicTrackIndex = 0;
             }
             else
             {
+                if(SelectedSetting.Music.Any(x => x.IsPlaying))
+                {
+                    return;
+                }
+
                 MessagingCenter.Subscribe<MusicTrackViewModel>(
                     this, Messages.MusicTrackPlayingStatusChanged, 
                     async (track) => await PlayNextTrack(track)

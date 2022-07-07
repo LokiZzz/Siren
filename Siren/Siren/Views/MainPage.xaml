@@ -136,13 +136,13 @@
                 
             </Grid>
             <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
-                <Grid RowDefinitions="auto,*,auto" RowSpacing="0">
+                <Grid RowDefinitions="auto,*,auto" RowSpacing="10">
                     <Grid Grid.Row="0" Margin="10,10,10,0" ColumnDefinitions="*,*,*" ColumnSpacing="10">
                         <Button Grid.Column="0" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleLeft}"/>
                         <Button Grid.Column="1" 
                                 Style="{StaticResource MusicControlButton}" 
                                 Text="{x:Static icons:FAFont.CirclePlay}" 
-                                BackgroundColor="{StaticResource Green}"
+                                BackgroundColor="{StaticResource DarkGreen}"
                                 TextColor="{StaticResource TextColor}"
                                 Command="{Binding PlayMusicCommand}">
                             <Button.Triggers>
@@ -156,7 +156,7 @@
                     </Grid>
                     <ScrollView Grid.Row="1" Padding="0" Margin="0"  VerticalScrollBarVisibility="Never">
                         <StackLayout x:Name="MusicList" BindableLayout.ItemsSource="{Binding SelectedSetting.Music}" 
-                                 Padding="10" Spacing="10">
+                                 Padding="10,0" Spacing="10">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
                                     <views:MusicPlayerView/>
@@ -164,7 +164,7 @@
                             </BindableLayout.ItemTemplate>
                         </StackLayout>
                     </ScrollView>
-                    <Frame Grid.Row="2" BackgroundColor="{StaticResource Light}" Margin="10" CornerRadius="10" Padding="10,0">
+                    <Frame Grid.Row="2" BackgroundColor="{StaticResource Light}" Margin="10,0,10,10" CornerRadius="10" Padding="10,0">
                         <Grid ColumnDefinitions="auto,*,auto" Margin="10,5" ColumnSpacing="15">
                             <StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="10">
                                 <Label FontFamily="FAEX" Text="{x:Static icons:FAEXFont.Shuffle}" FontSize="28"
