@@ -58,8 +58,8 @@ namespace Siren.ViewModels
             }
         }
 
-        private ObservableCollection<SceneComponentViewModel> _music = new ObservableCollection<SceneComponentViewModel>();
-        public ObservableCollection<SceneComponentViewModel> Music
+        private ObservableCollection<MusicTrackViewModel> _music = new ObservableCollection<MusicTrackViewModel>();
+        public ObservableCollection<MusicTrackViewModel> Music
         {
             get => _music;
             set
