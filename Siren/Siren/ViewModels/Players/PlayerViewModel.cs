@@ -23,7 +23,7 @@ namespace Siren.ViewModels
         {
             OpenCommand = new Command(async () => await Open());
             PlayCommand = new Command(async () => await PlayPause());
-            StopCommand = new Command(Stop);
+            StopCommand = new Command(() => Stop(true));
             SeekCommand = new Command(Seek);
             StopSeekCommand = new Command(StopSeek);
 
@@ -79,8 +79,11 @@ namespace Siren.ViewModels
             StartAdjustingVolume(targetVolume);
         }
 
-        public virtual void Stop()
+        private bool _isManualStopped = false;
+
+        public virtual void Stop(bool isManual = true)
         {
+            _isManualStopped = isManual;
             _timer.Stop();
             Player.Stop();
             OnPropertyChanged(nameof(IsPlaying));
@@ -181,9 +184,16 @@ namespace Siren.ViewModels
             }
         }
 
+        public event EventHandler<OnIsPlayingChangedEventArgs> OnIsPlayingChangedEvent;
+
         private void OnIsPlayingChanged(bool isPlaying)
         {
             OnPropertyChanged(nameof(IsPlaying));
+            if (OnIsPlayingChangedEvent != null)
+            {
+                OnIsPlayingChangedEvent(this, new OnIsPlayingChangedEventArgs(isPlaying, _isManualStopped));
+            }
+            _isManualStopped = false;
         }
 
         private async Task Open()
@@ -236,7 +246,7 @@ namespace Siren.ViewModels
                 PositionPercent = Position / TrackDurationSeconds;
                 if(Position == TrackDurationSeconds)
                 {
-                    Stop();
+                    Stop(false);
                 }
             }
         }
@@ -279,5 +289,18 @@ namespace Siren.ViewModels
         public string Name =>  Path.GetFileNameWithoutExtension(FilePath);
 
         #endregion
+    }
+
+    public class OnIsPlayingChangedEventArgs : EventArgs
+    {
+        public OnIsPlayingChangedEventArgs(bool isPlaying, bool isManualStopped = false)
+        {
+            IsPlaying = isPlaying;
+            IsManualStopped = isManualStopped;
+        }
+
+        public bool IsPlaying { get; set; }
+        public bool IsManualStopped { get; set; }
+
     }
 }

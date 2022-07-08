@@ -1,6 +1,7 @@
 ﻿using Siren.Messaging;
 using Siren.Models;
 using Siren.Services;
+using Siren.ViewModels.Players;
 using Siren.Views;
 using System;
 using System.Collections.Generic;
@@ -92,6 +93,8 @@ namespace Siren.ViewModels
                 ShowSettingEditTools = SelectedSetting != null;
                 OnPropertyChanged(nameof(CurrentElementsCountString));
                 OnPropertyChanged(nameof(CurrentEffectsCountString));
+
+                MusicPlayer.Tracks = SelectedSetting.Music;
 
                 IsBusy = false;
             });
@@ -369,6 +372,8 @@ namespace Siren.ViewModels
         #endregion
 
         #region Music
+        public SceneMusicPlayerViewModel MusicPlayer { get; set; } = new SceneMusicPlayerViewModel();
+
         private int _maxMusicTracksCount = 30;
         private async Task AddMusic()
         {
@@ -385,15 +390,16 @@ namespace Siren.ViewModels
             {
                 if (!SelectedSetting.Music.Any(x => x.FilePath.Equals(element.FullPath)))
                 {
-                    MusicTrackViewModel player = new MusicTrackViewModel { FilePath = element.FullPath };
-                    SelectedSetting.Music.Add(player);
+                    SceneComponentViewModel track = new SceneComponentViewModel { FilePath = element.FullPath };
+                    SelectedSetting.Music.Add(track);
+                    //MusicPlayer.Tracks.Add(track);
                 }
             }
 
             OnPropertyChanged(nameof(CurrentMusicTracksCountString));
         }
 
-        private async Task GoToEditMusicTrack(MusicTrackViewModel musicTrack)
+        private async Task GoToEditMusicTrack(SceneComponentViewModel musicTrack)
         {
             SceneManager.ComponentToEdit = musicTrack;
 
@@ -402,13 +408,15 @@ namespace Siren.ViewModels
             );
         }
 
-        private void DeleteMusicTrack(MusicTrackViewModel component)
+        private void DeleteMusicTrack(SceneComponentViewModel component)
         {
             SelectedSetting.Music.Remove(component);
+            //MusicPlayer.Tracks.Remove(component);
             component.Dispose();
             OnPropertyChanged(nameof(CurrentMusicTracksCountString));
         }
 
+        public double FreeMusicTracksSpace => ((double?)SelectedSetting?.Music?.Count ?? 0) / _maxMusicTracksCount;
         public string CurrentMusicTracksCountString
         {
             get
@@ -422,128 +430,17 @@ namespace Siren.ViewModels
             }
         }
 
-        public double FreeMusicTracksSpace => ((double?)SelectedSetting?.Music?.Count ?? 0) / _maxMusicTracksCount;
-
-        //All about playing «Music» components
-
-        private bool _isMusicPlaying;
-        public bool IsMusicPlaying
-        {
-            get => _isMusicPlaying;
-            set => SetProperty(ref _isMusicPlaying, value);
-        }
-
-        private bool _shuffle = true;
-        public bool Shuffle
-        {
-            get => _shuffle;
-            set => SetProperty(ref _shuffle, value);
-        }
-
-        private bool _musicIsOn = true;
-        public bool MusicIsOn
-        {
-            get => _musicIsOn;
-            set => SetProperty(ref _musicIsOn, value);
-        }
-
-        private double _musicVolume = 100;
-        public double MusicVolume
-        {
-            get => _musicVolume;
-            set => SetProperty(ref _musicVolume, value);
-        }
-
-        private int _currentMusicTrackIndex = 0;
-
         private async Task PlayMusic()
         {
-            if (IsMusicPlaying)
+            if (!MusicPlayer.IsMusicPlaying)
             {
-                MessagingCenter.Unsubscribe<MusicTrackViewModel>(this, Messages.MusicTrackPlayingStatusChanged);
-                _currentMusicTrackIndex = 0;
-                _stillNotPlayedMusicTracks.Clear();
-
-                foreach (var track in SelectedSetting.Music)
-                {
-                    track.SmoothStop();
-                }
+                await MusicPlayer.Play();
             }
             else
             {
-                if(SelectedSetting.Music.Any(x => x.IsPlaying))
-                {
-                    return;
-                }
-
-                MessagingCenter.Subscribe<MusicTrackViewModel>(
-                    this, Messages.MusicTrackPlayingStatusChanged, 
-                    async (track) => await PlayNextTrack(track)
-                );
-
-                await PlayNextTrack(null);
-            }
-
-            IsMusicPlaying = !IsMusicPlaying;
-        }
-
-        private List<int> _stillNotPlayedMusicTracks = new List<int>();
-
-        private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
-
-        private async Task PlayNextTrack(MusicTrackViewModel previous)
-        {
-            await _semaphore.WaitAsync();
-
-            try
-            {
-                if (previous?.IsPlaying == true)
-                {
-                    return;
-                }
-
-                int randomIndex= 0;
-
-                if (Shuffle)
-                {
-                    if (!_stillNotPlayedMusicTracks.Any())
-                    {
-                        _stillNotPlayedMusicTracks = SelectedSetting.Music.Select(x => SelectedSetting.Music.IndexOf(x)).ToList();
-                    }
-
-                    randomIndex = new Random().Next(0, _stillNotPlayedMusicTracks.Count() - 1);
-                    _currentMusicTrackIndex = _stillNotPlayedMusicTracks[randomIndex];
-                }
-
-                MusicTrackViewModel track = SelectedSetting.Music.ElementAtOrDefault(_currentMusicTrackIndex);
-
-                if (track != null)
-                {
-                    await track.JustPlay(volume: MusicVolume);
-
-                    if (Shuffle)
-                    {
-                        _stillNotPlayedMusicTracks.RemoveAt(randomIndex);
-                    }
-                    else
-                    {
-                        if (_currentMusicTrackIndex + 1 == SelectedSetting.Music.Count)
-                        {
-                            _currentMusicTrackIndex = 0;
-                        }
-                        else
-                        {
-                            _currentMusicTrackIndex++;
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                _semaphore.Release();
+                MusicPlayer.Stop();
             }
         }
-
         #endregion
 
         #region Environment
@@ -621,8 +518,8 @@ namespace Siren.ViewModels
         public Command EditEffectCommand { get => new Command<SceneComponentViewModel>(async (effect) => await GoToEditEffect(effect)); }
         public Command DeleteEffectCommand { get => new Command<SceneComponentViewModel>(DeleteEffect); }
         public Command AddMusicCommand { get => new Command(async () => await AddMusic()); }
-        public Command EditMusicCommand { get => new Command<MusicTrackViewModel>(async (music) => await GoToEditMusicTrack(music)); }
-        public Command DeleteMusicCommand { get => new Command<MusicTrackViewModel>(DeleteMusicTrack); }
+        public Command EditMusicCommand { get => new Command<SceneComponentViewModel>(async (music) => await GoToEditMusicTrack(music)); }
+        public Command DeleteMusicCommand { get => new Command<SceneComponentViewModel>(DeleteMusicTrack); }
         public Command PlayMusicCommand { get => new Command(async () => await PlayMusic()); }
         public Command GlobalPlayCommand { get => new Command(async () => await GlobalPlayStop()); }
         #endregion

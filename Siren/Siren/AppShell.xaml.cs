@@ -1,7 +1,6 @@
 ﻿using Siren.Services;
 using Siren.ViewModels;
 using Siren.Views;
-using Siren.Views.SimplePlayer;
 using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
@@ -18,7 +17,6 @@ namespace Siren
             Routing.RegisterRoute(nameof(CheckPermissionPage), typeof(CheckPermissionPage));
             Routing.RegisterRoute(nameof(AddOrEditComponentPage), typeof(AddOrEditComponentPage));
             Routing.RegisterRoute(nameof(BundlePage), typeof(BundlePage));
-            Routing.RegisterRoute(nameof(SimplePlayerPage), typeof(SimplePlayerPage));
         }
     }
 }

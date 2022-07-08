@@ -9,12 +9,23 @@
                 <Grid Padding="10" ColumnSpacing="10" ColumnDefinitions="auto,*,auto">
 
                     <ProgressBar Grid.ColumnSpan="3" VerticalOptions="Fill" HorizontalOptions="Fill"
-                                 Progress="{Binding PositionPercent}" 
+                                 Progress="{Binding BindingContext.MusicPlayer.PositionPercent,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                                  ProgressColor="{StaticResource DarkGreen}" 
                                  BackgroundColor="Transparent"
                                  Margin="-15"
                                  IsVisible="{Binding IsPlaying}"/>
-                    
+
+                    <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" 
+                               Grid.ColumnSpan="3" Margin="-10"
+                               IsVisible="{Binding IsSelected}">
+                        <Rectangle.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="{StaticResource Green}" Offset="1.2" />
+                                <GradientStop Color="Transparent" Offset="0" />
+                            </LinearGradientBrush>
+                        </Rectangle.Background>
+                    </Rectangle>
+
                     <Grid Grid.Column="2" RowDefinitions="30" ColumnDefinitions="30">
                         <Button Grid.Row="0" 
                             Style="{StaticResource DeleteButton}"

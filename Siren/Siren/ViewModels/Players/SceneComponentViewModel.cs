@@ -21,25 +21,18 @@ namespace Siren.ViewModels
     /// </summary>
     public class SceneComponentViewModel : PlayerViewModel
     {
+        public bool _isSelected = false;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);
+        }
+
         public string _alias;
         public string Alias
         {
             get => string.IsNullOrEmpty(_alias) ? Name : _alias;
             set => SetProperty(ref _alias, value);
-        }
-
-        public ImageSource Image { get; set; }
-
-        private string _imagePath;
-        public string ImagePath
-        {
-            get => _imagePath;
-            set
-            {
-                _imagePath = value;
-                Image = ImageSource.FromFile(value);
-                OnPropertyChanged(nameof(Image));
-            }
         }
 
         public override async Task PlayPause()
@@ -48,25 +41,10 @@ namespace Siren.ViewModels
             MessagingCenter.Send(this, Messages.ElementPlayingStatusChanged);
         }
 
-        public override void Stop()
+        public override void Stop(bool isManual = true)
         {
-            base.Stop();
+            base.Stop(isManual);
             MessagingCenter.Send(this, Messages.ElementPlayingStatusChanged);
-        }
-    }
-
-    public class MusicTrackViewModel : SceneComponentViewModel
-    {
-        //public override async Task PlayPause()
-        //{
-        //    await base.PlayPause();
-        //    MessagingCenter.Send(this, Messages.MusicTrackPlayingStatusChanged);
-        //}
-
-        public override void Stop()
-        {
-            base.Stop();
-            MessagingCenter.Send(this, Messages.MusicTrackPlayingStatusChanged);
         }
     }
 }
