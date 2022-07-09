@@ -27,7 +27,16 @@ namespace Siren.UWP.Services
             _player.MediaEnded += MediaEnded;
         }
 
-        public bool IsPlaying { get; private set; }
+        private bool _isPlatying;
+        public bool IsPlaying
+        {
+            get => _isPlatying;
+            private set
+            {
+                _isPlatying = value;
+                OnIsPlayingChanged(value);
+            }
+        }
 
         public TimeSpan Position
         {
@@ -46,12 +55,8 @@ namespace Siren.UWP.Services
 
         private void MediaEnded(MediaPlayer sender, object args)
         {
-            if (!Loop) IsPlaying = false;
-
-            if (OnIsPlayingChanged != null)
-            {
-                OnIsPlayingChanged(IsPlaying);
-            }
+            //VM итак вызывает Stop() по окончанию времени.
+            //if (!Loop) IsPlaying = false;
         }
 
         public TimeSpan Duration => _player.PlaybackSession.NaturalDuration;

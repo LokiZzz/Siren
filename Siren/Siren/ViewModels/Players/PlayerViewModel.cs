@@ -80,13 +80,23 @@ namespace Siren.ViewModels
         }
 
         private bool _isManualStopped = false;
+        private SemaphoreSlim _stopSemaphore = new SemaphoreSlim(1, 1);
 
         public virtual void Stop(bool isManual = true)
         {
-            _isManualStopped = isManual;
-            _timer.Stop();
-            Player.Stop();
-            OnPropertyChanged(nameof(IsPlaying));
+            try
+            {
+                _stopSemaphore.Wait();
+
+                _isManualStopped = isManual;
+                _timer.Stop();
+                Player.Stop();
+                OnPropertyChanged(nameof(IsPlaying));
+            }
+            finally
+            {
+                _stopSemaphore.Release();
+            }
         }
 
         public void SmoothStop()
@@ -101,7 +111,7 @@ namespace Siren.ViewModels
         {
             _timer.Stop();
             _timer.Dispose();
-            _timer = new Timer(4);
+            _timer = new Timer(10);
             _targetVolume = targetVolume;
             _timer.Elapsed += AdjustVolume;
             _timer.Start();
@@ -134,6 +144,7 @@ namespace Siren.ViewModels
                     if (_targetVolume == 0)
                     {
                         Stop();
+                        //Sleep to remove the «Click» sound
                         Thread.Sleep(100);
                         Volume = 100;
                     }

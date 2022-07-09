@@ -13,18 +13,7 @@
                                  ProgressColor="{StaticResource DarkGreen}" 
                                  BackgroundColor="Transparent"
                                  Margin="-15"
-                                 IsVisible="{Binding IsPlaying}"/>
-
-                    <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" 
-                               Grid.ColumnSpan="3" Margin="-10"
-                               IsVisible="{Binding IsSelected}">
-                        <Rectangle.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="{StaticResource Green}" Offset="1.2" />
-                                <GradientStop Color="Transparent" Offset="0" />
-                            </LinearGradientBrush>
-                        </Rectangle.Background>
-                    </Rectangle>
+                                 IsVisible="{Binding IsSelected}"/>
 
                     <Grid Grid.Column="2" RowDefinitions="30" ColumnDefinitions="30">
                         <Button Grid.Row="0" 

@@ -392,7 +392,6 @@ namespace Siren.ViewModels
                 {
                     SceneComponentViewModel track = new SceneComponentViewModel { FilePath = element.FullPath };
                     SelectedSetting.Music.Add(track);
-                    //MusicPlayer.Tracks.Add(track);
                 }
             }
 
@@ -411,7 +410,6 @@ namespace Siren.ViewModels
         private void DeleteMusicTrack(SceneComponentViewModel component)
         {
             SelectedSetting.Music.Remove(component);
-            //MusicPlayer.Tracks.Remove(component);
             component.Dispose();
             OnPropertyChanged(nameof(CurrentMusicTracksCountString));
         }
@@ -432,14 +430,7 @@ namespace Siren.ViewModels
 
         private async Task PlayMusic()
         {
-            if (!MusicPlayer.IsMusicPlaying)
-            {
-                await MusicPlayer.Play();
-            }
-            else
-            {
-                MusicPlayer.Stop();
-            }
+            await MusicPlayer.PlayStop();
         }
         #endregion
 

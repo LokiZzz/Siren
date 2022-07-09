@@ -139,19 +139,26 @@
                 <Grid RowDefinitions="auto,*,auto" RowSpacing="10">
                     <Grid Grid.Row="0" Margin="10,10,10,0" ColumnDefinitions="*,*,*" ColumnSpacing="10">
                         <Button Grid.Column="0" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleLeft}"/>
-                        <Button Grid.Column="1" 
-                                Style="{StaticResource MusicControlButton}" 
-                                Text="{x:Static icons:FAFont.CirclePlay}" 
-                                BackgroundColor="{StaticResource DarkGreen}"
-                                TextColor="{StaticResource TextColor}"
-                                Command="{Binding PlayMusicCommand}">
-                            <Button.Triggers>
-                                <DataTrigger TargetType="Button" Binding="{Binding MusicPlayer.IsMusicPlaying}" Value="True">
-                                    <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
-                                    <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
-                                </DataTrigger>
-                            </Button.Triggers>
-                        </Button>
+
+                        <Grid Grid.Column="1">
+                            <Button Style="{StaticResource MusicControlButton}" 
+                                    Text="{x:Static icons:FAFont.CirclePlay}" 
+                                    BackgroundColor="{StaticResource DarkGreen}"
+                                    TextColor="{StaticResource TextColor}"
+                                    Command="{Binding PlayMusicCommand}">
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding MusicPlayer.IsMusicPlaying}" Value="True">
+                                        <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
+                                        <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
+                                    </DataTrigger>
+                                    <!--<DataTrigger TargetType="Button" Binding="{Binding MusicPlayer.ActivityIndicatorIsVisible}" Value="True">
+                                        <Setter Property="Text" Value=""/>
+                                    </DataTrigger>-->
+                                </Button.Triggers>
+                            </Button>
+                            <!--<ActivityIndicator IsVisible="{Binding MusicPlayer.ActivityIndicatorIsVisible}" IsRunning="True" Color="White"/>-->
+                        </Grid>
+
                         <Button Grid.Column="2" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleRight}"/>
                     </Grid>
                     <ScrollView Grid.Row="1" Padding="0" Margin="0"  VerticalScrollBarVisibility="Never">

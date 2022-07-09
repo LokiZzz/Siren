@@ -13,6 +13,11 @@ namespace Siren.ViewModels.Players
 {
     public class SceneMusicPlayerViewModel : PlayerViewModel
     {
+        public SceneMusicPlayerViewModel()
+        {
+            OnIsPlayingChangedEvent += OnIsPlayingChanged;
+        }
+
         private ObservableCollection<SceneComponentViewModel> _tracks = new ObservableCollection<SceneComponentViewModel>();
         public ObservableCollection<SceneComponentViewModel> Tracks
         {
@@ -20,11 +25,26 @@ namespace Siren.ViewModels.Players
             set => SetProperty(ref _tracks, value);
         }
 
+        private bool _activityIndicatorIsVisible = false;
+        public bool ActivityIndicatorIsVisible
+        {
+            get => _activityIndicatorIsVisible;
+            set => SetProperty(ref _activityIndicatorIsVisible, value);
+        }
+
         private bool _isMusicPlaying;
         public bool IsMusicPlaying
         {
             get => _isMusicPlaying;
-            set => SetProperty(ref _isMusicPlaying, value);
+            set 
+            {
+                if (ActivityIndicatorIsVisible && !value)
+                {
+                    ActivityIndicatorIsVisible = false;
+                }
+
+                SetProperty(ref _isMusicPlaying, value); 
+            }
         }
 
         private bool _shuffle = true;
@@ -44,37 +64,31 @@ namespace Siren.ViewModels.Players
         private bool _nextTrackIsFirst = true;
         private int _currentMusicTrackIndex = -1;
         private List<int> _stillNotPlayedMusicTracks = new List<int>();
-        private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        public async Task Play()
+        public async Task PlayStop()
         {
-            if(!IsMusicPlaying)
+            if (IsMusicPlaying)
+            {
+                ResetState();
+
+                SmoothStop();
+            }
+            else
             {
                 RegisterNextTrackHandler();
 
                 await PlayNextTrack();
-                _nextTrackIsFirst = false;
+
                 IsMusicPlaying = true;
+                _nextTrackIsFirst = false;
             }
         }
 
-        public void Stop()
-        {
-            if (IsMusicPlaying)
-            {
-                UnregisterNextTrackHandler();
-
-                _currentMusicTrackIndex = -1;
-                _stillNotPlayedMusicTracks.Clear();
-                SmoothStop();
-                _nextTrackIsFirst = true;
-                IsMusicPlaying = false;
-            }
-        }
+        private SemaphoreSlim _playNextSemaphore = new SemaphoreSlim(1, 1);
 
         private async Task PlayNextTrack()
         {
-            await _semaphore.WaitAsync();
+            await _playNextSemaphore.WaitAsync();
 
             try
             {
@@ -117,26 +131,40 @@ namespace Siren.ViewModels.Players
             }
             finally
             {
-                _semaphore.Release();
+                _playNextSemaphore.Release();
             }
         }
 
+        private bool _stopPlayNext = false;
+
         private async void OnIsPlayingChanged(object sender, OnIsPlayingChangedEventArgs e)
         {
-            if (!e.IsPlaying && !e.IsManualStopped)
+            if (!e.IsPlaying)
             {
-                await PlayNextTrack();
+                if (!e.IsManualStopped && !_stopPlayNext)
+                {
+                    await PlayNextTrack();
+                }
+                else 
+                {
+                    IsMusicPlaying = false;
+                    Volume = TargetVolume;
+                }
             }
         }
 
         private void RegisterNextTrackHandler()
         {
-            OnIsPlayingChangedEvent += OnIsPlayingChanged;
+            _stopPlayNext = false;
         }
 
-        private void UnregisterNextTrackHandler()
+        private void ResetState()
         {
-            OnIsPlayingChangedEvent -= OnIsPlayingChanged;
+            ActivityIndicatorIsVisible = true;
+            _currentMusicTrackIndex = -1;
+            _stillNotPlayedMusicTracks.Clear();
+            _nextTrackIsFirst = true;
+            _stopPlayNext = true;
         }
     }
 }
