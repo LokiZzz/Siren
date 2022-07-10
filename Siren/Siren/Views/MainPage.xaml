@@ -45,12 +45,21 @@
             <Setter Property="BackgroundColor" Value="{StaticResource Light}"/>
             <Setter Property="HeightRequest" Value="45"/>
         </Style>
+        <Style x:Key="Headliner" TargetType="Label">
+            <Setter Property="FontFamily" Value="Lora"/>
+            <Setter Property="FontSize" Value="26"/>
+            <Setter Property="TextColor" Value="{StaticResource TextColor}"/>
+        </Style>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="auto,*,1.03*,auto" ColumnDefinitions="310,1.5*,*" ColumnSpacing="10" RowSpacing="0" >
+    <Grid RowDefinitions="auto,auto,*,1.03*,auto" ColumnDefinitions="310,1.5*,*" ColumnSpacing="10" RowSpacing="0" >
+
+        <Label Text="Settings" Grid.Row="0" Grid.Column="0" Style="{StaticResource Headliner}" Margin="20,0,0,0"/>
+
+        <Label Text="Scenes" Grid.Row="0" Grid.Column="1" Style="{StaticResource Headliner}" Margin="10,0,0,0"/>
 
         <!--Settings-->
-        <Grid Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" RowDefinitions="auto,*">
+        <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" RowDefinitions="auto,*">
             <Grid Grid.Row="0" Padding="10,10,0,10" RowDefinitions="85" ColumnDefinitions="300">
                 <Button Style="{StaticResource AddSettingButton}" Command="{Binding AddSettingCommand}"/>
             </Grid>
@@ -71,7 +80,7 @@
         </Grid>
 
         <!--Scenes-->
-        <Grid Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HeightRequest="100" ColumnDefinitions="auto,*">
+        <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HeightRequest="100" ColumnDefinitions="auto,*">
             <Grid Grid.Column="0" Padding="0,10,10,10" RowDefinitions="85" ColumnDefinitions="85">
                 <Button Style="{StaticResource AddSettingButton}" Command="{Binding AddSceneCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
             </Grid>
@@ -93,10 +102,11 @@
         </Grid>
 
         <!--Elements-->
-        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="auto,*">
-            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,*" >
-                <Button Grid.Column="0" Style="{StaticResource AddButton}" Command="{Binding AddElementsCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
-                <Grid Grid.Column="1" RowDefinitions="*,auto" VerticalOptions="Center" HorizontalOptions="Fill" RowSpacing="5">
+        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*">
+            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,*" >
+                <Label Text="Elements" Grid.Column="0" Style="{StaticResource Headliner}" Margin="10,0,0,0"/>
+                <Button Grid.Column="1" Style="{StaticResource AddButton}" Command="{Binding AddElementsCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
+                <Grid Grid.Column="2" RowDefinitions="*,auto" VerticalOptions="Center" HorizontalOptions="Fill" RowSpacing="5">
                     <Label Grid.Row="0" Text="{Binding CurrentElementsCountString}" VerticalOptions="Center" VerticalTextAlignment="Center"/>
                     <ProgressBar Grid.Row="1" Style="{StaticResource FreeSpaceProgressBar}" Progress="{Binding FreeElementsSpace}" 
                                  HorizontalOptions="Fill" VerticalOptions="End" Margin="0,0,10,0"/>
@@ -123,17 +133,17 @@
         </Grid>
 
         <!--Music-->
-        <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" RowDefinitions="auto,*" Margin="0,0,10,0">
-            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,*,auto">
-                <Button Grid.Column="0" Style="{StaticResource AddButton}" 
+        <Grid Grid.Row="2" Grid.Column="2" Grid.RowSpan="2" RowDefinitions="auto,*" Margin="0,0,10,0">
+            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,*">
+                <Label Text="Music" Grid.Column="0" Style="{StaticResource Headliner}" Margin="10,0,0,0"/>
+                <Button Grid.Column="1" Style="{StaticResource AddButton}" 
                         Command="{Binding AddMusicCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
-                <Grid Grid.Column="1" RowDefinitions="*,auto" VerticalOptions="Center" HorizontalOptions="Fill" RowSpacing="5">
+                <Grid Grid.Column="2" RowDefinitions="*,auto" VerticalOptions="Center" HorizontalOptions="Fill" RowSpacing="5">
                     <Label Grid.Row="0" Text="{Binding CurrentMusicTracksCountString}" 
                            VerticalOptions="Center" VerticalTextAlignment="Center"/>
                     <ProgressBar Grid.Row="1" Style="{StaticResource FreeSpaceProgressBar}" Progress="{Binding FreeMusicTracksSpace}" 
                                  HorizontalOptions="Fill" VerticalOptions="End"/>
                 </Grid>
-                
             </Grid>
             <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
                 <Grid RowDefinitions="auto,*,auto" RowSpacing="10">
@@ -208,10 +218,11 @@
         </Grid>
         
         <!--Effects-->
-        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*">
-            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,*" >
-                <Button Grid.Column="0" Style="{StaticResource AddButton}" Command="{Binding AddEffectsCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
-                <Grid Grid.Column="1" RowDefinitions="*,auto" VerticalOptions="Center" HorizontalOptions="Fill" RowSpacing="5">
+        <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*">
+            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,*" >
+                <Label Text="Effects" Grid.Column="0" Style="{StaticResource Headliner}" Margin="10,0,0,0"/>
+                <Button Grid.Column="1" Style="{StaticResource AddButton}" Command="{Binding AddEffectsCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
+                <Grid Grid.Column="2" RowDefinitions="*,auto" VerticalOptions="Center" HorizontalOptions="Fill" RowSpacing="5">
                     <Label Grid.Row="0" Text="{Binding CurrentEffectsCountString}" VerticalOptions="Center" VerticalTextAlignment="Center"/>
                     <ProgressBar Grid.Row="1" Style="{StaticResource FreeSpaceProgressBar}" Progress="{Binding FreeEffectsSpace}" 
                                  HorizontalOptions="Fill" VerticalOptions="End" Margin="0,0,10,0"/>
@@ -238,7 +249,7 @@
         </Grid>
 
         <!--Lower status bar-->
-        <Grid Grid.Row="3" Grid.ColumnSpan="2">
+        <Grid Grid.Row="4" Grid.ColumnSpan="2">
             <StackLayout Orientation="Horizontal" Margin="10" Spacing="10">
                 <Grid WidthRequest="300" HeightRequest="50">
                     <Button FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" FontSize="32"
