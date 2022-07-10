@@ -66,7 +66,7 @@ namespace Siren.ViewModels.Players
         private List<int> _stillNotPlayedMusicTracks = new List<int>();
         private Stack<int> _history = new Stack<int>();
 
-        public async Task PlayStop()
+        public async Task PlayMusic()
         {
             if (IsMusicPlaying)
             {
@@ -223,7 +223,7 @@ namespace Siren.ViewModels.Players
             {
                 if (forward)
                 {
-                    await PlayStop();
+                    await PlayMusic();
                     IsMusicPlaying = true;
                 }
                 else
