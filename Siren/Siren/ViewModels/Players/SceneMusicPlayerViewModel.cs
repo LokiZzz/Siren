@@ -180,6 +180,19 @@ namespace Siren.ViewModels.Players
 
         public Command NextTrackCommand { get => new Command(async () => await SwitchTrack(true)); }
         public Command PreviousTrackCommand { get => new Command(async () => await SwitchTrack(false)); }
+        public Command PlaySpecificTrackCommand { get => new Command<SceneComponentViewModel>(async (music) => await PlaySpecificTrack(music)); }
+
+        private async Task PlaySpecificTrack(SceneComponentViewModel music)
+        {
+            if (IsPlaying)
+            {
+                Stop(false);
+            }
+
+            _currentMusicTrackIndex = Tracks.IndexOf(music);
+            await PlayCurrentIndexTrack();
+            IsMusicPlaying = true;
+        }
 
         private async Task SwitchTrack(bool forward)
         {

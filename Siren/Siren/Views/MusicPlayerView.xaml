@@ -37,8 +37,9 @@
                             VerticalOptions="Center"
                             FontFamily="FAEX"
                             Text="{x:Static assets:FAEXFont.Play}" 
-                            Command="{Binding PlayCommand}"
-                            BackgroundColor="{StaticResource TransparentMedium}"/>
+                            BackgroundColor="{StaticResource TransparentMedium}"
+                            Command="{Binding BindingContext.MusicPlayer.PlaySpecificTrackCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            CommandParameter="{Binding .}"/>
 
                     <StackLayout Grid.Column="1" Orientation="Horizontal" Spacing="0" VerticalOptions="Start">
                         <Label TextColor="{StaticResource TextColor}" 
