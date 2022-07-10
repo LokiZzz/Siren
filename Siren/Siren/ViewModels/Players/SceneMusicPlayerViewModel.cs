@@ -68,13 +68,7 @@ namespace Siren.ViewModels.Players
 
         public async Task PlayMusic()
         {
-            if (IsMusicPlaying)
-            {
-                ResetState();
-
-                SmoothStop();
-            }
-            else if(Tracks.Any())
+            if(!IsMusicPlaying && Tracks.Any())
             {
                 RegisterNextTrackHandler();
 
@@ -82,6 +76,16 @@ namespace Siren.ViewModels.Players
 
                 IsMusicPlaying = true;
                 _nextTrackIsFirst = false;
+            }
+        }
+
+        public void StopMusic()
+        {
+            if (IsMusicPlaying)
+            {
+                ResetState();
+
+                SmoothStop();
             }
         }
 
@@ -162,6 +166,8 @@ namespace Siren.ViewModels.Players
                     Volume = TargetVolume;
                 }
             }
+
+            MessagingCenter.Send(this, Messages.MusicTrackPlayingStatusChanged);
         }
 
         private void RegisterNextTrackHandler()

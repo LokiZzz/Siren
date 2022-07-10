@@ -214,15 +214,17 @@ namespace Siren.ViewModels
             MusicPlayer.Shuffle = SelectedScene.IsMusicShuffled;
             MusicPlayer.TargetVolume = SelectedScene.MusicVolume;
 
-            bool needToPlayMusic = IsMusicIsOn && !MusicPlayer.IsMusicPlaying;
-            bool needToStopMusic = !IsMusicIsOn && MusicPlayer.IsMusicPlaying;
-
-            if (needToPlayMusic || needToStopMusic)
+            if (IsMusicIsOn && !MusicPlayer.IsMusicPlaying)
             {
                 await MusicPlayer.PlayMusic();
             }
 
-            OnPropertyChanged(nameof(IsScenePlaying));
+            if(!IsMusicIsOn && MusicPlayer.IsMusicPlaying)
+            {
+                MusicPlayer.StopMusic();
+            }
+
+            OnPropertyChanged(nameof(IsSomethingPlaying));
             OnPropertyChanged(nameof(CurrentSceneText));
             Settings.ForEach(x => x.UpdateHasSelectedScene());
 
@@ -445,7 +447,16 @@ namespace Siren.ViewModels
 
         private async Task PlayMusic()
         {
-            await MusicPlayer.PlayMusic();
+            if(MusicPlayer.IsMusicPlaying)
+            {
+                MusicPlayer.StopMusic();
+            }
+            else
+            {
+                await MusicPlayer.PlayMusic();
+            }
+
+            OnPropertyChanged(nameof(IsSomethingPlaying));
         }
 
         private bool _isMusicIsOn = true;
@@ -506,7 +517,9 @@ namespace Siren.ViewModels
 
         private void InitializeMessagingCenter()
         {
-            MessagingCenter.Subscribe<SceneComponentViewModel>(this, Messages.ElementPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsScenePlaying)));
+            MessagingCenter.Subscribe<SceneComponentViewModel>(this, Messages.ElementPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsSomethingPlaying)));
+            MessagingCenter.Subscribe<SceneMusicPlayerViewModel>(this, Messages.MusicTrackPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsSomethingPlaying)));
+
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SettingAdded, async (setting) => await AddSetting(setting));
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SceneAdded, AddScene);
             MessagingCenter.Subscribe<AddOrEditComponentViewModel>(this, Messages.IllustratedCardEdited, async (manager) => await SaveCurrentEnvironment());
@@ -547,13 +560,15 @@ namespace Siren.ViewModels
 
         private async Task GlobalPlayStop()
         {
-            if (IsScenePlaying)
+            if (IsSomethingPlaying)
             {
                 GlobalPlayActivityIndicatorIsVisible = true;
 
                 Settings.SelectMany(x => x.Elements)
                     .Where(x => x.IsPlaying)
                     .ForEach(x => x.SmoothStop());
+
+                MusicPlayer.StopMusic();
             }
             else
             {
@@ -562,14 +577,14 @@ namespace Siren.ViewModels
                     await SelectScene(SelectedScene);
                 }
             }
-            OnPropertyChanged(nameof(IsScenePlaying));
+            OnPropertyChanged(nameof(IsSomethingPlaying));
         }
 
-        public bool IsScenePlaying
+        public bool IsSomethingPlaying
         {
             get
             {
-                bool isScenePlaying = Settings.SelectMany(x => x.Elements).Any(x => x.IsPlaying);
+                bool isScenePlaying = Settings.SelectMany(x => x.Elements).Any(x => x.IsPlaying) || MusicPlayer.IsPlaying;
                 
                 if(GlobalPlayActivityIndicatorIsVisible && !isScenePlaying)
                 {

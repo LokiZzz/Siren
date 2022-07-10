@@ -247,7 +247,7 @@
                             HorizontalOptions="Fill"
                             CornerRadius="15">
                         <Button.Triggers>
-                            <DataTrigger TargetType="Button" Binding="{Binding IsScenePlaying}" Value="True">
+                            <DataTrigger TargetType="Button" Binding="{Binding IsSomethingPlaying}" Value="True">
                                 <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
                                 <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
                             </DataTrigger>
