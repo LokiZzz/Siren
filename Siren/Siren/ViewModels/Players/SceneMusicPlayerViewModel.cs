@@ -64,6 +64,7 @@ namespace Siren.ViewModels.Players
         private bool _nextTrackIsFirst = true;
         private int _currentMusicTrackIndex = -1;
         private List<int> _stillNotPlayedMusicTracks = new List<int>();
+        private Stack<int> _history = new Stack<int>();
 
         public async Task PlayStop()
         {
@@ -73,11 +74,11 @@ namespace Siren.ViewModels.Players
 
                 SmoothStop();
             }
-            else
+            else if(Tracks.Any())
             {
                 RegisterNextTrackHandler();
 
-                await PlayNextTrack();
+                await ChooseNextTrackAndPlayIt();
 
                 IsMusicPlaying = true;
                 _nextTrackIsFirst = false;
@@ -86,15 +87,15 @@ namespace Siren.ViewModels.Players
 
         private SemaphoreSlim _playNextSemaphore = new SemaphoreSlim(1, 1);
 
-        private async Task PlayNextTrack()
+        private async Task ChooseNextTrackAndPlayIt()
         {
             await _playNextSemaphore.WaitAsync();
 
             try
             {
-                if(Shuffle)
+                if (Shuffle)
                 {
-                    if(!_stillNotPlayedMusicTracks.Any())
+                    if (!_stillNotPlayedMusicTracks.Any())
                     {
                         _stillNotPlayedMusicTracks = Tracks.Select(x => Tracks.IndexOf(x)).ToList();
                     }
@@ -105,7 +106,7 @@ namespace Siren.ViewModels.Players
                 }
                 else
                 {
-                    if(_currentMusicTrackIndex == Tracks.Count() - 1)
+                    if (_currentMusicTrackIndex == Tracks.Count() - 1)
                     {
                         _currentMusicTrackIndex = 0;
                     }
@@ -115,23 +116,33 @@ namespace Siren.ViewModels.Players
                     }
                 }
 
-                await Load(Tracks[_currentMusicTrackIndex].FilePath);
-                Tracks.ForEach(x => x.IsSelected = false);
-                Tracks[_currentMusicTrackIndex].IsSelected = true;
-
-                if (_nextTrackIsFirst)
-                {
-                    await SmoothPlay(TargetVolume);
-
-                }
-                else
-                {
-                    await JustPlay();
-                }
+                await PlayCurrentIndexTrack();
             }
             finally
             {
                 _playNextSemaphore.Release();
+            }
+        }
+
+        private async Task PlayCurrentIndexTrack()
+        {
+            await Load(Tracks[_currentMusicTrackIndex].FilePath);
+            Tracks.ForEach(x => x.IsSelected = false);
+            Tracks[_currentMusicTrackIndex].IsSelected = true;
+
+            if (_nextTrackIsFirst)
+            {
+                await SmoothPlay(TargetVolume);
+
+            }
+            else
+            {
+                await JustPlay();
+            }
+
+            if (!_history.Any() || _history.Peek() != _currentMusicTrackIndex)
+            {
+                _history.Push(_currentMusicTrackIndex);
             }
         }
 
@@ -143,7 +154,7 @@ namespace Siren.ViewModels.Players
             {
                 if (!e.IsManualStopped && !_stopPlayNext)
                 {
-                    await PlayNextTrack();
+                    await ChooseNextTrackAndPlayIt();
                 }
                 else 
                 {
@@ -165,6 +176,56 @@ namespace Siren.ViewModels.Players
             _stillNotPlayedMusicTracks.Clear();
             _nextTrackIsFirst = true;
             _stopPlayNext = true;
+        }
+
+        public Command NextTrackCommand { get => new Command(async () => await SwitchTrack(true)); }
+        public Command PreviousTrackCommand { get => new Command(async () => await SwitchTrack(false)); }
+
+        private async Task SwitchTrack(bool forward)
+        {
+            _stopPlayNext = true;
+
+            if (IsMusicPlaying)
+            {
+                if(forward)
+                {
+                    Stop(false);
+                    await ChooseNextTrackAndPlayIt();
+                    IsMusicPlaying = true;
+                }
+                else
+                {
+                    if(_history.Count > 1)
+                    {
+                        Stop(false);
+                        _history.Pop();
+                        _currentMusicTrackIndex = _history.Peek();
+                        await PlayCurrentIndexTrack();
+                        IsMusicPlaying = true;
+                    }
+                }
+
+            }
+            else 
+            {
+                if (forward)
+                {
+                    await PlayStop();
+                    IsMusicPlaying = true;
+                }
+                else
+                {
+                    if (_history.Count > 1)
+                    {
+                        _history.Pop();
+                        _currentMusicTrackIndex = _history.Peek();
+                        await PlayCurrentIndexTrack();
+                        IsMusicPlaying = true;
+                    }
+                }
+            }
+
+            _stopPlayNext = false;
         }
     }
 }

@@ -88,13 +88,13 @@ namespace Siren.ViewModels
                     }
 
                     SelectedSetting.IsSelected = true;
+                    MusicPlayer.Tracks = SelectedSetting.Music;
                 }
 
                 ShowSettingEditTools = SelectedSetting != null;
                 OnPropertyChanged(nameof(CurrentElementsCountString));
                 OnPropertyChanged(nameof(CurrentEffectsCountString));
 
-                MusicPlayer.Tracks = SelectedSetting.Music;
 
                 IsBusy = false;
             });
@@ -374,7 +374,7 @@ namespace Siren.ViewModels
         #region Music
         public SceneMusicPlayerViewModel MusicPlayer { get; set; } = new SceneMusicPlayerViewModel();
 
-        private int _maxMusicTracksCount = 30;
+        private int _maxMusicTracksCount = 100;
         private async Task AddMusic()
         {
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);

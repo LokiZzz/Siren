@@ -15,6 +15,17 @@
                                  Margin="-15"
                                  IsVisible="{Binding IsSelected}"/>
 
+                    <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" 
+                           Grid.ColumnSpan="3" Margin="-10"
+                           IsVisible="{Binding IsSelected}">
+                        <Rectangle.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="Transparent" Offset="0" />
+                                <GradientStop Color="{StaticResource Green}" Offset="1.5" />
+                            </LinearGradientBrush>
+                        </Rectangle.Background>
+                    </Rectangle>
+
                     <Grid Grid.Column="2" RowDefinitions="30" ColumnDefinitions="30">
                         <Button Grid.Row="0" 
                             Style="{StaticResource DeleteButton}"
@@ -24,17 +35,10 @@
 
                     <Button Grid.Column="0" Style="{StaticResource DeleteButton}"
                             VerticalOptions="Center"
-                            Text="{x:Static assets:FAFont.CirclePlay}" 
+                            FontFamily="FAEX"
+                            Text="{x:Static assets:FAEXFont.Play}" 
                             Command="{Binding PlayCommand}"
-                            BackgroundColor="{StaticResource DarkGreen}">
-                        <Button.Triggers>
-                            <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
-                                <Setter Property="Text" Value="{x:Static assets:FAFont.CircleStop}"/>
-                                <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
-                                <Setter Property="Command" Value="{Binding StopCommand}"/>
-                            </DataTrigger>
-                        </Button.Triggers>
-                    </Button>
+                            BackgroundColor="{StaticResource TransparentMedium}"/>
 
                     <StackLayout Grid.Column="1" Orientation="Horizontal" Spacing="0" VerticalOptions="Start">
                         <Label TextColor="{StaticResource TextColor}" 

@@ -124,7 +124,7 @@
 
         <!--Music-->
         <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" RowDefinitions="auto,*" Margin="0,0,10,0">
-            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,*,auto" >
+            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,*,auto">
                 <Button Grid.Column="0" Style="{StaticResource AddButton}" 
                         Command="{Binding AddMusicCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
                 <Grid Grid.Column="1" RowDefinitions="*,auto" VerticalOptions="Center" HorizontalOptions="Fill" RowSpacing="5">
@@ -137,8 +137,9 @@
             </Grid>
             <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
                 <Grid RowDefinitions="auto,*,auto" RowSpacing="10">
-                    <Grid Grid.Row="0" Margin="10,10,10,0" ColumnDefinitions="*,*,*" ColumnSpacing="10">
-                        <Button Grid.Column="0" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleLeft}"/>
+                    <Grid Grid.Row="0" Margin="10,10,10,0" ColumnDefinitions="*,*,*" ColumnSpacing="10" IsVisible="{Binding ShowSettingEditTools}">
+                        <Button Grid.Column="0" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleLeft}"
+                                Command="{Binding MusicPlayer.PreviousTrackCommand}"/>
 
                         <Grid Grid.Column="1">
                             <Button Style="{StaticResource MusicControlButton}" 
@@ -151,19 +152,19 @@
                                         <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
                                         <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
                                     </DataTrigger>
-                                    <!--<DataTrigger TargetType="Button" Binding="{Binding MusicPlayer.ActivityIndicatorIsVisible}" Value="True">
+                                    <DataTrigger TargetType="Button" Binding="{Binding MusicPlayer.ActivityIndicatorIsVisible}" Value="True">
                                         <Setter Property="Text" Value=""/>
-                                    </DataTrigger>-->
+                                    </DataTrigger>
                                 </Button.Triggers>
                             </Button>
-                            <!--<ActivityIndicator IsVisible="{Binding MusicPlayer.ActivityIndicatorIsVisible}" IsRunning="True" Color="White"/>-->
+                            <ActivityIndicator IsVisible="{Binding MusicPlayer.ActivityIndicatorIsVisible}" IsRunning="True" Color="White"/>
                         </Grid>
 
-                        <Button Grid.Column="2" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleRight}"/>
+                        <Button Grid.Column="2" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleRight}"
+                                Command="{Binding MusicPlayer.NextTrackCommand}"/>
                     </Grid>
                     <ScrollView Grid.Row="1" Padding="0" Margin="0"  VerticalScrollBarVisibility="Never">
-                        <StackLayout x:Name="MusicList" BindableLayout.ItemsSource="{Binding SelectedSetting.Music}" 
-                                 Padding="10,0" Spacing="10">
+                        <StackLayout x:Name="MusicList" BindableLayout.ItemsSource="{Binding SelectedSetting.Music}" Padding="10,0" Spacing="10">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
                                     <views:MusicPlayerView/>
@@ -171,7 +172,7 @@
                             </BindableLayout.ItemTemplate>
                         </StackLayout>
                     </ScrollView>
-                    <Frame Grid.Row="2" BackgroundColor="{StaticResource Light}" Margin="10,0,10,10" CornerRadius="10" Padding="10,0">
+                    <Frame Grid.Row="2" BackgroundColor="{StaticResource Light}" Margin="10,0,10,10" CornerRadius="10" Padding="10,0" IsVisible="{Binding ShowSettingEditTools}">
                         <Grid ColumnDefinitions="auto,*,auto" Margin="10,5" ColumnSpacing="15">
                             <StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="10">
                                 <Label FontFamily="FAEX" Text="{x:Static icons:FAEXFont.Shuffle}" FontSize="28"
@@ -252,6 +253,7 @@
                             </DataTrigger>
                             <DataTrigger TargetType="Button" Binding="{Binding GlobalPlayActivityIndicatorIsVisible}" Value="True">
                                 <Setter Property="Text" Value=""/>
+                                <Setter Property="InputTransparent" Value="True"/>
                             </DataTrigger>
                         </Button.Triggers>
                     </Button>
