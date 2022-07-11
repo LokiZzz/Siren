@@ -210,19 +210,11 @@ namespace Siren.ViewModels
                 }
             }
 
-            IsMusicIsOn = SelectedScene.IsMusicEnabled;
-            MusicPlayer.Shuffle = SelectedScene.IsMusicShuffled;
-            MusicPlayer.TargetVolume = SelectedScene.MusicVolume;
-
-            if (IsMusicIsOn && !MusicPlayer.IsMusicPlaying)
-            {
-                await MusicPlayer.PlayMusic();
-            }
-
-            if(!IsMusicIsOn && MusicPlayer.IsMusicPlaying)
-            {
-                MusicPlayer.StopMusic();
-            }
+            await MusicPlayer.AdjustPlayer(
+                SelectedScene.IsMusicEnabled, 
+                SelectedScene.IsMusicShuffled, 
+                SelectedScene.MusicVolume
+            );
 
             OnPropertyChanged(nameof(IsSomethingPlaying));
             OnPropertyChanged(nameof(CurrentSceneText));
@@ -259,7 +251,7 @@ namespace Siren.ViewModels
                 .ToList();
 
             scene.Elements = new ObservableCollection<TrackSetupViewModel>(playingElements);
-            scene.IsMusicEnabled = IsMusicIsOn;
+            scene.IsMusicEnabled = MusicPlayer.IsOn;
             scene.IsMusicShuffled = MusicPlayer.Shuffle;
             scene.MusicVolume = MusicPlayer.Volume;
 
@@ -457,13 +449,6 @@ namespace Siren.ViewModels
             }
 
             OnPropertyChanged(nameof(IsSomethingPlaying));
-        }
-
-        private bool _isMusicIsOn = true;
-        public bool IsMusicIsOn
-        {
-            get => _isMusicIsOn;
-            set => SetProperty(ref _isMusicIsOn, value);
         }
         #endregion
 

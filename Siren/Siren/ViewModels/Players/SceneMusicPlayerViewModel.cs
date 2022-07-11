@@ -54,17 +54,18 @@ namespace Siren.ViewModels.Players
             set => SetProperty(ref _shuffle, value);
         }
 
-        private double _targetVolume = 100;
-        public double TargetVolume
+        private bool _isOn = true;
+        public bool IsOn
         {
-            get => _targetVolume;
-            set => SetProperty(ref _targetVolume, value);
+            get => _isOn;
+            set => SetProperty(ref _isOn, value);
         }
 
         private bool _nextTrackIsFirst = true;
         private int _currentMusicTrackIndex = -1;
         private List<int> _stillNotPlayedMusicTracks = new List<int>();
         private Stack<int> _history = new Stack<int>();
+        private double _volumeBeforeStop = 0;
 
         public async Task PlayMusic()
         {
@@ -84,7 +85,6 @@ namespace Siren.ViewModels.Players
             if (IsMusicPlaying)
             {
                 ResetState();
-
                 SmoothStop();
             }
         }
@@ -136,12 +136,12 @@ namespace Siren.ViewModels.Players
 
             if (_nextTrackIsFirst)
             {
-                await SmoothPlay(TargetVolume);
+                await SmoothPlay(Volume);
 
             }
             else
             {
-                await JustPlay();
+                await JustPlay(Volume);
             }
 
             if (!_history.Any() || _history.Peek() != _currentMusicTrackIndex)
@@ -163,7 +163,6 @@ namespace Siren.ViewModels.Players
                 else 
                 {
                     IsMusicPlaying = false;
-                    Volume = TargetVolume;
                 }
             }
 
@@ -245,6 +244,23 @@ namespace Siren.ViewModels.Players
             }
 
             _stopPlayNext = false;
+        }
+
+        public async Task AdjustPlayer(bool isEnabled, bool isShuffled, double volume)
+        {
+            IsOn = isEnabled;
+            Shuffle = isShuffled;
+            Volume = volume;
+
+            if (IsOn && !IsMusicPlaying)
+            {
+                await PlayMusic();
+            }
+
+            if (!IsOn && IsMusicPlaying)
+            {
+                StopMusic();
+            }
         }
     }
 }

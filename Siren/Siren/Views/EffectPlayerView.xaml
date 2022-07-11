@@ -16,7 +16,7 @@
         </Style>
     </ContentView.Resources>
 
-    <Grid Margin="5" RowDefinitions="auto" ColumnDefinitions="200">
+    <Grid Margin="5" RowDefinitions="auto" ColumnDefinitions="220">
         <Frame BackgroundColor="{StaticResource Light}" CornerRadius="{StaticResource CornerRadiusMedium}" Padding="0">
             <Grid Padding="10" 
               RowSpacing="5"

@@ -6,7 +6,7 @@
              x:DataType="viewmodels:SceneComponentViewModel"
              xmlns:icons="clr-namespace:Siren.Assets">
 
-    <Grid Margin="5" RowDefinitions="auto" ColumnDefinitions="280">
+    <Grid Margin="5" RowDefinitions="auto" ColumnDefinitions="300">
         <Frame Padding="0" BackgroundColor="{StaticResource Light}" CornerRadius="{StaticResource CornerRadiusMedium}">            
             <Grid Padding="10" ColumnSpacing="10"
                   RowDefinitions="auto,auto,auto" 

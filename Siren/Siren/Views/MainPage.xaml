@@ -208,7 +208,7 @@
                                        VerticalOptions="Center" VerticalTextAlignment="Center"
                                        TextColor="{StaticResource Green}"/>
                                 <Switch OnColor="{StaticResource Green}" VerticalOptions="Center"
-                                        IsToggled="{Binding IsMusicIsOn}"/>
+                                        IsToggled="{Binding MusicPlayer.IsOn}"/>
                             </StackLayout>
                         </Grid>
                     </Frame>
