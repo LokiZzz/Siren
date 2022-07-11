@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:vm="clr-namespace:Siren.ViewModels.Help"
+             x:Class="Siren.Views.Help.HelpPage"
+             BackgroundColor="{StaticResource VeryDark}">
+
+    <ContentPage.BindingContext>
+        <vm:HelpViewModel/>
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Content>
+        <Grid ColumnDefinitions="570" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="{Binding ShowMessage}" Margin="0,-40,0,0">
+            <Frame BackgroundColor="{StaticResource Medium}" CornerRadius="15" Padding="10,30,10,10">
+                <StackLayout Orientation="Vertical" 
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Margin="15,0,15,15">
+
+                    <StackLayout Orientation="Vertical">
+                        <Label FontSize="30" Text="{Binding MessageTitle}" Margin="0,0,0,10" FontFamily="Lora"/>
+                        <Label FontSize="15" LineBreakMode="WordWrap" Text="{Binding Message}" Margin="0,0,0,20"/>
+                    </StackLayout>
+
+                    <Grid ColumnDefinitions="*,auto" >
+                        <StackLayout Grid.Column="1" Orientation="Horizontal" VerticalOptions="End" Spacing="10">
+                            <Label Text="ENG" VerticalOptions="Center" VerticalTextAlignment="Center"/>
+                            <Switch IsToggled="{Binding IsRUS}" OnColor="{StaticResource Green}"/>
+                            <Label Text="RUS" VerticalOptions="Center" VerticalTextAlignment="Center"/>
+                        </StackLayout>
+
+                        <Button Grid.Column="0" Text="{Binding ButtonText}" 
+                                Command="{Binding GoBackCommand}" 
+                                CornerRadius="5"
+                                BackgroundColor="{StaticResource DarkGreen}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="End"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

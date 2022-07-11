@@ -1,8 +1,10 @@
 ﻿using Siren.Messaging;
 using Siren.Models;
 using Siren.Services;
+using Siren.ViewModels.Help;
 using Siren.ViewModels.Players;
 using Siren.Views;
+using Siren.Views.Help;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -211,8 +213,8 @@ namespace Siren.ViewModels
             }
 
             await MusicPlayer.AdjustPlayer(
-                SelectedScene.IsMusicEnabled, 
-                SelectedScene.IsMusicShuffled, 
+                SelectedScene.IsMusicEnabled,
+                SelectedScene.IsMusicShuffled,
                 SelectedScene.MusicVolume
             );
 
@@ -439,7 +441,7 @@ namespace Siren.ViewModels
 
         private async Task PlayMusic()
         {
-            if(MusicPlayer.IsMusicPlaying)
+            if (MusicPlayer.IsMusicPlaying)
             {
                 MusicPlayer.StopMusic();
             }
@@ -570,8 +572,8 @@ namespace Siren.ViewModels
             get
             {
                 bool isScenePlaying = Settings.SelectMany(x => x.Elements).Any(x => x.IsPlaying) || MusicPlayer.IsPlaying;
-                
-                if(GlobalPlayActivityIndicatorIsVisible && !isScenePlaying)
+
+                if (GlobalPlayActivityIndicatorIsVisible && !isScenePlaying)
                 {
                     GlobalPlayActivityIndicatorIsVisible = false;
                 }
@@ -586,7 +588,7 @@ namespace Siren.ViewModels
             {
                 string current;
 
-                if(SelectedSetting == null || SelectedScene == null)
+                if (SelectedSetting == null || SelectedScene == null)
                 {
                     current = "still does not selected...";
                 }
@@ -609,6 +611,15 @@ namespace Siren.ViewModels
                 $"You have selected too many files, split them into groups and put them in different settings.",
                 "Ok :("
             );
+        }
+        #endregion
+
+        #region Help
+        public Command GoToHelpCommand 
+        { 
+            get => new Command<EHelpTopic>(async (topic) => 
+                await Shell.Current.GoToAsync($"{nameof(HelpPage)}?topic={topic}")
+            ); 
         }
         #endregion
     }
