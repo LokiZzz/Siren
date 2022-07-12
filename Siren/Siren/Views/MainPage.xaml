@@ -131,23 +131,44 @@
                                  HorizontalOptions="Fill" VerticalOptions="End"/>
                 </Grid>
             </Grid>
-            <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
-                <ScrollView  VerticalScrollBarVisibility="Never">
-                    <FlexLayout x:Name="ElementsList" 
-                                BindableLayout.ItemsSource="{Binding SelectedSetting.Elements}" 
-                                Wrap="Wrap" 
-                                Direction="Row" 
-                                JustifyContent="Start"
-                                AlignContent="Start"
-                                AlignItems="Start"
-                                Padding="5">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <views:ElementPlayerView/>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </FlexLayout>
-                </ScrollView>
+            <Frame Grid.Row="1" Padding="5" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
+                <CollectionView x:Name="ElementsList" ItemsSource="{Binding SelectedSetting.Elements}" VerticalScrollBarVisibility="Never">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="3"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <views:ElementPlayerView/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Frame>
+        </Grid>
+
+        <!--Effects-->
+        <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*">
+            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*" Margin="10,0">
+                <Label Text="Effects" Grid.Column="0" Style="{StaticResource Headliner}" />
+                <Button Grid.Column="1" Style="{StaticResource HelpButton}"
+                        Command="{Binding GoToHelpCommand}" CommandParameter="{x:Static help:EHelpTopic.Effect}"/>
+                <Button Grid.Column="2" Style="{StaticResource AddButton}" Command="{Binding AddEffectsCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
+                <Grid Grid.Column="3" RowDefinitions="*,auto" VerticalOptions="Center" HorizontalOptions="Fill" RowSpacing="5">
+                    <Label Grid.Row="0" Text="{Binding CurrentEffectsCountString}" VerticalOptions="Center" VerticalTextAlignment="Center"/>
+                    <ProgressBar Grid.Row="1" Style="{StaticResource FreeSpaceProgressBar}" Progress="{Binding FreeEffectsSpace}" 
+                                 HorizontalOptions="Fill" VerticalOptions="End"/>
+                </Grid>
+            </Grid>
+            <Frame Grid.Row="1" Padding="5" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
+                <CollectionView x:Name="EffectsList" ItemsSource="{Binding SelectedSetting.Effects}" VerticalScrollBarVisibility="Never">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="4"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <views:EffectPlayerView/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </Frame>
         </Grid>
 
@@ -234,40 +255,7 @@
                         </Grid>
                     </Frame>
                 </Grid>
-                
-            </Frame>
-        </Grid>
-        
-        <!--Effects-->
-        <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*">
-            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*" Margin="10,0">
-                <Label Text="Effects" Grid.Column="0" Style="{StaticResource Headliner}" />
-                <Button Grid.Column="1" Style="{StaticResource HelpButton}"
-                        Command="{Binding GoToHelpCommand}" CommandParameter="{x:Static help:EHelpTopic.Effect}"/>
-                <Button Grid.Column="2" Style="{StaticResource AddButton}" Command="{Binding AddEffectsCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
-                <Grid Grid.Column="3" RowDefinitions="*,auto" VerticalOptions="Center" HorizontalOptions="Fill" RowSpacing="5">
-                    <Label Grid.Row="0" Text="{Binding CurrentEffectsCountString}" VerticalOptions="Center" VerticalTextAlignment="Center"/>
-                    <ProgressBar Grid.Row="1" Style="{StaticResource FreeSpaceProgressBar}" Progress="{Binding FreeEffectsSpace}" 
-                                 HorizontalOptions="Fill" VerticalOptions="End"/>
-                </Grid>
-            </Grid>
-            <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
-                <ScrollView Grid.Row="1" Padding="0" Margin="0" VerticalScrollBarVisibility="Never">
-                    <FlexLayout x:Name="EffectsList" 
-                            BindableLayout.ItemsSource="{Binding SelectedSetting.Effects}" 
-                            Wrap="Wrap" 
-                            Direction="Row" 
-                            JustifyContent="Start"
-                            AlignContent="Start"
-                            AlignItems="Start"
-                            Padding="5">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <views:EffectPlayerView/>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </FlexLayout>
-                </ScrollView>
+
             </Frame>
         </Grid>
 

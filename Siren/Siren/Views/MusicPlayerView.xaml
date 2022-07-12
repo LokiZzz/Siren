@@ -38,18 +38,18 @@
                             FontFamily="FAEX"
                             Text="{x:Static assets:FAEXFont.Play}" 
                             BackgroundColor="{StaticResource TransparentMedium}"
-                            Command="{Binding BindingContext.MusicPlayer.PlaySpecificTrackCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            Command="{Binding BindingContext.SelectedSetting.MusicPlayer.PlaySpecificTrackCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                             CommandParameter="{Binding .}"/>
 
                     <StackLayout Grid.Column="1" Orientation="Horizontal" Spacing="0" VerticalOptions="Start">
                         <Label TextColor="{StaticResource TextColor}" 
-                           Text="{Binding Alias}"
-                           VerticalOptions="Center" 
-                           VerticalTextAlignment="Center"
-                           LineBreakMode="TailTruncation"/>
-                        <Button Style="{StaticResource EditAliasButton}"
-                            Command="{Binding BindingContext.EditMusicCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
-                            CommandParameter="{Binding .}"/>
+                               Text="{Binding Alias}"
+                               VerticalOptions="Center" 
+                               VerticalTextAlignment="Center"
+                               LineBreakMode="TailTruncation"/>
+                        <Button Style="{StaticResource EditAliasButton}" 
+                                Command="{Binding BindingContext.EditMusicCommand,Source={RelativeSource AncestorType={x:Type ScrollView}}}" 
+                                CommandParameter="{Binding .}"/>
                     </StackLayout>
                 </Grid>
             </Frame>

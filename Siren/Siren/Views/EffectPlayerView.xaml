@@ -16,13 +16,12 @@
         </Style>
     </ContentView.Resources>
 
-    <Grid Margin="5" RowDefinitions="auto" ColumnDefinitions="220">
+    <Grid Margin="5" RowDefinitions="auto" ColumnDefinitions="*">
         <Frame BackgroundColor="{StaticResource Light}" CornerRadius="{StaticResource CornerRadiusMedium}" Padding="0">
-            <Grid Padding="10" 
-              RowSpacing="5"
-              ColumnSpacing="10"
-              RowDefinitions="auto,auto"
-              ColumnDefinitions="auto,*,auto">
+            <Grid Padding="10" RowSpacing="5"
+                  ColumnSpacing="10"
+                  RowDefinitions="auto,auto"
+                  ColumnDefinitions="auto,*,auto">
 
                 <ProgressBar Grid.RowSpan="2" Grid.ColumnSpan="3"
                              VerticalOptions="Fill"
@@ -34,11 +33,11 @@
                              IsVisible="{Binding IsPlaying}"/>
 
                 <Button Grid.Row="0" Grid.Column="0"
-                    VerticalOptions="Center"
-                    Style="{StaticResource PlayerControlButton}" 
-                    Text="{x:Static icons:FAFont.CirclePlay}" 
-                    Command="{Binding PlayCommand}"
-                    BackgroundColor="{StaticResource DarkGreen}">
+                        VerticalOptions="Center"
+                        Style="{StaticResource PlayerControlButton}" 
+                        Text="{x:Static icons:FAFont.CirclePlay}" 
+                        Command="{Binding PlayCommand}"
+                        BackgroundColor="{StaticResource DarkGreen}">
                     <Button.Triggers>
                         <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
                             <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
@@ -49,31 +48,32 @@
                 </Button>
 
                 <Label Grid.Row="0" Grid.Column="1" Text="SFX" 
-                   VerticalOptions="Center" VerticalTextAlignment="Center" 
-                   HorizontalOptions="Center" HorizontalTextAlignment="Center"
-                   FontAttributes="Bold"
-                   FontSize="Large"
-                   FontFamily="Lora"
-                   Margin="-5,0,0,0"/>
-
+                       VerticalOptions="Center" VerticalTextAlignment="Center" 
+                       HorizontalOptions="Center" HorizontalTextAlignment="Center"
+                       FontAttributes="Bold"
+                       FontSize="Large"
+                       FontFamily="Lora"
+                       Margin="-5,0,0,0"/>
 
                 <Grid Grid.Row="0" Grid.Column="2" RowDefinitions="30" ColumnDefinitions="30" HorizontalOptions="End">
                     <Button Style="{StaticResource DeleteButton}" 
-                        Command="{Binding BindingContext.DeleteEffectCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
+                        Command="{Binding BindingContext.DeleteEffectCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
                         CommandParameter="{Binding .}"
                         BackgroundColor="{StaticResource Red}"/>
                 </Grid>
 
-                <StackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="0">
-                    <Label TextColor="{StaticResource TextColor}" 
-                       Text="{Binding Alias}"
-                       VerticalOptions="Center" 
-                       VerticalTextAlignment="Center"
-                       LineBreakMode="TailTruncation"/>
-                    <Button Style="{StaticResource EditAliasButton}"
-                        Command="{Binding BindingContext.EditEffectCommand,Source={RelativeSource AncestorType={x:Type FlexLayout}}}" 
-                        CommandParameter="{Binding .}"/>
-                </StackLayout>
+                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ColumnDefinitions="*,auto" RowSpacing="0">
+                    <Label Grid.Column="0"  
+                           TextColor="{StaticResource TextColor}" 
+                           Text="{Binding Alias}"
+                           VerticalOptions="Center" 
+                           VerticalTextAlignment="Center"
+                           LineBreakMode="TailTruncation"/>
+                    <Button Grid.Column="1"  
+                            Style="{StaticResource EditAliasButton}" 
+                            Command="{Binding BindingContext.EditEffectCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                            CommandParameter="{Binding .}"/>
+                </Grid>
             </Grid>
         </Frame>
     </Grid>
