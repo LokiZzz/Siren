@@ -86,6 +86,5 @@ namespace Siren.ViewModels
             get => _musicPlayer;
             set => SetProperty(ref _musicPlayer, value);
         }
-
     }
 }

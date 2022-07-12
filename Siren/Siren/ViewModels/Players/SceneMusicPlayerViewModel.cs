@@ -249,7 +249,11 @@ namespace Siren.ViewModels.Players
         {
             IsOn = isEnabled;
             Shuffle = isShuffled;
-            Volume = volume;
+            
+            if(IsMusicPlaying && IsOn)
+            {
+                StartAdjustingVolume(volume);
+            }
 
             if (IsOn && !IsMusicPlaying)
             {

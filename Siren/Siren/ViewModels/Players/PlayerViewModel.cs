@@ -107,7 +107,7 @@ namespace Siren.ViewModels
         private Timer _timer = new Timer();
         private double _targetVolume;
 
-        private void StartAdjustingVolume(double targetVolume)
+        public void StartAdjustingVolume(double targetVolume)
         {
             _timer.Stop();
             _timer.Dispose();
