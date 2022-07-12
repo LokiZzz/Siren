@@ -170,7 +170,7 @@
                 <Grid RowDefinitions="auto,*,auto" RowSpacing="10">
                     <Grid Grid.Row="0" Margin="10,10,10,0" ColumnDefinitions="*,*,*" ColumnSpacing="10" IsVisible="{Binding ShowSettingEditTools}">
                         <Button Grid.Column="0" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleLeft}"
-                                Command="{Binding MusicPlayer.PreviousTrackCommand}"/>
+                                Command="{Binding SelectedSetting.MusicPlayer.PreviousTrackCommand}"/>
 
                         <Grid Grid.Column="1">
                             <Button Style="{StaticResource MusicControlButton}" 
@@ -179,20 +179,20 @@
                                     TextColor="{StaticResource TextColor}"
                                     Command="{Binding PlayMusicCommand}">
                                 <Button.Triggers>
-                                    <DataTrigger TargetType="Button" Binding="{Binding MusicPlayer.IsMusicPlaying}" Value="True">
+                                    <DataTrigger TargetType="Button" Binding="{Binding SelectedSetting.MusicPlayer.IsMusicPlaying}" Value="True">
                                         <Setter Property="Text" Value="{x:Static icons:FAFont.CircleStop}"/>
                                         <Setter Property="BackgroundColor" Value="{StaticResource Red}"/>
                                     </DataTrigger>
-                                    <DataTrigger TargetType="Button" Binding="{Binding MusicPlayer.ActivityIndicatorIsVisible}" Value="True">
+                                    <DataTrigger TargetType="Button" Binding="{Binding SelectedSetting.MusicPlayer.ActivityIndicatorIsVisible}" Value="True">
                                         <Setter Property="Text" Value=""/>
                                     </DataTrigger>
                                 </Button.Triggers>
                             </Button>
-                            <ActivityIndicator IsVisible="{Binding MusicPlayer.ActivityIndicatorIsVisible}" IsRunning="True" Color="White"/>
+                            <ActivityIndicator IsVisible="{Binding SelectedSetting.MusicPlayer.ActivityIndicatorIsVisible}" IsRunning="True" Color="White"/>
                         </Grid>
 
                         <Button Grid.Column="2" Style="{StaticResource MusicControlButton}" Text="{x:Static icons:FAFont.CircleRight}"
-                                Command="{Binding MusicPlayer.NextTrackCommand}"/>
+                                Command="{Binding SelectedSetting.MusicPlayer.NextTrackCommand}"/>
                     </Grid>
                     <ScrollView Grid.Row="1" Padding="0" Margin="0"  VerticalScrollBarVisibility="Never">
                         <StackLayout x:Name="MusicList" BindableLayout.ItemsSource="{Binding SelectedSetting.Music}" Padding="10,0" Spacing="10">
@@ -210,7 +210,7 @@
                                        VerticalOptions="Center" VerticalTextAlignment="Center"
                                        TextColor="{StaticResource Green}"/>
                                 <Switch OnColor="{StaticResource Green}" VerticalOptions="Center"
-                                        IsToggled="{Binding MusicPlayer.Shuffle}"/>
+                                        IsToggled="{Binding SelectedSetting.MusicPlayer.Shuffle}"/>
                             </StackLayout>
                             <Grid Grid.Column="1" ColumnDefinitions="auto,*" ColumnSpacing="10" Margin="15,0">
                                 <Label Grid.Column="0" FontFamily="FAEX" Text="{x:Static icons:FAEXFont.VolumeHigh}" 
@@ -222,14 +222,14 @@
                                         ThumbColor="{StaticResource Green}"
                                         Minimum="0"
                                         Maximum="100"
-                                        Value="{Binding MusicPlayer.Volume}"/>
+                                        Value="{Binding SelectedSetting.MusicPlayer.Volume}"/>
                             </Grid>
                             <StackLayout Grid.Column="2" Orientation="Horizontal" Spacing="10">
                                 <Label FontFamily="FAEX" Text="{x:Static icons:FAEXFont.PowerOff}" FontSize="28"
                                        VerticalOptions="Center" VerticalTextAlignment="Center"
                                        TextColor="{StaticResource Green}"/>
                                 <Switch OnColor="{StaticResource Green}" VerticalOptions="Center"
-                                        IsToggled="{Binding MusicPlayer.IsOn}"/>
+                                        IsToggled="{Binding SelectedSetting.MusicPlayer.IsOn}"/>
                             </StackLayout>
                         </Grid>
                     </Frame>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Siren.ViewModels.Players;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -78,5 +79,13 @@ namespace Siren.ViewModels
                 SettingChanged(sender, e);
             }
         }
+
+        private SceneMusicPlayerViewModel _musicPlayer = new SceneMusicPlayerViewModel();
+        public SceneMusicPlayerViewModel MusicPlayer
+        {
+            get => _musicPlayer;
+            set => SetProperty(ref _musicPlayer, value);
+        }
+
     }
 }

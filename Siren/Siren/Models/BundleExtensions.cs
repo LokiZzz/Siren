@@ -65,7 +65,7 @@ namespace Siren.Models
                 Scenes = m.Scenes.Select(x => x.ToVM()).ToObservableCollection(),
                 Elements = m.Elements.Select(x => x.ToVM(true)).ToObservableCollection(),
                 Effects = m.Effects.Select(x => x.ToVM(false)).ToObservableCollection(),
-                Music = m.Music.Select(x => x.ToVM(false)).ToObservableCollection()
+                Music = m.Music.Select(x => x.ToVM(false)).ToObservableCollection(),
             };
         }
 

@@ -90,7 +90,7 @@ namespace Siren.ViewModels
                     }
 
                     SelectedSetting.IsSelected = true;
-                    MusicPlayer.Tracks = SelectedSetting.Music;
+                    SelectedSetting.MusicPlayer.Tracks = SelectedSetting.Music;
                 }
 
                 ShowSettingEditTools = SelectedSetting != null;
@@ -212,7 +212,7 @@ namespace Siren.ViewModels
                 }
             }
 
-            await MusicPlayer.AdjustPlayer(
+            await SelectedSetting.MusicPlayer.AdjustPlayer(
                 SelectedScene.IsMusicEnabled,
                 SelectedScene.IsMusicShuffled,
                 SelectedScene.MusicVolume
@@ -253,9 +253,9 @@ namespace Siren.ViewModels
                 .ToList();
 
             scene.Elements = new ObservableCollection<TrackSetupViewModel>(playingElements);
-            scene.IsMusicEnabled = MusicPlayer.IsOn;
-            scene.IsMusicShuffled = MusicPlayer.Shuffle;
-            scene.MusicVolume = MusicPlayer.Volume;
+            scene.IsMusicEnabled = SelectedSetting.MusicPlayer.IsOn;
+            scene.IsMusicShuffled = SelectedSetting.MusicPlayer.Shuffle;
+            scene.MusicVolume = SelectedSetting.MusicPlayer.Volume;
 
             await SaveCurrentEnvironment();
         }
@@ -383,8 +383,6 @@ namespace Siren.ViewModels
         #endregion
 
         #region Music
-        public SceneMusicPlayerViewModel MusicPlayer { get; set; } = new SceneMusicPlayerViewModel();
-
         private int _maxMusicTracksCount = 100;
         private async Task AddMusic()
         {
@@ -441,13 +439,13 @@ namespace Siren.ViewModels
 
         private async Task PlayMusic()
         {
-            if (MusicPlayer.IsMusicPlaying)
+            if (SelectedSetting.MusicPlayer.IsMusicPlaying)
             {
-                MusicPlayer.StopMusic();
+                SelectedSetting.MusicPlayer.StopMusic();
             }
             else
             {
-                await MusicPlayer.PlayMusic();
+                await SelectedSetting.MusicPlayer.PlayMusic();
             }
 
             OnPropertyChanged(nameof(IsSomethingPlaying));
@@ -555,7 +553,9 @@ namespace Siren.ViewModels
                     .Where(x => x.IsPlaying)
                     .ForEach(x => x.SmoothStop());
 
-                MusicPlayer.StopMusic();
+                Settings.Select(x => x.MusicPlayer)
+                    .Where(x => x.IsMusicPlaying)
+                    .ForEach(x => x.StopMusic());
             }
             else
             {
@@ -571,14 +571,16 @@ namespace Siren.ViewModels
         {
             get
             {
-                bool isScenePlaying = Settings.SelectMany(x => x.Elements).Any(x => x.IsPlaying) || MusicPlayer.IsPlaying;
+                bool isScenePlaying = Settings.SelectMany(x => x.Elements).Any(x => x.IsPlaying);
+                bool isMusicPlaying = Settings.Select(x => x.MusicPlayer).Any(x => x.IsMusicPlaying);
+                bool isSomethingPlaying = isScenePlaying || isMusicPlaying;
 
-                if (GlobalPlayActivityIndicatorIsVisible && !isScenePlaying)
+                if (GlobalPlayActivityIndicatorIsVisible && !isSomethingPlaying)
                 {
                     GlobalPlayActivityIndicatorIsVisible = false;
                 }
 
-                return isScenePlaying;
+                return isSomethingPlaying;
             }
         }
 
@@ -603,7 +605,7 @@ namespace Siren.ViewModels
         }
         #endregion
 
-        #region Private utility
+        #region Utility
         private async Task AlertTooManyFiles()
         {
             await Application.Current.MainPage.DisplayAlert(

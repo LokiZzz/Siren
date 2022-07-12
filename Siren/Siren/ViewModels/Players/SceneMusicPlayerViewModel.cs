@@ -65,7 +65,6 @@ namespace Siren.ViewModels.Players
         private int _currentMusicTrackIndex = -1;
         private List<int> _stillNotPlayedMusicTracks = new List<int>();
         private Stack<int> _history = new Stack<int>();
-        private double _volumeBeforeStop = 0;
 
         public async Task PlayMusic()
         {
