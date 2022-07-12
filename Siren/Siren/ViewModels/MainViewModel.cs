@@ -212,11 +212,14 @@ namespace Siren.ViewModels
                 }
             }
 
-            await SelectedSetting.MusicPlayer.AdjustPlayer(
-                SelectedScene.IsMusicEnabled,
-                SelectedScene.IsMusicShuffled,
-                SelectedScene.MusicVolume
-            );
+            if (SelectedSetting != null)
+            {
+                await SelectedSetting.MusicPlayer.AdjustPlayer(
+                    SelectedScene.IsMusicEnabled,
+                    SelectedScene.IsMusicShuffled,
+                    SelectedScene.MusicVolume
+                );
+            }
 
             OnPropertyChanged(nameof(IsSomethingPlaying));
             OnPropertyChanged(nameof(CurrentSceneText));

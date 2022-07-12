@@ -28,7 +28,7 @@ namespace Siren.UWP
             LoadApplication(new Siren.App());
             Size size = new Size(500, 500);
             ApplicationView.GetForCurrentView().SetPreferredMinSize(size);
-            MaximizeWindowOnLoad();
+            //MaximizeWindowOnLoad();
         }
 
         void MaximizeWindowOnLoad()
