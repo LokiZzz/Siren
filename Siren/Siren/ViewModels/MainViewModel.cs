@@ -96,7 +96,7 @@ namespace Siren.ViewModels
                 ShowSettingEditTools = SelectedSetting != null;
                 OnPropertyChanged(nameof(CurrentElementsCountString));
                 OnPropertyChanged(nameof(CurrentEffectsCountString));
-
+                OnPropertyChanged(nameof(CurrentMusicTracksCountString));
 
                 IsBusy = false;
             });
@@ -261,6 +261,12 @@ namespace Siren.ViewModels
             scene.MusicVolume = SelectedSetting.MusicPlayer.Volume;
 
             await SaveCurrentEnvironment();
+
+            await Application.Current.MainPage.DisplayAlert(
+                "Nice!",
+                $"Scene «{scene.Name}» successfully saved!",
+                "Pretty!"
+            );
         }
 
         private bool _showSceneEditTools;
@@ -473,6 +479,12 @@ namespace Siren.ViewModels
             {
                 await SelectScene(null);
                 await SelectSetting(null);
+            }
+            else
+            {
+                //Cosmetics
+                SelectedSetting.MusicPlayer.Shuffle = true;
+                SelectedSetting.MusicPlayer.IsOn = true;
             }
         }
         #endregion

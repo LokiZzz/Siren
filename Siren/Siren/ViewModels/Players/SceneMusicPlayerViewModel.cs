@@ -257,6 +257,7 @@ namespace Siren.ViewModels.Players
 
             if (IsOn && !IsMusicPlaying)
             {
+                Volume = volume;
                 await PlayMusic();
             }
 

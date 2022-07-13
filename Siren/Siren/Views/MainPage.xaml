@@ -132,12 +132,7 @@
                 </Grid>
             </Grid>
             <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
-                <CollectionView x:Name="ElementsList" ItemsSource="{Binding SelectedSetting.Elements}" VerticalScrollBarVisibility="Never" Margin="5,0">
-                    <CollectionView.Header>
-                        <Grid RowDefinitions="5">
-                            <Label Text=""/>
-                        </Grid>
-                    </CollectionView.Header>
+                <CollectionView x:Name="ElementsList" ItemsSource="{Binding SelectedSetting.Elements}" VerticalScrollBarVisibility="Never" Margin="5">
                     <CollectionView.ItemsLayout>
                         <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="0" VerticalItemSpacing="0"/>
                     </CollectionView.ItemsLayout>
@@ -164,12 +159,7 @@
                 </Grid>
             </Grid>
             <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
-                <CollectionView x:Name="EffectsList" ItemsSource="{Binding SelectedSetting.Effects}" VerticalScrollBarVisibility="Never" Margin="5,0">
-                    <CollectionView.Header>
-                        <Grid RowDefinitions="5">
-                            <Label Text=""/>
-                        </Grid>
-                    </CollectionView.Header>
+                <CollectionView x:Name="EffectsList" ItemsSource="{Binding SelectedSetting.Effects}" VerticalScrollBarVisibility="Never" Margin="5">
                     <CollectionView.ItemsLayout>
                         <GridItemsLayout Orientation="Vertical" Span="4"/>
                     </CollectionView.ItemsLayout>
