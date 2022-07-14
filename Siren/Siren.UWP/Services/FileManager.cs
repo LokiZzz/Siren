@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Storage;
+using Windows.Storage.AccessCache;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using static System.Net.WebRequestMethods;
@@ -32,6 +33,12 @@ namespace Siren.UWP.Services
             StorageFile result = await savePicker.PickSaveFileAsync();
 
             return result != null ? result.Path : null;
+        }
+
+        public void ClearAccessList()
+        {
+            StorageApplicationPermissions.FutureAccessList.Clear();
+            StorageApplicationPermissions.MostRecentlyUsedList.Clear();
         }
 
         public async Task CreateFolderIfNotExistsAsync(string folderPath, string folderName)

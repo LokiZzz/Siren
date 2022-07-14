@@ -27,6 +27,8 @@ namespace Siren.Droid.Services
             );
         }
 
+        public void ClearAccessList() { }
+
         public Task CreateFolderIfNotExistsAsync(string folderPath, string folderName)
         {
             return Task.Run(() => 

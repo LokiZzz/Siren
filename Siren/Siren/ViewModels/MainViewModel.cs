@@ -98,6 +98,8 @@ namespace Siren.ViewModels
                 OnPropertyChanged(nameof(CurrentEffectsCountString));
                 OnPropertyChanged(nameof(CurrentMusicTracksCountString));
                 OnPropertyChanged(nameof(SelectedSetting.Music));
+                OnPropertyChanged(nameof(SelectedSetting.MusicPlayer.IsOn));
+                OnPropertyChanged(nameof(SelectedSetting.MusicPlayer.Shuffle));
 
                 IsBusy = false;
             });
@@ -294,6 +296,8 @@ namespace Siren.ViewModels
         private int _maxElementsCount = 30;
         private async Task AddElements()
         {
+            ClearAccessList();
+
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
             if (result.Count() + SelectedSetting.Elements.Count() > _maxElementsCount)
@@ -351,6 +355,8 @@ namespace Siren.ViewModels
         private int _maxEffectsCount = 30;
         private async Task AddEffects()
         {
+            ClearAccessList();
+
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
             if (result.Count() + SelectedSetting.Effects.Count() > _maxEffectsCount)
@@ -419,6 +425,8 @@ namespace Siren.ViewModels
         private int _maxMusicTracksCount = 100;
         private async Task AddMusic()
         {
+            ClearAccessList();
+
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
             if (result.Count() + SelectedSetting.Music.Count() > _maxMusicTracksCount)
@@ -657,6 +665,12 @@ namespace Siren.ViewModels
                 $"You have selected too many files, split them into groups and put them in different settings.",
                 "Ok :("
             );
+        }
+
+        private void ClearAccessList()
+        {
+            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+            fileManager.ClearAccessList();
         }
         #endregion
 

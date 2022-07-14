@@ -16,5 +16,6 @@ namespace Siren.Services
         Task<bool> TestFileManagerAsync();
         Task RequestFileSystemPermissionAsync();
         Task<string> ChoosePlaceToSaveFileAsync(string fileName = null);
+        void ClearAccessList();
     }
 }
