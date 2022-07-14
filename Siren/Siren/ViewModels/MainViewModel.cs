@@ -97,6 +97,7 @@ namespace Siren.ViewModels
                 OnPropertyChanged(nameof(CurrentElementsCountString));
                 OnPropertyChanged(nameof(CurrentEffectsCountString));
                 OnPropertyChanged(nameof(CurrentMusicTracksCountString));
+                OnPropertyChanged(nameof(SelectedSetting.Music));
 
                 IsBusy = false;
             });
@@ -123,9 +124,21 @@ namespace Siren.ViewModels
 
                 if (!Settings.Any())
                 {
-                    await SelectScene(null);
                     await SelectSetting(null);
+                    await SelectScene(null);
                 }
+                else
+                {
+                    if(SelectedSetting == setting)
+                    {
+                        await SelectSetting(Settings.First());
+                    }
+                }
+
+                OnPropertyChanged(nameof(CurrentElementsCountString));
+                OnPropertyChanged(nameof(CurrentEffectsCountString));
+                OnPropertyChanged(nameof(CurrentMusicTracksCountString));
+                OnPropertyChanged(nameof(SelectedSetting.Music));
             }
         }
 
@@ -565,6 +578,10 @@ namespace Siren.ViewModels
                 GlobalPlayActivityIndicatorIsVisible = true;
 
                 Settings.SelectMany(x => x.Elements)
+                    .Where(x => x.IsPlaying)
+                    .ForEach(x => x.SmoothStop());
+
+                Settings.SelectMany(x => x.Effects)
                     .Where(x => x.IsPlaying)
                     .ForEach(x => x.SmoothStop());
 

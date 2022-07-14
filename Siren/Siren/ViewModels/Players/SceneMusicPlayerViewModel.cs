@@ -196,6 +196,8 @@ namespace Siren.ViewModels.Players
             _currentMusicTrackIndex = Tracks.IndexOf(music);
             await PlayCurrentIndexTrack();
             IsMusicPlaying = true;
+
+            MessagingCenter.Send(this, Messages.MusicTrackPlayingStatusChanged);
         }
 
         private async Task SwitchTrack(bool forward)

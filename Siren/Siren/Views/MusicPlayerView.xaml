@@ -9,7 +9,7 @@
                 <Grid Padding="10" ColumnSpacing="10" ColumnDefinitions="auto,*,auto">
 
                     <ProgressBar Grid.ColumnSpan="3" VerticalOptions="Fill" HorizontalOptions="Fill"
-                                 Progress="{Binding BindingContext.MusicPlayer.PositionPercent,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                                 Progress="{Binding BindingContext.SelectedSetting.MusicPlayer.PositionPercent,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                                  ProgressColor="{StaticResource DarkGreen}" 
                                  BackgroundColor="Transparent"
                                  Margin="-15"

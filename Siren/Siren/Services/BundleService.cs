@@ -91,24 +91,31 @@ namespace Siren.Services
 
             foreach (string file in filesToCompress)
             {
-                using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(file))
+                try
                 {
-                    using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+                    using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(file))
                     {
-                        targetStream.Position = targetStream.Length;
-                        await sourceStream.CopyToAsync(targetStream, 81920, cancellationToken);
-                        metadata.Bundle.Size = targetStream.Length;
+                        using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+                        {
+                            targetStream.Position = targetStream.Length;
+                            await sourceStream.CopyToAsync(targetStream, 81920, cancellationToken);
+                            metadata.Bundle.Size = targetStream.Length;
+                        }
+
+                        metadata.CompressedFiles.Add(new CompressedFileInfo
+                        {
+                            Name = Path.GetFileName(file),
+                            SizeBytesBefore = sourceStream.Length,
+                        });
                     }
 
-                    metadata.CompressedFiles.Add(new CompressedFileInfo
-                    {
-                        Name = Path.GetFileName(file),
-                        SizeBytesBefore = sourceStream.Length,
-                    });
+                    double progress = (double)(filesToCompress.IndexOf(file) + 1) / (double)filesToCompress.Count();
+                    OnCreateProgressUpdate(this, new ProcessingProgress(progress, "Fusing files together..."));
                 }
-
-                double progress = (double)(filesToCompress.IndexOf(file) + 1) / (double)filesToCompress.Count();
-                OnCreateProgressUpdate(this, new ProcessingProgress(progress, "Fusing files together..."));
+                catch(Exception ex)
+                {
+                    throw ex;
+                }
             }
 
             //3. Add metadata to the created gap
