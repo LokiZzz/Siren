@@ -402,6 +402,17 @@ namespace Siren.ViewModels
         }
 
         public double FreeEffectsSpace => ((double?)SelectedSetting?.Effects?.Count ?? 0) / _maxElementsCount;
+
+        private double _effectsVolume = 100;
+        public double EffectsVolume
+        {
+            get => _effectsVolume;
+            set
+            {
+                SetProperty(ref _effectsVolume, value);
+                Settings.SelectMany(s => s.Effects).ForEach(x => x.Volume = value);
+            }
+        }
         #endregion
 
         #region Music
@@ -604,8 +615,9 @@ namespace Siren.ViewModels
             get
             {
                 bool isScenePlaying = Settings.SelectMany(x => x.Elements).Any(x => x.IsPlaying);
+                bool isEffectPlaying = Settings.SelectMany(x => x.Effects).Any(x => x.IsPlaying);
                 bool isMusicPlaying = Settings.Select(x => x.MusicPlayer).Any(x => x.IsMusicPlaying);
-                bool isSomethingPlaying = isScenePlaying || isMusicPlaying;
+                bool isSomethingPlaying = isScenePlaying || isEffectPlaying || isMusicPlaying;
 
                 if (GlobalPlayActivityIndicatorIsVisible && !isSomethingPlaying)
                 {
