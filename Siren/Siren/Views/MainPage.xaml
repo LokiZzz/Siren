@@ -76,24 +76,23 @@
         </StackLayout>
 
         <!--Settings-->
-        <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" RowDefinitions="auto,*">
+        <Grid Grid.Row="1" Grid.RowSpan="4" Grid.Column="0" RowDefinitions="auto,*">
             <Grid Grid.Row="0" Padding="10,10,0,10" RowDefinitions="85" ColumnDefinitions="300">
                 <Button Style="{StaticResource AddSettingButton}" Command="{Binding AddSettingCommand}"/>
             </Grid>
-            <ScrollView Grid.Row="1" Orientation="Vertical" VerticalScrollBarVisibility="Never">
-                <StackLayout x:Name="SettingsList" Grid.Row="0" BindableLayout.ItemsSource="{Binding Settings}" Spacing="10" HorizontalOptions="Center" Padding="0">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate>
-                            <views:SettingCardView>
-                                <views:SettingCardView.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding BindingContext.SelectSettingCommand,Source={x:Reference SettingsList}}" 
-                                                          CommandParameter="{Binding .}"/>
-                                </views:SettingCardView.GestureRecognizers>
-                            </views:SettingCardView>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </StackLayout>
-            </ScrollView>
+            <CollectionView Grid.Row="1" x:Name="SettingsList" ItemsSource="{Binding Settings}" 
+                            HorizontalOptions="Center" SelectionMode="None" VerticalScrollBarVisibility="Never" >
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <views:SettingCardView>
+                            <views:SettingCardView.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.SelectSettingCommand,Source={x:Reference SettingsList}}" 
+                                                        CommandParameter="{Binding .}"/>
+                            </views:SettingCardView.GestureRecognizers>
+                        </views:SettingCardView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
 
         <!--Scenes-->
@@ -101,21 +100,19 @@
             <Grid Grid.Column="0" Padding="0,10,10,10" RowDefinitions="85" ColumnDefinitions="85">
                 <Button Style="{StaticResource AddSettingButton}" Command="{Binding AddSceneCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
             </Grid>
-            <ScrollView Orientation="Horizontal" Grid.Column="1">
-                <StackLayout x:Name="ScenesList" Grid.Row="0" BindableLayout.ItemsSource="{Binding SelectedSetting.Scenes}" 
-                             Orientation="Horizontal" Spacing="10" Padding="0,0,10,0">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate>
-                            <views:SceneCardView>
-                                <views:SceneCardView.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding BindingContext.SelectSceneCommand,Source={x:Reference ScenesList}}" 
-                                                          CommandParameter="{Binding .}"/>
-                                </views:SceneCardView.GestureRecognizers>
-                            </views:SceneCardView>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </StackLayout>
-            </ScrollView>
+            <CollectionView x:Name="ScenesList" Grid.Column="1" ItemsSource="{Binding SelectedSetting.Scenes}"
+                            ItemsLayout="HorizontalList" HorizontalScrollBarVisibility="Never">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <views:SceneCardView>
+                            <views:SceneCardView.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.SelectSceneCommand,Source={x:Reference ScenesList}}" 
+                                                      CommandParameter="{Binding .}"/>
+                            </views:SceneCardView.GestureRecognizers>
+                        </views:SceneCardView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Grid>
 
         <!--Elements-->
@@ -272,9 +269,9 @@
         </Grid>
 
         <!--Lower status bar-->
-        <Grid Grid.Row="4" Grid.ColumnSpan="2">
-            <StackLayout Orientation="Horizontal" Margin="10" Spacing="10">
-                <Grid WidthRequest="300" HeightRequest="50">
+        <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
+            <StackLayout Orientation="Horizontal" Margin="0,10" Spacing="10">
+                <Grid WidthRequest="304" HeightRequest="50">
                     <Button FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" FontSize="32"
                             Command="{Binding GlobalPlayCommand}"
                             BackgroundColor="{StaticResource DarkGreen}"

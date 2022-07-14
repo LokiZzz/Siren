@@ -6,7 +6,7 @@
              x:Class="Siren.Views.SceneCardView"
              LayoutChanged="ContentView_LayoutChanged">
 
-    <Grid Padding="0,10" RowDefinitions="85" ColumnDefinitions="260">
+    <Grid Padding="0,10" RowDefinitions="85" ColumnDefinitions="260" Margin="0,0,10,0">
 
         <Frame BackgroundColor="{StaticResource Light}" Padding="10" CornerRadius="{StaticResource CornerRadiusOuter}">
             <Grid ColumnDefinitions="*,auto">
@@ -39,19 +39,19 @@
 
                 <Grid Grid.Column="1" RowDefinitions="*,*" ColumnDefinitions="*,*" ColumnSpacing="5" RowSpacing="5">
                     <Button Grid.Row="0" Grid.Column="0"
-                            Command="{Binding BindingContext.SaveSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            Command="{Binding BindingContext.SaveSceneCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource DeleteButton}"
                             BackgroundColor="{StaticResource TransparentMedium}"
                             Text="{x:Static icons:FAFont.FloppyDisk}"/>
                     
                     <Button Grid.Row="0" Grid.Column="1"
-                            Command="{Binding BindingContext.DeleteSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            Command="{Binding BindingContext.DeleteSceneCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource DeleteButton}"/>
 
                     <Button Grid.Row="1" Grid.Column="1"
-                            Command="{Binding BindingContext.EditSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
+                            Command="{Binding BindingContext.EditSceneCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource EditButton}"/>
                 </Grid>
