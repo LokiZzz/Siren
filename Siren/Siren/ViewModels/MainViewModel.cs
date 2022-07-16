@@ -229,6 +229,8 @@ namespace Siren.ViewModels
 
             if (SelectedSetting != null)
             {
+                Settings.Where(x => x != SelectedSetting).ForEach(x => x.MusicPlayer.SmoothStop());
+
                 await SelectedSetting.MusicPlayer.AdjustPlayer(
                     SelectedScene.IsMusicEnabled,
                     SelectedScene.IsMusicShuffled,

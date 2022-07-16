@@ -40,7 +40,7 @@
 
                     <Label Text="Image" IsVisible="{Binding IsImagePickerVisible}"/>
                     
-                    <Grid RowDefinitions="85" ColumnDefinitions="300" IsVisible="{Binding IsImagePickerVisible}">
+                    <Grid RowDefinitions="85" ColumnDefinitions="260" IsVisible="{Binding IsImagePickerVisible}">
                         <Frame BackgroundColor="{StaticResource Light}" Padding="10" CornerRadius="{StaticResource CornerRadiusOuter}">
                             <Grid ColumnDefinitions="*,auto">
                                 <Image Grid.ColumnSpan="2" Source="{Binding Image}" Aspect="AspectFill" Margin="-10"/>

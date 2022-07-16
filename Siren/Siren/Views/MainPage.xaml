@@ -63,7 +63,7 @@
         </Style>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="auto,auto,*,1.03*,auto" ColumnDefinitions="310,1.5*,*" ColumnSpacing="10" RowSpacing="0" >
+    <Grid RowDefinitions="auto,auto,*,*,auto" ColumnDefinitions="270,2*,*" ColumnSpacing="10" RowSpacing="0" >
 
         <StackLayout Grid.Row="0" Grid.Column="0" Spacing="10" Margin="15,0,0,0" Orientation="Horizontal">
             <Label Text="Settings" Style="{StaticResource Headliner}" />
@@ -77,7 +77,7 @@
 
         <!--Settings-->
         <Grid Grid.Row="1" Grid.RowSpan="4" Grid.Column="0" RowDefinitions="auto,*">
-            <Grid Grid.Row="0" Padding="10,10,0,10" RowDefinitions="85" ColumnDefinitions="300">
+            <Grid Grid.Row="0" Padding="10,10,0,10" RowDefinitions="85" ColumnDefinitions="260">
                 <Button Style="{StaticResource AddSettingButton}" Command="{Binding AddSettingCommand}"/>
             </Grid>
             <CollectionView Grid.Row="1" x:Name="SettingsList" ItemsSource="{Binding Settings}" 
@@ -234,17 +234,17 @@
                         </StackLayout>
                     </ScrollView>
                     <Frame Grid.Row="2" BackgroundColor="{StaticResource Light}" Margin="10,0,10,10" CornerRadius="10" Padding="10,0" IsVisible="{Binding ShowSettingEditTools}">
-                        <Grid ColumnDefinitions="auto,*,auto" Margin="10,5" ColumnSpacing="15">
+                        <Grid ColumnDefinitions="auto,*,auto" Margin="5,5" ColumnSpacing="10">
                             <StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="10">
                                 <Label FontFamily="FAEX" Text="{x:Static icons:FAEXFont.Shuffle}" FontSize="28"
                                        VerticalOptions="Center" VerticalTextAlignment="Center"
-                                       TextColor="{StaticResource Green}"/>
+                                       TextColor="{StaticResource TextColor}"/>
                                 <Switch OnColor="{StaticResource Green}" VerticalOptions="Center"
                                         IsToggled="{Binding SelectedSetting.MusicPlayer.Shuffle}"/>
                             </StackLayout>
-                            <Grid Grid.Column="1" ColumnDefinitions="auto,*" ColumnSpacing="10" Margin="15,0">
+                            <Grid Grid.Column="1" ColumnDefinitions="auto,*" ColumnSpacing="10" Margin="0">
                                 <Label Grid.Column="0" FontFamily="FAEX" Text="{x:Static icons:FAEXFont.VolumeHigh}" 
-                                       FontSize="28" TextColor="{StaticResource Green}"
+                                       FontSize="28" TextColor="{StaticResource TextColor}"
                                        VerticalOptions="Center" VerticalTextAlignment="Center"/>
                                 <Slider Grid.Column="1" VerticalOptions="Center"
                                         MinimumTrackColor="{StaticResource Green}" 
@@ -257,7 +257,7 @@
                             <StackLayout Grid.Column="2" Orientation="Horizontal" Spacing="10">
                                 <Label FontFamily="FAEX" Text="{x:Static icons:FAEXFont.PowerOff}" FontSize="28"
                                        VerticalOptions="Center" VerticalTextAlignment="Center"
-                                       TextColor="{StaticResource Green}"/>
+                                       TextColor="{StaticResource TextColor}"/>
                                 <Switch OnColor="{StaticResource Green}" VerticalOptions="Center"
                                         IsToggled="{Binding SelectedSetting.MusicPlayer.IsOn}"/>
                             </StackLayout>
@@ -271,7 +271,7 @@
         <!--Lower status bar-->
         <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
             <StackLayout Orientation="Horizontal" Margin="0,10" Spacing="10">
-                <Grid WidthRequest="304" HeightRequest="50">
+                <Grid WidthRequest="260" HeightRequest="50">
                     <Button FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" FontSize="32"
                             Command="{Binding GlobalPlayCommand}"
                             BackgroundColor="{StaticResource DarkGreen}"

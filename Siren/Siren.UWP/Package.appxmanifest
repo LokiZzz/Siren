@@ -10,14 +10,14 @@
 
   <Identity
     Name="24A5919B-B795-4CAD-B938-3FB85A3E4EA2"
-    Publisher="CN=7AC5E926-4395-41F7-9FB7-3950315BB574"
-    Version="1.0.0.0" />
+    Publisher="CN=lokiz"
+    Version="1.0.3.0" />
 
   <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Siren.UWP</DisplayName>
-    <PublisherDisplayName>7AC5E926-4395-41F7-9FB7-3950315BB574</PublisherDisplayName>
+    <PublisherDisplayName>Loki the Gloomy Dragon</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

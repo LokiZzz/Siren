@@ -4,7 +4,7 @@
              xmlns:icons="clr-namespace:Siren.Assets"
              x:Class="Siren.Views.SettingCardView">
 
-    <Grid RowDefinitions="85" ColumnDefinitions="300" Padding="10,0" Margin="0,0,0,10">
+    <Grid RowDefinitions="85" ColumnDefinitions="260" Padding="10,0" Margin="0,0,0,10">
 
         <Frame BackgroundColor="{StaticResource Light}" Padding="10" CornerRadius="{StaticResource CornerRadiusOuter}">
             

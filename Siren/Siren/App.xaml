@@ -72,12 +72,7 @@
                 <Setter Property="BackgroundColor" Value="Transparent"/>
             </Style>
 
-            <Style x:Key="PlayerControlButton" TargetType="Button">
-                <Setter Property="HeightRequest" Value="50"/>
-                <Setter Property="WidthRequest" Value="50"/>
-                <Setter Property="CornerRadius" Value="25"/>
-                <Setter Property="FontFamily" Value="FA"/>
-                <Setter Property="FontSize" Value="26"/>
+            <Style x:Key="PlayerControlButton" TargetType="Button" BasedOn="{StaticResource DeleteButton}">
             </Style>
 
             <Style TargetType="Switch">
