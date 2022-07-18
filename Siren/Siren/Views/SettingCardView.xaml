@@ -10,9 +10,9 @@
             
             <Grid RowDefinitions="*,auto" ColumnDefinitions="*,auto">
 
-                <Image Source="{Binding Image}" Aspect="AspectFill" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10"/>
+                <Image Source="{Binding Image}" Aspect="AspectFill" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-15"/>
 
-                <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-10" Opacity="0.5" IsVisible="{Binding HasImage}">
+                <Rectangle HorizontalOptions="Fill" VerticalOptions="Fill" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="-15" Opacity="0.5" IsVisible="{Binding HasImage}">
                     <Rectangle.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                             <GradientStop Color="Black" Offset="0" />

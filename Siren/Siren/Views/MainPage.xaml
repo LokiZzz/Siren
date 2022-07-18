@@ -182,7 +182,7 @@
         </Grid>
 
         <!--Music-->
-        <Grid Grid.Row="2" Grid.Column="2" Grid.RowSpan="2" RowDefinitions="auto,*" Margin="0,0,10,0">
+        <Grid Grid.Row="2" Grid.Column="2" Grid.RowSpan="3" RowDefinitions="auto,*" Margin="0,0,0,10">
             <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*" Margin="10,0">
                 <Label Text="Music" Grid.Column="0" Style="{StaticResource Headliner}"/>
                 <Button Grid.Column="1" Style="{StaticResource HelpButton}"
@@ -269,9 +269,9 @@
         </Grid>
 
         <!--Lower status bar-->
-        <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
+        <Grid Grid.Row="4" Grid.Column="1" >
             <StackLayout Orientation="Horizontal" Margin="0,10" Spacing="10">
-                <Grid WidthRequest="260" HeightRequest="50">
+                <Grid WidthRequest="230" HeightRequest="50">
                     <Button FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" FontSize="32"
                             Command="{Binding GlobalPlayCommand}"
                             BackgroundColor="{StaticResource DarkGreen}"
@@ -293,7 +293,7 @@
                 
                 <Label Text="{Binding CurrentSceneText}" 
                        HorizontalOptions="Start" 
-                       FontSize="24" 
+                       FontSize="22" 
                        VerticalOptions="Center" VerticalTextAlignment="Center"
                        Margin="10,0,0,0"
                        FontFamily="Lora"/>
