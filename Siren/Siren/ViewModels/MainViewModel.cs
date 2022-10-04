@@ -231,11 +231,7 @@ namespace Siren.ViewModels
             {
                 Settings.Where(x => x != SelectedSetting).ForEach(x => x.MusicPlayer.SmoothStop());
 
-                await SelectedSetting.MusicPlayer.AdjustPlayer(
-                    SelectedScene.IsMusicEnabled,
-                    SelectedScene.IsMusicShuffled,
-                    SelectedScene.MusicVolume
-                );
+                await SelectedSetting.MusicPlayer.AdjustPlayer(SelectedScene);
             }
 
             OnPropertyChanged(nameof(IsSomethingPlaying));
@@ -275,6 +271,7 @@ namespace Siren.ViewModels
             scene.Elements = new ObservableCollection<TrackSetupViewModel>(playingElements);
             scene.IsMusicEnabled = SelectedSetting.MusicPlayer.IsOn;
             scene.IsMusicShuffled = SelectedSetting.MusicPlayer.Shuffle;
+            scene.IsOneMusicTrackRepeatEnabled = SelectedSetting.MusicPlayer.IsRepeat;
             scene.MusicVolume = SelectedSetting.MusicPlayer.Volume;
 
             await SaveCurrentEnvironment();
@@ -660,6 +657,19 @@ namespace Siren.ViewModels
         #endregion
 
         #region Utility
+        private bool _isPlayerSettingsExpanded;
+        public bool IsPlayerSettingsExpanded
+        {
+            get
+            {
+                return Preferences.Get(nameof(IsPlayerSettingsExpanded), true);
+            }
+            set
+            {
+                Preferences.Set(nameof(IsPlayerSettingsExpanded), value);
+            }
+        }
+
         private async Task AlertTooManyFiles()
         {
             await Application.Current.MainPage.DisplayAlert(

@@ -37,6 +37,14 @@ namespace Siren.ViewModels
             set => SetProperty(ref _musicVolume, value);
         }
 
+        private bool _isOneMusicTrackRepeatEnabled;
+        public bool IsOneMusicTrackRepeatEnabled
+        {
+            get => _isOneMusicTrackRepeatEnabled;
+            set => SetProperty(ref _isOneMusicTrackRepeatEnabled, value);
+        }
+
+
         public ObservableCollection<TrackSetupViewModel> Elements { get; set; } = new ObservableCollection<TrackSetupViewModel>();
 
         public void ReloadImage()

@@ -33,6 +33,7 @@ namespace Siren.Models
         public List<TrackSetup> ElementsSetup { get; set; } = new List<TrackSetup>();
         public bool IsMusicEnabled { get; set; }
         public bool IsMusicShuffled { get; set; }
+        public bool IsOneMusicTrackRepeatEnabled { get; set; }
         public double MusicVolume { get; set; }
     }
 

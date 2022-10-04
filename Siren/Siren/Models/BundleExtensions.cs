@@ -33,6 +33,7 @@ namespace Siren.Models
                 ElementsSetup = vm.Elements.Select(x => x.ToModel()).ToList(),
                 IsMusicEnabled = vm.IsMusicEnabled,
                 IsMusicShuffled = vm.IsMusicShuffled,
+                IsOneMusicTrackRepeatEnabled = vm.IsOneMusicTrackRepeatEnabled,
                 MusicVolume = vm.MusicVolume,
             };
         }
@@ -78,6 +79,7 @@ namespace Siren.Models
                 Elements = m.ElementsSetup.Select(x => x.ToVM()).ToObservableCollection(),
                 IsMusicShuffled = m.IsMusicShuffled,
                 IsMusicEnabled = m.IsMusicEnabled,
+                IsOneMusicTrackRepeatEnabled = m.IsOneMusicTrackRepeatEnabled,
                 MusicVolume = m.MusicVolume,
             };
         }

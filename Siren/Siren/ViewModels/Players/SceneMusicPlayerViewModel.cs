@@ -61,6 +61,13 @@ namespace Siren.ViewModels.Players
             set => SetProperty(ref _isOn, value);
         }
 
+        private bool _isRepeat = false;
+        public bool IsRepeat
+        {
+            get => _isRepeat;
+            set => SetProperty(ref _isRepeat, value);
+        }
+
         private bool _nextTrackIsFirst = true;
         private int _currentMusicTrackIndex = -1;
         private List<int> _stillNotPlayedMusicTracks = new List<int>();
@@ -96,7 +103,22 @@ namespace Siren.ViewModels.Players
 
             try
             {
-                if (Shuffle)
+                if(IsRepeat)
+                {
+                    if(_currentMusicTrackIndex == -1)
+                    {
+                        if(Shuffle)
+                        {
+                            SceneComponentViewModel randomTrack = Tracks[new Random().Next(0, Tracks.Count())];
+                            _currentMusicTrackIndex = Tracks.IndexOf(randomTrack);
+                        }
+                        else
+                        {
+                            _currentMusicTrackIndex = 0;
+                        }
+                    }
+                }
+                else if (Shuffle)
                 {
                     if (!_stillNotPlayedMusicTracks.Any())
                     {
@@ -247,19 +269,20 @@ namespace Siren.ViewModels.Players
             _stopPlayNext = false;
         }
 
-        public async Task AdjustPlayer(bool isEnabled, bool isShuffled, double volume)
+        public async Task AdjustPlayer(SceneViewModel scene)
         {
-            IsOn = isEnabled;
-            Shuffle = isShuffled;
+            IsOn = scene.IsMusicEnabled;
+            Shuffle = scene.IsMusicShuffled;
+            IsRepeat = scene.IsOneMusicTrackRepeatEnabled;
             
             if(IsMusicPlaying && IsOn)
             {
-                StartAdjustingVolume(volume);
+                StartAdjustingVolume(scene.MusicVolume);
             }
 
             if (IsOn && !IsMusicPlaying)
             {
-                Volume = volume;
+                Volume = scene.MusicVolume;
                 await PlayMusic();
             }
 

@@ -19,9 +19,13 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            
-            <SolidColorBrush x:Key="SystemControlHighlightBaseHighBrush" Color="White" />
-            <Color x:Key="SystemAccentColor">#FFFFFF</Color>
+
+            <SolidColorBrush x:Key="SystemControlHighlightBaseHighBrush" Color="#b0da5c" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOffPointerOver" Color="#E75A7C" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#E75A7C" />
+
+
+            <Color x:Key="SystemAccentColor">#b0da5c</Color>
 
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
