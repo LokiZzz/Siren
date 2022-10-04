@@ -20,8 +20,8 @@
                            IsVisible="{Binding IsSelected}">
                         <Rectangle.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="Transparent" Offset="0" />
-                                <GradientStop Color="{StaticResource Green}" Offset="1.5" />
+                                <GradientStop Color="{StaticResource Green}" Offset="-1" />
+                                <GradientStop Color="Transparent" Offset="1" />
                             </LinearGradientBrush>
                         </Rectangle.Background>
                     </Rectangle>
