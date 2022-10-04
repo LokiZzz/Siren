@@ -182,7 +182,7 @@
         </Grid>
 
         <!--Music-->
-        <Grid Grid.Row="2" Grid.Column="2" Grid.RowSpan="3" RowDefinitions="auto,*" Margin="0,0,0,10">
+        <Grid Grid.Row="2" Grid.Column="2" Grid.RowSpan="3" RowDefinitions="auto,*" Margin="0,0,10,10">
             <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*" Margin="10,0">
                 <Label Text="Music" Grid.Column="0" Style="{StaticResource Headliner}"/>
                 <Button Grid.Column="1" Style="{StaticResource HelpButton}"
