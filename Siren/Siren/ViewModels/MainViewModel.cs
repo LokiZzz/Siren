@@ -263,7 +263,7 @@ namespace Siren.ViewModels
 
         private async Task SaveScene(SceneViewModel scene)
         {
-            List<TrackSetupViewModel> playingElements = SelectedSetting.Elements
+            List<TrackSetupViewModel> playingElements = Settings.SelectMany(x => x.Elements)
                 .Where(x => x.IsPlaying)
                 .Select(x => new TrackSetupViewModel
                 {
