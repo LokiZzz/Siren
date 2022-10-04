@@ -236,7 +236,6 @@ namespace Siren.ViewModels
 
             OnPropertyChanged(nameof(IsSomethingPlaying));
             OnPropertyChanged(nameof(CurrentSceneText));
-            Settings.ForEach(x => x.UpdateHasSelectedScene());
 
             ShowSceneEditTools = SelectedScene != null;
 
@@ -631,6 +630,8 @@ namespace Siren.ViewModels
                     GlobalPlayActivityIndicatorIsVisible = false;
                 }
 
+                Settings.ForEach(x => x.UpdateHasSelectedScene());
+
                 return isSomethingPlaying;
             }
         }
@@ -657,16 +658,34 @@ namespace Siren.ViewModels
         #endregion
 
         #region Utility
-        private bool _isPlayerSettingsExpanded;
         public bool IsPlayerSettingsExpanded
+        {
+            get => Preferences.Get(nameof(IsPlayerSettingsExpanded), true);
+            set => Preferences.Set(nameof(IsPlayerSettingsExpanded), value);
+        }
+
+        private int _elementsSpan;
+        public int ElementsSpan
+        {
+            get => Preferences.Get(nameof(ElementsSpan), 3);
+            set
+            {
+                Preferences.Set(nameof(ElementsSpan), value);
+                SetProperty(ref _elementsSpan, value);
+            }
+        }
+
+        private int _effectsSpan;
+        public int EffectsSpan
         {
             get
             {
-                return Preferences.Get(nameof(IsPlayerSettingsExpanded), true);
+                return Preferences.Get(nameof(EffectsSpan), 4);
             }
             set
             {
-                Preferences.Set(nameof(IsPlayerSettingsExpanded), value);
+                Preferences.Set(nameof(EffectsSpan), value);
+                SetProperty(ref _effectsSpan, value);
             }
         }
 

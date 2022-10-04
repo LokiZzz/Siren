@@ -23,7 +23,7 @@ namespace Siren.ViewModels
         }
 
         public void UpdateHasSelectedScene() => OnPropertyChanged(nameof(HasSelectedScene));
-        public bool HasSelectedScene => Scenes?.Any(x => x.IsSelected) == true;
+        public bool HasSelectedScene => Elements.Any(x => x.IsPlaying) || Effects.Any(x => x.IsPlaying) || Music.Any(x => x.IsPlaying);
 
         private ObservableCollection<SceneViewModel> _scenes = new ObservableCollection<SceneViewModel>();
         public ObservableCollection<SceneViewModel> Scenes

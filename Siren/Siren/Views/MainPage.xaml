@@ -117,7 +117,7 @@
 
         <!--Elements-->
         <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*">
-            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*" Margin="10,0">
+            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*,auto" Margin="10,0">
                 <Label Text="Elements" Grid.Column="0" Style="{StaticResource Headliner}" />
                 <Button Grid.Column="1" Style="{StaticResource HelpButton}" 
                         Command="{Binding GoToHelpCommand}" CommandParameter="{x:Static help:EHelpTopic.Element}"/>
@@ -127,11 +127,15 @@
                     <ProgressBar Grid.Row="1" Style="{StaticResource FreeSpaceProgressBar}" Progress="{Binding FreeElementsSpace}" 
                                  HorizontalOptions="Fill" VerticalOptions="End"/>
                 </Grid>
+                <StackLayout Grid.Column="4"  Orientation="Horizontal" Margin="10,0,0,0">
+                    <Label Text="{Binding ElementsSpan, StringFormat='Span: {0}'}" VerticalOptions="Center" VerticalTextAlignment="Center" FontFamily="Lora" FontSize="18" Margin="0,0,0,-5"/>
+                    <Stepper Minimum="1" Maximum="10" Increment="1" Value="{Binding ElementsSpan}"/>
+                </StackLayout>
             </Grid>
             <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
                 <CollectionView x:Name="ElementsList" ItemsSource="{Binding SelectedSetting.Elements}" VerticalScrollBarVisibility="Never" Margin="5">
                     <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="0" VerticalItemSpacing="0"/>
+                        <GridItemsLayout Orientation="Vertical" Span="{Binding ElementsSpan}" HorizontalItemSpacing="0" VerticalItemSpacing="0"/>
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
@@ -144,7 +148,7 @@
 
         <!--Effects-->
         <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*">
-            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*,auto" Margin="10,0">
+            <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*,auto,auto" Margin="10,0">
                 <Label Text="Effects" Grid.Column="0" Style="{StaticResource Headliner}" />
                 <Button Grid.Column="1" Style="{StaticResource HelpButton}"
                         Command="{Binding GoToHelpCommand}" CommandParameter="{x:Static help:EHelpTopic.Effect}"/>
@@ -166,13 +170,15 @@
                             Minimum="0" Maximum="100" WidthRequest="150"
                             Margin="0,-10" Value="{Binding EffectsVolume}"/>
                 </Grid>
-                <Entry x:Name="EffectsSpanEntry" Grid.Column="5" Text="4"></Entry>
-                <Stepper x:Name="EffectsSpanStepper" Grid.Column="6" Maximum="10" Increment="1" Value="4"/>
+                <StackLayout Grid.Column="5"  Orientation="Horizontal" Margin="10,0,0,0">
+                    <Label Text="{Binding EffectsSpan, StringFormat='Span: {0}'}" VerticalOptions="Center" VerticalTextAlignment="Center" FontFamily="Lora" FontSize="18" Margin="0,0,0,-5"/>
+                    <Stepper Minimum="1" Maximum="10" Increment="1" Value="{Binding EffectsSpan}"/>
+                </StackLayout>
             </Grid>
             <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
                 <CollectionView x:Name="EffectsList" ItemsSource="{Binding SelectedSetting.Effects}" VerticalScrollBarVisibility="Never" Margin="5">
                     <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="{Binding Source={Reference EffectsSpanStepper}, Path=Value}"/>
+                        <GridItemsLayout Orientation="Vertical" Span="{Binding EffectsSpan}"/>
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
