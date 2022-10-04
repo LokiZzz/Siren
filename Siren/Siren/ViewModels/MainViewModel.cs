@@ -144,6 +144,23 @@ namespace Siren.ViewModels
             }
         }
 
+        private async Task MoveSetting(SettingViewModel setting, bool up)
+        {
+            int currentIndex = Settings.IndexOf(setting);
+
+            bool cantMove = currentIndex == 0 && up
+                || currentIndex == Settings.Count() - 1 && !up;
+
+            if (cantMove) return;
+
+            int neighborIndex = up ? currentIndex - 1 : currentIndex + 1;
+            SettingViewModel temp = Settings[neighborIndex];
+            Settings[neighborIndex] = Settings[currentIndex];
+            Settings[currentIndex] = temp;
+
+            await SaveCurrentEnvironment();
+        }
+
         private bool _showSettingEditTools;
         public bool ShowSettingEditTools
         {
@@ -280,6 +297,23 @@ namespace Siren.ViewModels
                 $"Scene «{scene.Name}» successfully saved!",
                 "Pretty!"
             );
+        }
+
+        private async Task MoveScene(SceneViewModel scene, bool toTheLeft)
+        {
+            int currentIndex = SelectedSetting.Scenes.IndexOf(scene);
+
+            bool cantMove = currentIndex == 0 && toTheLeft 
+                || currentIndex == SelectedSetting.Scenes.Count() - 1 && !toTheLeft;
+
+            if (cantMove) return;
+
+            int neighborIndex = toTheLeft ? currentIndex - 1 : currentIndex + 1;
+            SceneViewModel temp = SelectedSetting.Scenes[neighborIndex];
+            SelectedSetting.Scenes[neighborIndex] = SelectedSetting.Scenes[currentIndex];
+            SelectedSetting.Scenes[currentIndex] = temp;
+
+            await SaveCurrentEnvironment();
         }
 
         private bool _showSceneEditTools;
@@ -562,11 +596,15 @@ namespace Siren.ViewModels
         public Command EditSettingCommand { get => new Command<SettingViewModel>(async (setting) => await GoToEditSetting(setting)); }
         public Command SelectSettingCommand { get => new Command<SettingViewModel>(async (setting) => await SelectSetting(setting)); }
         public Command DeleteSettingCommand { get => new Command<SettingViewModel>(async (scetting) => await DeleteSetting(scetting)); }
+        public Command MoveSettingUpCommand { get => new Command<SettingViewModel>(async (scetting) => await MoveSetting(scetting, true)); }
+        public Command MoveSettingDownCommand { get => new Command<SettingViewModel>(async (scetting) => await MoveSetting(scetting, false)); }
         public Command AddSceneCommand { get => new Command(async () => await GoToAddScene()); }
         public Command SaveSceneCommand { get => new Command<SceneViewModel>(async (scene) => await SaveScene(scene)); }
         public Command EditSceneCommand { get => new Command<SceneViewModel>(async (scene) => await GoToEditScene(scene)); }
         public Command SelectSceneCommand { get => new Command<SceneViewModel>(async (scene) => await SelectScene(scene)); }
         public Command DeleteSceneCommand { get => new Command<SceneViewModel>(async (scene) => await DeleteScene(scene)); }
+        public Command MoveSceneLeftCommand { get => new Command<SceneViewModel>(async (scene) => await MoveScene(scene, true)); }
+        public Command MoveSceneRightCommand { get => new Command<SceneViewModel>(async (scene) => await MoveScene(scene, false)); }
         public Command AddElementsCommand { get => new Command(async () => await AddElements()); }
         public Command EditElementCommand { get => new Command<SceneComponentViewModel>(async (element) => await GoToEditElement(element)); }
         public Command DeleteElementCommand { get => new Command<SceneComponentViewModel>(DeleteElement); }

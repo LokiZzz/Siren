@@ -40,15 +40,27 @@
                 </Rectangle>
 
                 <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}" Style="{StaticResource IllustratedCardTitle}"
-                       VerticalOptions="Start" VerticalTextAlignment="Start" />
+                       VerticalOptions="Start" VerticalTextAlignment="Start" Margin="0,0,-60,0"/>
 
-                <Grid Grid.Column="1" Grid.RowSpan="2" RowDefinitions="*,*" ColumnDefinitions="*,*" ColumnSpacing="5" RowSpacing="5">
-                    <Button Grid.Row="0" Grid.Column="1"
+                <Grid Grid.Column="1" Grid.RowSpan="2" RowDefinitions="*,*" ColumnDefinitions="*,*,*" ColumnSpacing="5" RowSpacing="5">
+                    <Button Grid.Row="1" Grid.Column="0"
+                        Command="{Binding BindingContext.MoveSettingDownCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                        CommandParameter="{Binding .}"
+                        Style="{StaticResource DeleteButton}"
+                        BackgroundColor="{StaticResource TransparentMedium}" FontFamily="FAEX" Text="{x:Static icons:FAEXFont.ChevronDown}"/>
+
+                    <Button Grid.Row="1" Grid.Column="1"
+                        Command="{Binding BindingContext.MoveSettingUpCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                        CommandParameter="{Binding .}"
+                        Style="{StaticResource DeleteButton}"
+                        BackgroundColor="{StaticResource TransparentMedium}" FontFamily="FAEX" Text="{x:Static icons:FAEXFont.ChevronUp}"/>
+
+                    <Button Grid.Row="0" Grid.Column="2"
                         Command="{Binding BindingContext.DeleteSettingCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
                         CommandParameter="{Binding .}"
                         Style="{StaticResource DeleteButton}"/>
 
-                    <Button Grid.Row="1" Grid.Column="1" 
+                    <Button Grid.Row="1" Grid.Column="2" 
                         Command="{Binding BindingContext.EditSettingCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
                         CommandParameter="{Binding .}"
                         Style="{StaticResource EditButton}"/>
