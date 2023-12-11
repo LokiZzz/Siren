@@ -76,33 +76,32 @@ namespace Siren.ViewModels
 
         private Task SelectSetting(SettingViewModel setting)
         {
-            return Task.Run(() =>
+            IsBusy = true;
+
+            SelectedSetting = setting;
+
+            if (SelectedSetting != null)
             {
-                IsBusy = true;
-
-                SelectedSetting = setting;
-
-                if (SelectedSetting != null)
+                foreach (SettingViewModel item in Settings)
                 {
-                    foreach (SettingViewModel item in Settings)
-                    {
-                        item.IsSelected = false;
-                    }
-
-                    SelectedSetting.IsSelected = true;
-                    SelectedSetting.MusicPlayer.Tracks = SelectedSetting.Music;
+                    item.IsSelected = false;
                 }
 
-                ShowSettingEditTools = SelectedSetting != null;
-                OnPropertyChanged(nameof(CurrentElementsCountString));
-                OnPropertyChanged(nameof(CurrentEffectsCountString));
-                OnPropertyChanged(nameof(CurrentMusicTracksCountString));
-                OnPropertyChanged(nameof(SelectedSetting.Music));
-                OnPropertyChanged(nameof(SelectedSetting.MusicPlayer.IsOn));
-                OnPropertyChanged(nameof(SelectedSetting.MusicPlayer.Shuffle));
+                SelectedSetting.IsSelected = true;
+                SelectedSetting.MusicPlayer.Tracks = SelectedSetting.Music;
+            }
 
-                IsBusy = false;
-            });
+            ShowSettingEditTools = SelectedSetting != null;
+            OnPropertyChanged(nameof(CurrentElementsCountString));
+            OnPropertyChanged(nameof(CurrentEffectsCountString));
+            OnPropertyChanged(nameof(CurrentMusicTracksCountString));
+            OnPropertyChanged(nameof(SelectedSetting.Music));
+            OnPropertyChanged(nameof(SelectedSetting.MusicPlayer.IsOn));
+            OnPropertyChanged(nameof(SelectedSetting.MusicPlayer.Shuffle));
+
+            IsBusy = false;
+
+            return Task.CompletedTask;
         }
 
         private async Task DeleteSetting(SettingViewModel setting)
