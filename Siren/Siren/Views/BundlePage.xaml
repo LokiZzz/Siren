@@ -12,7 +12,7 @@
         <converters:DoubleToPercentStringConverter x:Key="DoubleToPercentStringConverter"></converters:DoubleToPercentStringConverter>
         <converters:NotConverter x:Key="NotConverter"></converters:NotConverter>
 
-        <Style TargetType="Label" x:Key="Header">
+        <Style TargetType="Label" x:Key="TitleLabel">
             <Setter Property="FontSize" Value="Large"/>
             <Setter Property="FontFamily" Value="Lora"/>
         </Style>
@@ -91,7 +91,7 @@
             <Grid Grid.Row="0" RowDefinitions="auto" ColumnDefinitions="*,*" ColumnSpacing="10" VerticalOptions="Start" HorizontalOptions="Fill">
                 <Frame Grid.Column="0">
                     <StackLayout Spacing="10" HorizontalOptions="Fill">
-                        <Label Style="{StaticResource Header}"
+                        <Label Style="{StaticResource TitleLabel}"
                                Text="Create new Bundle" />
                         <Label LineBreakMode="WordWrap"
                                Text="If you want to create new bundle from current settings set, enter the preferred bundle file name and press «Create»."/>
@@ -118,7 +118,7 @@
                 
                 <Frame Grid.Column="1">
                     <Grid RowDefinitions="auto,auto,auto,*" RowSpacing="10" >
-                        <Label Grid.Row="0" Text="Install Bundle" Style="{StaticResource Header}"/>
+                        <Label Grid.Row="0" Text="Install Bundle" Style="{StaticResource TitleLabel}"/>
                         <Label Grid.Row="1" LineBreakMode="WordWrap" Text="To install bundle using *.siren file, press button «Install»."/>
 
                         <StackLayout Grid.Row="2" Orientation="Vertical" Spacing="5">
@@ -157,7 +157,7 @@
                                                VerticalTextAlignment="Start"
                                                VerticalOptions="Start"
                                                Text="{Binding Bundle.Name}"
-                                               Style="{StaticResource Header}" FontSize="Medium"/>
+                                               Style="{StaticResource TitleLabel}" FontSize="Medium"/>
 
                                     <Switch Grid.Row="0" Grid.Column="1" 
                                             HorizontalOptions="End" VerticalOptions="Start"

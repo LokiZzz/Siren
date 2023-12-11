@@ -116,7 +116,7 @@
         </Grid>
 
         <!--Elements-->
-        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*">
+        <!--<Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*">
             <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*,auto" Margin="10,0">
                 <Label Text="Elements" Grid.Column="0" Style="{StaticResource Headliner}" />
                 <Button Grid.Column="1" Style="{StaticResource HelpButton}" 
@@ -144,7 +144,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </Frame>
-        </Grid>
+        </Grid>-->
 
         <!--Effects-->
         <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*">

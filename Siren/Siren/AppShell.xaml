@@ -90,14 +90,6 @@
     <!-- Optional Templates 
     // These may be provided inline as below or as separate classes.
 
-    // This header appears at the top of the Flyout.
-    // https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/shell/flyout#flyout-header
-    <Shell.FlyoutHeaderTemplate>
-        <DataTemplate>
-            <Grid>ContentHere</Grid>
-        </DataTemplate>
-    </Shell.FlyoutHeaderTemplate>
-
     // ItemTemplate is for ShellItems as displayed in a Flyout
     // https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/shell/flyout#define-flyoutitem-appearance
     <Shell.ItemTemplate>

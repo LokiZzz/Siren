@@ -57,7 +57,7 @@ namespace Siren.UWP
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
                 global::Xamarin.Forms.Forms.SetFlags("Shell_UWP_Experimental");
-                Xamarin.Forms.Forms.Init(e);
+                Xamarin.Forms.Forms.Init(e, new[] { typeof(Siren.App).Assembly });
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
