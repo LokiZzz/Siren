@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:Siren.ViewModels" 
              xmlns:views="clr-namespace:Siren.Views"
              xmlns:icons="clr-namespace:Siren.Assets"
-             xmlns:help="clr-namespace:Siren.ViewModels.Help" xmlns:behaviors="http://xamarin.com/schemas/2020/toolkit"
+             xmlns:help="clr-namespace:Siren.ViewModels.Help" xmlns:behaviors="http://xamarin.com/schemas/2020/toolkit" xmlns:flv="clr-namespace:DLToolkit.Forms.Controls;assembly=DLToolkit.Forms.Controls.FlowListView"
              Title="{Binding Title}"
              BackgroundColor="{StaticResource VeryDark}"
              ControlTemplate="{StaticResource BusyPageTemplate}">
@@ -80,19 +80,20 @@
             <Grid Grid.Row="0" Padding="10,10,0,10" RowDefinitions="85" ColumnDefinitions="260">
                 <Button Style="{StaticResource AddSettingButton}" Command="{Binding AddSettingCommand}"/>
             </Grid>
-            <CollectionView Grid.Row="1" x:Name="SettingsList" ItemsSource="{Binding Settings}" 
-                            HorizontalOptions="Center" SelectionMode="None" VerticalScrollBarVisibility="Never" >
-                <CollectionView.ItemTemplate>
+            <flv:FlowListView 
+                Grid.Row="1"
+                FlowColumnCount="1" SeparatorVisibility="None" HasUnevenRows="false"
+	            FlowItemTappedCommand="{Binding SelectSettingCommand}" 
+	            FlowItemsSource="{Binding Settings}" 
+                FlowRowBackgroundColor="{StaticResource VeryDark}" 
+                FlowTappedBackgroundColor="{StaticResource VeryDark}"
+                SelectionMode="None">
+                <flv:FlowListView.FlowColumnTemplate>
                     <DataTemplate>
-                        <views:SettingCardView>
-                            <views:SettingCardView.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding BindingContext.SelectSettingCommand,Source={x:Reference SettingsList}}" 
-                                                        CommandParameter="{Binding .}"/>
-                            </views:SettingCardView.GestureRecognizers>
-                        </views:SettingCardView>
+                        <views:SettingCardView/>
                     </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                </flv:FlowListView.FlowColumnTemplate>
+            </flv:FlowListView>
         </Grid>
 
         <!--Scenes-->

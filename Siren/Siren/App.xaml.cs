@@ -1,4 +1,5 @@
-﻿using Siren.Services;
+﻿using DLToolkit.Forms.Controls;
+using Siren.Services;
 using Siren.Views;
 using System;
 using Xamarin.Essentials;
@@ -13,6 +14,7 @@ namespace Siren
         public App()
         {
             InitializeComponent();
+            FlowListView.Init();
             RegisterServices();
 
             MainPage = new AppShell();

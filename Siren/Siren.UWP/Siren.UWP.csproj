@@ -107,6 +107,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Renderers\ListViewCellRenderer.cs" />
     <Compile Include="Services\AudioPlayer.cs" />
     <Compile Include="Services\FileManager.cs" />
   </ItemGroup>
