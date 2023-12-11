@@ -39,15 +39,15 @@
                        Margin="0,0,-80,0"/>
 
                 <Grid Grid.Column="1" RowDefinitions="*,*" ColumnDefinitions="*,*,*,*" ColumnSpacing="5" RowSpacing="5">
-                    <!--<Button Grid.Row="0" Grid.Column="0"
-                            Command="{Binding BindingContext.MoveSceneLeftCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                    <Button Grid.Row="0" Grid.Column="0"
+                            Command="{Binding BindingContext.MoveSceneLeftCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource DeleteButton}"
                             BackgroundColor="{StaticResource TransparentMedium}"
                             FontFamily="FAEX"
                             Text="{x:Static icons:FAEXFont.ChevronLeft}"/>
                     <Button Grid.Row="0" Grid.Column="1"
-                            Command="{Binding BindingContext.MoveSceneRightCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                            Command="{Binding BindingContext.MoveSceneRightCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource DeleteButton}"
                             BackgroundColor="{StaticResource TransparentMedium}"
@@ -55,21 +55,21 @@
                             Text="{x:Static icons:FAEXFont.ChevronRight}"/>
                     
                     <Button Grid.Row="0" Grid.Column="2"
-                            Command="{Binding BindingContext.SaveSceneCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                            Command="{Binding BindingContext.SaveSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource DeleteButton}"
                             BackgroundColor="{StaticResource TransparentMedium}"
                             Text="{x:Static icons:FAFont.FloppyDisk}"/>
                     
                     <Button Grid.Row="0" Grid.Column="3"
-                            Command="{Binding BindingContext.DeleteSceneCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                            Command="{Binding BindingContext.DeleteSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                             CommandParameter="{Binding .}"
                             Style="{StaticResource DeleteButton}"/>
 
                     <Button Grid.Row="1" Grid.Column="3"
-                            Command="{Binding BindingContext.EditSceneCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                            Command="{Binding BindingContext.EditSceneCommand,Source={RelativeSource AncestorType={x:Type StackLayout}}}" 
                             CommandParameter="{Binding .}"
-                            Style="{StaticResource EditButton}"/>-->
+                            Style="{StaticResource EditButton}"/>
                 </Grid>
                 
             </Grid>

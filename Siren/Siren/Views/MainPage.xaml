@@ -5,7 +5,9 @@
              xmlns:vm="clr-namespace:Siren.ViewModels" 
              xmlns:views="clr-namespace:Siren.Views"
              xmlns:icons="clr-namespace:Siren.Assets"
-             xmlns:help="clr-namespace:Siren.ViewModels.Help" xmlns:behaviors="http://xamarin.com/schemas/2020/toolkit" xmlns:flv="clr-namespace:DLToolkit.Forms.Controls;assembly=DLToolkit.Forms.Controls.FlowListView"
+             xmlns:help="clr-namespace:Siren.ViewModels.Help" 
+             xmlns:behaviors="http://xamarin.com/schemas/2020/toolkit" 
+             xmlns:flv="clr-namespace:DLToolkit.Forms.Controls;assembly=DLToolkit.Forms.Controls.FlowListView"
              Title="{Binding Title}"
              BackgroundColor="{StaticResource VeryDark}"
              ControlTemplate="{StaticResource BusyPageTemplate}">
@@ -28,12 +30,6 @@
         <Style x:Key="HelpButton" TargetType="Button" BasedOn="{StaticResource AddButton}">
             <Setter Property="Text" Value="{x:Static icons:FAFont.CircleQuestion}"/>
             <Setter Property="FontSize" Value="17"/>
-            <!--<Setter Property="HeightRequest" Value="30"/>
-            <Setter Property="WidthRequest" Value="30"/>
-            <Setter Property="CornerRadius" Value="15"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="HorizontalOptions" Value="Center"/>
-            <Setter Property="VerticalOptions" Value="Center"/>-->
         </Style>
         <Style x:Key="FreeSpaceProgressBar" TargetType="ProgressBar">
             <Setter Property="VerticalOptions" Value="Center"/>
@@ -101,23 +97,27 @@
             <Grid Grid.Column="0" Padding="0,10,10,10" RowDefinitions="85" ColumnDefinitions="85">
                 <Button Style="{StaticResource AddSettingButton}" Command="{Binding AddSceneCommand}" IsVisible="{Binding ShowSettingEditTools}"/>
             </Grid>
-            <CollectionView x:Name="ScenesList" Grid.Column="1" ItemsSource="{Binding SelectedSetting.Scenes}"
-                            ItemsLayout="HorizontalList" HorizontalScrollBarVisibility="Never">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <views:SceneCardView>
-                            <views:SceneCardView.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding BindingContext.SelectSceneCommand,Source={x:Reference ScenesList}}" 
-                                                      CommandParameter="{Binding .}"/>
-                            </views:SceneCardView.GestureRecognizers>
-                        </views:SceneCardView>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+            <ScrollView Orientation="Horizontal" Grid.Column="1">
+                <StackLayout 
+                    x:Name="ScenesList"  
+                    BindableLayout.ItemsSource="{Binding SelectedSetting.Scenes}"
+                    Orientation="Horizontal">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <views:SceneCardView>
+                                <views:SceneCardView.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding BindingContext.SelectSceneCommand,Source={x:Reference ScenesList}}" 
+                                                          CommandParameter="{Binding .}"/>
+                                </views:SceneCardView.GestureRecognizers>
+                            </views:SceneCardView>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+            </ScrollView>
         </Grid>
 
         <!--Elements-->
-        <!--<Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*">
+        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="auto,*">
             <Grid Grid.Row="0" Padding="0,10" ColumnSpacing="10" ColumnDefinitions="auto,auto,auto,*,auto" Margin="10,0">
                 <Label Text="Elements" Grid.Column="0" Style="{StaticResource Headliner}" />
                 <Button Grid.Column="1" Style="{StaticResource HelpButton}" 
@@ -134,18 +134,20 @@
                 </StackLayout>
             </Grid>
             <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
-                <CollectionView x:Name="ElementsList" ItemsSource="{Binding SelectedSetting.Elements}" VerticalScrollBarVisibility="Never" Margin="5">
-                    <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="{Binding ElementsSpan}" HorizontalItemSpacing="0" VerticalItemSpacing="0"/>
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
+                <flv:FlowListView 
+                    FlowColumnCount="{Binding ElementsSpan}" SeparatorVisibility="None" HasUnevenRows="false"
+                    FlowItemsSource="{Binding SelectedSetting.Elements}" 
+                    FlowRowBackgroundColor="{StaticResource Dark}" 
+                    FlowTappedBackgroundColor="{StaticResource Dark}"
+                    SelectionMode="None">
+                    <flv:FlowListView.FlowColumnTemplate>
                         <DataTemplate>
                             <views:ElementPlayerView/>
                         </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                    </flv:FlowListView.FlowColumnTemplate>
+                </flv:FlowListView>
             </Frame>
-        </Grid>-->
+        </Grid>
 
         <!--Effects-->
         <Grid Grid.Row="3" Grid.Column="1" RowDefinitions="auto,*">
@@ -177,16 +179,18 @@
                 </StackLayout>
             </Grid>
             <Frame Grid.Row="1" Padding="0" BackgroundColor="{StaticResource Dark}" CornerRadius="{StaticResource CornerRadiusOuter}">
-                <CollectionView x:Name="EffectsList" ItemsSource="{Binding SelectedSetting.Effects}" VerticalScrollBarVisibility="Never" Margin="5">
-                    <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="{Binding EffectsSpan}"/>
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
+                <flv:FlowListView 
+                    FlowColumnCount="{Binding EffectsSpan}" SeparatorVisibility="None" HasUnevenRows="false"
+                    FlowItemsSource="{Binding SelectedSetting.Effects}" 
+                    FlowRowBackgroundColor="{StaticResource Dark}" 
+                    FlowTappedBackgroundColor="{StaticResource Dark}"
+                    SelectionMode="None">
+                    <flv:FlowListView.FlowColumnTemplate>
                         <DataTemplate>
                             <views:EffectPlayerView/>
                         </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                    </flv:FlowListView.FlowColumnTemplate>
+                </flv:FlowListView>
             </Frame>
         </Grid>
 
@@ -269,26 +273,26 @@
                                     <Style x:Key="SettingsLabel" TargetType="Label">
                                         <Setter Property="VerticalOptions" Value="Center"/>
                                         <Setter Property="VerticalTextAlignment" Value="Center"/>
-                                        <Setter Property="FontFamily" Value="Lora"/>
                                         <Setter Property="FontSize" Value="22"/>
+                                        <Setter Property="FontFamily" Value="Lora"/>
                                     </Style>
                                 </Grid.Resources>
                                 
-                                <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource SettingsLabel}" Text="Play in scene:"/>
+                                <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource SettingsLabel}" Text="Play in scene"/>
                                 <Label Grid.Row="0" Grid.Column="1" FontFamily="FAEX" Text="{x:Static icons:FAEXFont.PowerOff}" FontSize="28"
                                     VerticalOptions="Center" VerticalTextAlignment="Center"
                                     TextColor="{StaticResource TextColor}"/>
                                 <Switch Grid.Row="0" Grid.Column="2" OnColor="{StaticResource Green}" VerticalOptions="Center"
                                     IsToggled="{Binding SelectedSetting.MusicPlayer.IsOn}"/>
                                 
-                                <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource SettingsLabel}" Text="Repeat track:"/>
+                                <Label Grid.Row="1" Grid.Column="0" Style="{StaticResource SettingsLabel}" Text="Repeat track"/>
                                 <Label Grid.Row="1" Grid.Column="1" FontFamily="FAEX" Text="{x:Static icons:FAEXFont.Repeat}" FontSize="28"
                                     VerticalOptions="Center" VerticalTextAlignment="Center"
                                     TextColor="{StaticResource TextColor}"/>
                                 <Switch Grid.Row="1" Grid.Column="2" OnColor="{StaticResource Green}" VerticalOptions="Center"
                                     IsToggled="{Binding SelectedSetting.MusicPlayer.IsRepeat}"/>
 
-                                <Label Grid.Row="2" Grid.Column="0" Style="{StaticResource SettingsLabel}" Text="Shuffle tracks:"/>
+                                <Label Grid.Row="2" Grid.Column="0" Style="{StaticResource SettingsLabel}" Text="Shuffle tracks"/>
                                 <Label Grid.Row="2" Grid.Column="1" FontFamily="FAEX" Text="{x:Static icons:FAEXFont.Shuffle}" FontSize="28"
                                     VerticalOptions="Center" VerticalTextAlignment="Center"
                                     TextColor="{StaticResource TextColor}"/>
