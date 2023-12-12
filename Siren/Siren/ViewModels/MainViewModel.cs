@@ -464,7 +464,7 @@ namespace Siren.ViewModels
         private int _maxMusicTracksCount = 100;
         private async Task AddMusic()
         {
-            IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
+            IEnumerable<string> result = await FileManager.ChooseAndCopyToAppData();
 
             if (result.Count() + SelectedSetting.Music.Count() > _maxMusicTracksCount)
             {
@@ -473,11 +473,11 @@ namespace Siren.ViewModels
                 return;
             }
 
-            foreach (FileResult element in result)
+            foreach (string element in result)
             {
-                if (!SelectedSetting.Music.Any(x => x.FilePath.Equals(element.FullPath)))
+                if (!SelectedSetting.Music.Any(x => x.FilePath.Equals(element)))
                 {
-                    SceneComponentViewModel track = new SceneComponentViewModel { FilePath = element.FullPath };
+                    SceneComponentViewModel track = new SceneComponentViewModel { FilePath = element };
                     SelectedSetting.Music.Add(track);
                 }
             }
@@ -494,10 +494,17 @@ namespace Siren.ViewModels
             );
         }
 
-        private void DeleteMusicTrack(SceneComponentViewModel component)
+        private async Task DeleteMusicTrack(SceneComponentViewModel component)
         {
             SelectedSetting.Music.Remove(component);
             component.Dispose();
+
+            if (!SelectedSetting.Elements.Any(x => x.FilePath == component.FilePath)
+                && !SelectedSetting.Effects.Any(x => x.FilePath == component.FilePath))
+            {
+                await FileManager.DeleteFromAppData(Path.GetFileName(component.FilePath));
+            }
+
             OnPropertyChanged(nameof(CurrentMusicTracksCountString));
         }
 
@@ -618,7 +625,7 @@ namespace Siren.ViewModels
         public Command DeleteEffectCommand { get => new Command<SceneComponentViewModel>(async (effect) => await DeleteEffect(effect)); }
         public Command AddMusicCommand { get => new Command(async () => await AddMusic()); }
         public Command EditMusicCommand { get => new Command<SceneComponentViewModel>(async (music) => await GoToEditMusicTrack(music)); }
-        public Command DeleteMusicCommand { get => new Command<SceneComponentViewModel>(DeleteMusicTrack); }
+        public Command DeleteMusicCommand { get => new Command<SceneComponentViewModel>(async (music) => await DeleteMusicTrack(music)); }
         public Command PlayMusicCommand { get => new Command(async () => await PlayMusic()); }
         public Command GlobalPlayCommand { get => new Command(async () => await GlobalPlayStop()); }
         #endregion
