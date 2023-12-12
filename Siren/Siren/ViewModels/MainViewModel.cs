@@ -325,7 +325,7 @@ namespace Siren.ViewModels
         private int _maxElementsCount = 30;
         private async Task AddElements()
         {
-            IEnumerable<string> result = await FileManager.ChooseAndCopyToAppData();
+            IEnumerable<string> result = await FileManager.ChooseAndCopySoundsToAppData();
 
             if (result.Count() + SelectedSetting.Elements.Count() > _maxElementsCount)
             {
@@ -389,7 +389,7 @@ namespace Siren.ViewModels
         private int _maxEffectsCount = 30;
         private async Task AddEffects()
         {
-            IEnumerable<string> result = await FileManager.ChooseAndCopyToAppData();
+            IEnumerable<string> result = await FileManager.ChooseAndCopySoundsToAppData();
 
             if (result.Count() + SelectedSetting.Effects.Count() > _maxEffectsCount)
             {
@@ -464,7 +464,7 @@ namespace Siren.ViewModels
         private int _maxMusicTracksCount = 100;
         private async Task AddMusic()
         {
-            IEnumerable<string> result = await FileManager.ChooseAndCopyToAppData();
+            IEnumerable<string> result = await FileManager.ChooseAndCopySoundsToAppData();
 
             if (result.Count() + SelectedSetting.Music.Count() > _maxMusicTracksCount)
             {

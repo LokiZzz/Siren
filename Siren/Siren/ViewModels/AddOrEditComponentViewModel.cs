@@ -18,12 +18,14 @@ namespace Siren.ViewModels
     public class AddOrEditComponentViewModel : BaseViewModel, IQueryAttributable
     {
         private SceneManager SceneManager { get; }
+        private IFileManager FileManager { get; }
 
         public AddOrEditComponentViewModel()
         {
             SceneManager = DependencyService.Resolve<SceneManager>();
+            FileManager = DependencyService.Resolve<IFileManager>();
 
-            SelectImageCommand = new Command(SelectImage);
+            SelectImageCommand = new Command(async () => await SelectImage());
             SaveCommand = new Command(OnSave, ValidateSave);
             CancelCommand = new Command(OnCancel);
             PropertyChanged += (_, __) => SaveCommand.ChangeCanExecute();
@@ -52,7 +54,7 @@ namespace Siren.ViewModels
             set => SetProperty(ref _image, value); 
         }
 
-        private FileResult _imageFileResult;
+        private string _imageFileResult;
 
         private string _actionTitle;
         public string ActionTitle
@@ -76,15 +78,14 @@ namespace Siren.ViewModels
             OnPropertyChanged(nameof(ShowSceneTitle));
         }
 
-        private async void SelectImage()
+        private async Task SelectImage()
         {
-            _imageFileResult = await FilePicker.PickAsync(PickOptions.Images);
+            _imageFileResult = await FileManager.ChooseAndCopyImageToAppData();
 
             if (_imageFileResult != null)
             {
-                _imagePath = _imageFileResult.FullPath;
-                Stream stream = await _imageFileResult.OpenReadAsync();
-                Image = ImageSource.FromStream(() => stream);
+                _imagePath = _imageFileResult;
+                Image = ImageSource.FromFile(_imageFileResult);
             }
 
             UpdateVisibility();

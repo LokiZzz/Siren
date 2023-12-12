@@ -17,7 +17,8 @@ namespace Siren.Services
         Task<string> ChoosePlaceToSaveFileAsync(string fileName = null);
         
         Task OpenFolder(string folderPath);
-        Task<List<string>> ChooseAndCopyToAppData(string prefix = null);
+        Task<List<string>> ChooseAndCopySoundsToAppData();
+        Task<string> ChooseAndCopyImageToAppData();
         Task DeleteFromAppData(string fileName);
     }
 }

@@ -11,6 +11,7 @@ using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
 using Windows.System;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 [assembly: Dependency(typeof(FileManager))]
 namespace Siren.UWP.Services
@@ -33,7 +34,25 @@ namespace Siren.UWP.Services
             return result != null ? result.Path : null;
         }
 
-        public async Task<List<string>> ChooseAndCopyToAppData(string prefix = null)
+        public async Task<string> ChooseAndCopyImageToAppData()
+        {
+            FileOpenPicker picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".png");
+            StorageFile file = await picker.PickSingleFileAsync();
+
+            if (file != null)
+            {
+                StorageFolder dstFolder = ApplicationData.Current.LocalFolder;
+                StorageFile copy = await file.CopyAsync(dstFolder, file.Name, NameCollisionOption.ReplaceExisting);
+
+                return copy.Path;
+            }
+
+            return null;
+        }
+
+        public async Task<List<string>> ChooseAndCopySoundsToAppData()
         {
             List<string> copiedFiles = new List<string>();
             FileOpenPicker picker = new FileOpenPicker();
