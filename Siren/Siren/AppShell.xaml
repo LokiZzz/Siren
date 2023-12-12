@@ -2,7 +2,6 @@
 <Shell xmlns="http://xamarin.com/schemas/2014/forms" 
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:local="clr-namespace:Siren.Views"
-       xmlns:sp="clr-namespace:Siren.Views.SimplePlayer"
        Title="Siren"
        x:Class="Siren.AppShell">
 
@@ -55,12 +54,6 @@
             </Style>-->
         </ResourceDictionary>
     </Shell.Resources>
-
-    <TabBar>
-        <ShellContent Route="CheckPermissionPage" 
-                      Shell.FlyoutBehavior="Disabled"
-                      ContentTemplate="{DataTemplate local:CheckPermissionPage}" />
-    </TabBar>
 
     <FlyoutItem Title="Environment">
         <!--Icon="icon_about.png"-->

@@ -66,5 +66,11 @@ namespace Siren.Utility
                 _semaphoreSlim.Release(); 
             }
         }
+
+        public static async Task OpenAppDataFolder()
+        {
+            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+            await fileManager.OpenFolder(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+        }
     }
 }

@@ -4,15 +4,11 @@ using Siren.UWP.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.Devices.Geolocation;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
-using Xamarin.Essentials;
+using Windows.System;
 using Xamarin.Forms;
-using static System.Net.WebRequestMethods;
 
 [assembly: Dependency(typeof(FileManager))]
 namespace Siren.UWP.Services
@@ -79,6 +75,12 @@ namespace Siren.UWP.Services
             StorageFile file = await storageFolder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.OpenIfExists);
 
             return await file.OpenStreamForWriteAsync();
+        }
+
+        public async Task OpenFolder(string folderPath)
+        {
+            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(folderPath);
+            await Launcher.LaunchFolderAsync(storageFolder);
         }
 
         public async Task RequestFileSystemPermissionAsync()

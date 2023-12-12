@@ -1,20 +1,15 @@
 ﻿using Siren.Messaging;
-using Siren.Models;
 using Siren.Services;
+using Siren.Utility;
 using Siren.ViewModels.Help;
 using Siren.ViewModels.Players;
 using Siren.Views;
 using Siren.Views.Help;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Xml.Linq;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
@@ -749,6 +744,14 @@ namespace Siren.ViewModels
                 await Shell.Current.GoToAsync($"{nameof(HelpPage)}?topic={topic}")
             ); 
         }
+        #endregion
+
+        #region Other
+
+        public Command OpenAppDataCommand { get => new Command(async () => {
+            await LocalDataHelper.OpenAppDataFolder();
+        });}
+
         #endregion
     }
 }
