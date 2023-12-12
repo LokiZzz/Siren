@@ -34,51 +34,6 @@ namespace Siren.UWP.Services
             return result != null ? result.Path : null;
         }
 
-        public async Task<string> ChooseAndCopyImageToAppData()
-        {
-            FileOpenPicker picker = new FileOpenPicker();
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".png");
-            StorageFile file = await picker.PickSingleFileAsync();
-
-            if (file != null)
-            {
-                StorageFolder dstFolder = ApplicationData.Current.LocalFolder;
-                StorageFile copy = await file.CopyAsync(dstFolder, file.Name, NameCollisionOption.ReplaceExisting);
-
-                return copy.Path;
-            }
-
-            return null;
-        }
-
-        public async Task<List<string>> ChooseAndCopySoundsToAppData()
-        {
-            List<string> copiedFiles = new List<string>();
-            FileOpenPicker picker = new FileOpenPicker();
-            picker.FileTypeFilter.Add(".mp3");
-            picker.FileTypeFilter.Add(".wav");
-            IReadOnlyList<StorageFile> files = await picker.PickMultipleFilesAsync();
-
-            if (files.Count > 0)
-            {
-                foreach (StorageFile file in files)
-                {
-                    StorageFolder dstFolder = ApplicationData.Current.LocalFolder;
-                    StorageFile copy = await file.CopyAsync(dstFolder, file.Name, NameCollisionOption.ReplaceExisting);
-                    copiedFiles.Add(copy.Path);
-                }
-            }
-
-            return copiedFiles;
-        }
-
-        public async Task CreateFolderIfNotExistsAsync(string folderPath, string folderName)
-        {
-            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(folderPath);
-            await storageFolder.CreateFolderAsync(folderName, CreationCollisionOption.OpenIfExists);
-        }
-
         public async Task DeleteFileAsync(string filePath)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
@@ -111,12 +66,6 @@ namespace Siren.UWP.Services
             StorageFile file = await storageFolder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.OpenIfExists);
 
             return await file.OpenStreamForWriteAsync();
-        }
-
-        public async Task OpenFolder(string folderPath)
-        {
-            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(folderPath);
-            await Launcher.LaunchFolderAsync(storageFolder);
         }
 
         public async Task RequestFileSystemPermissionAsync()
@@ -163,6 +112,107 @@ namespace Siren.UWP.Services
         {
             StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName);
             await file.DeleteAsync();
+        }
+
+        public async Task<string> ChooseAndCopyImageToAppData()
+        {
+            FileOpenPicker picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".png");
+            StorageFile file = await picker.PickSingleFileAsync();
+
+            if (file != null)
+            {
+                StorageFolder dstFolder = ApplicationData.Current.LocalFolder;
+                StorageFile copy = await file.CopyAsync(dstFolder, file.Name, NameCollisionOption.ReplaceExisting);
+
+                return copy.Path;
+            }
+
+            return null;
+        }
+
+        public async Task<List<string>> ChooseAndCopySoundsToAppData()
+        {
+            List<string> copiedFiles = new List<string>();
+            FileOpenPicker picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".mp3");
+            picker.FileTypeFilter.Add(".wav");
+            IReadOnlyList<StorageFile> files = await picker.PickMultipleFilesAsync();
+
+            if (files.Count > 0)
+            {
+                foreach (StorageFile file in files)
+                {
+                    StorageFolder dstFolder = ApplicationData.Current.LocalFolder;
+                    StorageFile copy = await file.CopyAsync(dstFolder, file.Name, NameCollisionOption.ReplaceExisting);
+                    copiedFiles.Add(copy.Path);
+                }
+            }
+
+            return copiedFiles;
+        }
+
+        public async Task OpenFolder(string folderPath)
+        {
+            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(folderPath);
+            await Launcher.LaunchFolderAsync(storageFolder);
+        }
+
+        public async ValueTask<Stream> PickFolderAndGetStreamToWrite(string suggestedFileName)
+        {
+            FileSavePicker savePicker = new FileSavePicker();
+            savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            // Dropdown of file types the user can save the file as
+            savePicker.FileTypeChoices.Add("Siren bundle", new List<string>() { ".siren" });
+            // Default file name if the user does not type one in or select a file to replace
+            savePicker.SuggestedFileName = suggestedFileName;
+
+            StorageFile file = await savePicker.PickSaveFileAsync();
+
+            if (file != null)
+            {
+                return await file.OpenStreamForWriteAsync();
+            }
+            
+            return null;
+        }
+
+        public async ValueTask<Stream> PickAndGetStreamToRead()
+        {
+            FileOpenPicker picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".siren");
+            StorageFile file = await picker.PickSingleFileAsync();
+
+            if (file != null)
+            {
+                return await file.OpenStreamForReadAsync();
+            }
+            
+            return null;
+        }
+
+        public async ValueTask<Stream> GetStreamToReadFromAppDataAsync(string fileName)
+        {
+            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName);
+
+            return await file.OpenStreamForReadAsync();
+        }
+
+        public async Task CreateFolderForBundleFiles(Guid bundleId)
+        {
+            await ApplicationData.Current.LocalFolder.CreateFolderAsync(
+                bundleId.ToString(), 
+                CreationCollisionOption.OpenIfExists
+            );
+        }
+
+        public async ValueTask<Stream> GetStreamToWriteFileIntoBundleFolder(Guid bundleId, string fileName)
+        {
+            StorageFolder folder = await ApplicationData.Current.LocalFolder.GetFolderAsync(bundleId.ToString());
+            StorageFile file = await folder.CreateFileAsync(fileName);
+
+            return await file.OpenStreamForWriteAsync();
         }
     }
 }

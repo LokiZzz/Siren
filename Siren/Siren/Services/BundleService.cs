@@ -17,10 +17,10 @@ namespace Siren.Services
 {
     public interface IBundleService
     {
-        Task SaveBundleAsync(Bundle bundle, string filePath, CancellationToken cancellationToken);
-        Task<Bundle> LoadBundleAsync(string filePath, CancellationToken cancellationToken);
+        Task<bool> SaveBundleAsync(Bundle bundle, string filePath, CancellationToken cancellationToken);
+        Task<Bundle> LoadBundleAsync(List<Guid> installedBundles, CancellationToken cancellationToken);
         Task DeleteBundleFilesAsync(Guid bundleId);
-        Task<SirenFileMetaData> GetSirenFileMetaData(string filePath);
+        Task<SirenFileMetaData> GetSirenFileMetaData();
 
         event EventHandler<ProcessingProgress> OnCreateProgressUpdate;
         event EventHandler<ProcessingProgress> OnInstallProgressUpdate;
@@ -33,35 +33,34 @@ namespace Siren.Services
         const int _metadataFrameSize = 1024 * 1024; //1MB
         string _sirenFilePath = string.Empty;
 
-        //string SirenTempFile => $"{_sirenFilePath}.temp";
-
         public event EventHandler<ProcessingProgress> OnCreateProgressUpdate;
         public event EventHandler<ProcessingProgress> OnInstallProgressUpdate;
 
-        public async Task SaveBundleAsync(Bundle bundle, string filePath, CancellationToken cancellationToken)
+        public async Task<bool> SaveBundleAsync(Bundle bundle, string filePath, CancellationToken cancellationToken)
         {
             _fileManager = DependencyService.Resolve<IFileManager>();
             _sirenFilePath = filePath;
 
             try
             {
-                await CreateBundleAsync(bundle, cancellationToken);
+                return await CreateBundleAsync(bundle, cancellationToken);
             }
             catch(OperationCanceledException)
             {
                 OnCreateProgressUpdate(this, new ProcessingProgress(0, "Creating cancelled..."));
                 await _fileManager.DeleteFileAsync(_sirenFilePath);
+
+                return false;
             }
         }
 
-        public async Task<Bundle> LoadBundleAsync(string filePath, CancellationToken cancellationToken)
+        public async Task<Bundle> LoadBundleAsync(List<Guid> installedBundles, CancellationToken cancellationToken)
         {
             _fileManager = DependencyService.Resolve<IFileManager>();
-            _sirenFilePath = filePath;
 
             try
             {
-                return await UnpackBundleAsync(cancellationToken);
+                return await UnpackBundleAsync(installedBundles, cancellationToken);
             }
             catch (OperationCanceledException)
             {
@@ -71,7 +70,7 @@ namespace Siren.Services
             }
         }
 
-        public async Task CreateBundleAsync(Bundle bundle, CancellationToken cancellationToken)
+        private async Task<bool> CreateBundleAsync(Bundle bundle, CancellationToken cancellationToken)
         {
             //1. Create bundle model for metadata
             Bundle bundleCopy = bundle.GetDeepCopy();
@@ -84,47 +83,50 @@ namespace Siren.Services
             };
             List<string> filesToCompress = GetAllFilesFromBundle(bundleCopy);
 
-            using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+            Stream targetStream = await _fileManager.PickFolderAndGetStreamToWrite(_sirenFilePath);
+
+            if (targetStream != null)
             {
                 await targetStream.WriteAsync(new byte[_metadataFrameSize], 0, _metadataFrameSize);
-            }
 
-            foreach (string file in filesToCompress)
-            {
-                try
+                foreach (string file in filesToCompress)
                 {
-                    using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(file))
+                    try
                     {
-                        using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
+                        string fileName = Path.GetFileName(file);
+
+                        using (Stream sourceStream = await _fileManager.GetStreamToReadFromAppDataAsync(fileName))
                         {
-                            targetStream.Position = targetStream.Length;
                             await sourceStream.CopyToAsync(targetStream, 81920, cancellationToken);
                             metadata.Bundle.Size = targetStream.Length;
+
+                            metadata.CompressedFiles.Add(new CompressedFileInfo
+                            {
+                                Name = Path.GetFileName(file),
+                                SizeBytesBefore = sourceStream.Length,
+                            });
                         }
 
-                        metadata.CompressedFiles.Add(new CompressedFileInfo
-                        {
-                            Name = Path.GetFileName(file),
-                            SizeBytesBefore = sourceStream.Length,
-                        });
+                        double progress = (double)(filesToCompress.IndexOf(file) + 1) / (double)filesToCompress.Count();
+                        OnCreateProgressUpdate(this, new ProcessingProgress(progress, "Fusing files together..."));
                     }
-
-                    double progress = (double)(filesToCompress.IndexOf(file) + 1) / (double)filesToCompress.Count();
-                    OnCreateProgressUpdate(this, new ProcessingProgress(progress, "Fusing files together..."));
+                    catch(Exception ex)
+                    {
+                        throw ex;
+                    }
                 }
-                catch(Exception ex)
-                {
-                    throw ex;
-                }
-            }
 
-            //3. Add metadata to the created gap
-            using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(_sirenFilePath))
-            {
+                //3. Add metadata to the created gap
+                targetStream.Position = 0;
                 byte[] metadataFrame = new byte[_metadataFrameSize];
                 byte[] metadataActualBytes = ConvertToByteArray(metadata);
                 metadataActualBytes.CopyTo(metadataFrame, 0);
                 await targetStream.WriteAsync(metadataFrame, 0, _metadataFrameSize);
+
+                targetStream.Dispose();
+                OnCreateProgressUpdate(this, new ProcessingProgress(1, "Complete!"));
+
+                return true;
             }
 
             //4. Create a compressed bundle (*.siren) file
@@ -146,7 +148,7 @@ namespace Siren.Services
             //5. Delete temp file
             //await _fileManager.DeleteFileAsync(SirenTempFile);
 
-            OnCreateProgressUpdate(this, new ProcessingProgress(1, "Complete!"));
+            return false;
         }
 
         private void UpdateCompressingProgress(object sender, ProgressEventArgs e)
@@ -157,10 +159,8 @@ namespace Siren.Services
             ));
         }
 
-        public async Task<Bundle> UnpackBundleAsync(CancellationToken cancellationToken)
+        public async Task<Bundle> UnpackBundleAsync(List<Guid> installedBundles, CancellationToken cancellationToken)
         {
-            SirenFileMetaData metadata = null;
-
             //using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
             //{
             //    using (GZipStream decompressionStream = new GZipStream(sourceStream, CompressionMode.Decompress))
@@ -172,26 +172,22 @@ namespace Siren.Services
             //    }
             //}
 
-            using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
+            Stream sourceStream = await _fileManager.PickAndGetStreamToRead();
+
+            if (sourceStream != null)
             {
-                metadata = await GetMetadataModel(sourceStream);
-            }
+                SirenFileMetaData metadata = await GetMetadataModel(sourceStream);
 
-            await _fileManager.CreateFolderIfNotExistsAsync(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                metadata.Bundle.Id.ToString()
-            );
-
-            long offset = _metadataFrameSize;
-
-            foreach (CompressedFileInfo file in metadata.CompressedFiles)
-            {
-                using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(_sirenFilePath))
+                if(installedBundles.Any(x => x == metadata.Bundle.Id))
                 {
-                    sourceStream.Position = offset;
-                    string path = GetLocalAppDataBundleFilePath(file.Name, metadata.Bundle.Id);
+                    throw new BundleAlreadyInstalledException();
+                }
 
-                    using (Stream targetStream = await _fileManager.GetStreamToWriteAsync(path))
+                await _fileManager.CreateFolderForBundleFiles(metadata.Bundle.Id);
+
+                foreach (CompressedFileInfo file in metadata.CompressedFiles)
+                {
+                    using (Stream targetStream = await _fileManager.GetStreamToWriteFileIntoBundleFolder(metadata.Bundle.Id, file.Name))
                     {
                         try
                         {
@@ -213,26 +209,26 @@ namespace Siren.Services
 
                     double progress = (double)(metadata.CompressedFiles.IndexOf(file) + 1) / (double)metadata.CompressedFiles.Count();
                     OnInstallProgressUpdate(this, new ProcessingProgress(progress, "Unpacking elements..."));
-
-                    offset = sourceStream.Position;
                 }
+
+                //await _fileManager.DeleteFileAsync(SirenTempFile);
+
+                SetFilePathsToLocalAppData(metadata);
+
+                OnInstallProgressUpdate(this, new ProcessingProgress(1, "Complete!"));
+
+                return metadata.Bundle;
             }
 
-            //await _fileManager.DeleteFileAsync(SirenTempFile);
-
-            SetFilePathsToLocalAppData(metadata);
-
-            OnInstallProgressUpdate(this, new ProcessingProgress(1, "Complete!"));
-
-            return metadata.Bundle;
+            return null;
         }
 
-        public async Task<SirenFileMetaData> GetSirenFileMetaData(string path)
+        public async Task<SirenFileMetaData> GetSirenFileMetaData()
         {
             SirenFileMetaData metadata = null;
             _fileManager = DependencyService.Resolve<IFileManager>();
 
-            using (Stream sourceStream = await _fileManager.GetStreamToReadAsync(path))
+            using (Stream sourceStream = await _fileManager.PickAndGetStreamToRead())
             {
                 metadata = await GetMetadataModel(sourceStream);
             }
@@ -382,4 +378,6 @@ namespace Siren.Services
         public double Progress { get; set; }
         public string Message { get; set; }
     }
+
+    public class BundleAlreadyInstalledException : Exception { }
 }
