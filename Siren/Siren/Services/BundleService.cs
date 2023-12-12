@@ -83,7 +83,7 @@ namespace Siren.Services
             };
             List<string> filesToCompress = GetAllFilesFromBundle(bundleCopy);
 
-            Stream targetStream = await _fileManager.PickFolderAndGetStreamToWrite(_sirenFilePath);
+            Stream targetStream = await _fileManager.PickAndGetStreamToWrite(_sirenFilePath);
 
             if (targetStream != null)
             {
@@ -95,7 +95,7 @@ namespace Siren.Services
                     {
                         string fileName = Path.GetFileName(file);
 
-                        using (Stream sourceStream = await _fileManager.GetStreamToReadFromAppDataAsync(fileName))
+                        using (Stream sourceStream = await _fileManager.GetStreamToReadFromAppData(fileName))
                         {
                             await sourceStream.CopyToAsync(targetStream, 81920, cancellationToken);
                             metadata.Bundle.Size = targetStream.Length;
@@ -187,7 +187,7 @@ namespace Siren.Services
 
                 foreach (CompressedFileInfo file in metadata.CompressedFiles)
                 {
-                    using (Stream targetStream = await _fileManager.GetStreamToWriteFileIntoBundleFolder(metadata.Bundle.Id, file.Name))
+                    using (Stream targetStream = await _fileManager.GetStreamToWriteToBundleFolder(metadata.Bundle.Id, file.Name))
                     {
                         try
                         {

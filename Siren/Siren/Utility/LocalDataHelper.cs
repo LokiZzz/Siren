@@ -19,7 +19,7 @@ namespace Siren.Utility
             {
                 IFileManager fileManager = DependencyService.Resolve<IFileManager>();
 
-                using (Stream stream = await fileManager.GetStreamToReadAsync(path))
+                using (Stream stream = await fileManager.GetStreamToRead(path))
                 {
                     byte[] buffer = new byte[stream.Length];
                     await stream.ReadAsync(buffer, 0, buffer.Length);
@@ -28,7 +28,7 @@ namespace Siren.Utility
                     return JsonConvert.DeserializeObject<T>(content);
                 }
             }
-            catch(FileNotFoundException ex)
+            catch(FileNotFoundException)
             {
                 return null;
             }
@@ -55,7 +55,7 @@ namespace Siren.Utility
 
                 byte[] buffer = Encoding.UTF8.GetBytes(content);
 
-                using (Stream stream = await fileManager.GetStreamToWriteAsync(path))
+                using (Stream stream = await fileManager.GetStreamToWrite(path))
                 {
                     await stream.WriteAsync(buffer, 0, buffer.Length);
                 }

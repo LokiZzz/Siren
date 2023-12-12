@@ -7,33 +7,15 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
 using Windows.System;
 using Xamarin.Forms;
-using Xamarin.Forms.Internals;
 
 [assembly: Dependency(typeof(FileManager))]
 namespace Siren.UWP.Services
 {
     public class FileManager : IFileManager
     {
-        public async Task<string> ChoosePlaceToSaveFileAsync(string fileName = null)
-        {
-            Windows.Storage.Pickers.FileSavePicker savePicker = new Windows.Storage.Pickers.FileSavePicker();
-            savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
-
-            // Dropdown of file types the user can save the file as
-            savePicker.FileTypeChoices.Add("Siren file", new List<string>() { ".siren" });
-
-            // Default file name if the user does not type one in or select a file to replace
-            savePicker.SuggestedFileName = fileName;
-
-            StorageFile result = await savePicker.PickSaveFileAsync();
-
-            return result != null ? result.Path : null;
-        }
-
         public async Task DeleteFileAsync(string filePath)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
@@ -52,7 +34,7 @@ namespace Siren.UWP.Services
             await storageFolder.DeleteAsync();
         }
 
-        public async ValueTask<Stream> GetStreamToReadAsync(string filePath)
+        public async ValueTask<Stream> GetStreamToRead(string filePath)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
             StorageFile file = await storageFolder.GetFileAsync(Path.GetFileName(filePath));
@@ -60,7 +42,7 @@ namespace Siren.UWP.Services
             return await file.OpenStreamForReadAsync();
         }
 
-        public async ValueTask<Stream> GetStreamToWriteAsync(string filePath)
+        public async ValueTask<Stream> GetStreamToWrite(string filePath)
         {
             StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(filePath));
             StorageFile file = await storageFolder.CreateFileAsync(Path.GetFileName(filePath), CreationCollisionOption.OpenIfExists);
@@ -159,7 +141,7 @@ namespace Siren.UWP.Services
             await Launcher.LaunchFolderAsync(storageFolder);
         }
 
-        public async ValueTask<Stream> PickFolderAndGetStreamToWrite(string suggestedFileName)
+        public async ValueTask<Stream> PickAndGetStreamToWrite(string suggestedFileName)
         {
             FileSavePicker savePicker = new FileSavePicker();
             savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
@@ -192,7 +174,7 @@ namespace Siren.UWP.Services
             return null;
         }
 
-        public async ValueTask<Stream> GetStreamToReadFromAppDataAsync(string fileName)
+        public async ValueTask<Stream> GetStreamToReadFromAppData(string fileName)
         {
             StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName);
 
@@ -207,7 +189,7 @@ namespace Siren.UWP.Services
             );
         }
 
-        public async ValueTask<Stream> GetStreamToWriteFileIntoBundleFolder(Guid bundleId, string fileName)
+        public async ValueTask<Stream> GetStreamToWriteToBundleFolder(Guid bundleId, string fileName)
         {
             StorageFolder folder = await ApplicationData.Current.LocalFolder.GetFolderAsync(bundleId.ToString());
             StorageFile file = await folder.CreateFileAsync(fileName);

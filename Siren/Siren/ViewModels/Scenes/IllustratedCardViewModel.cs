@@ -59,7 +59,7 @@ namespace Siren.ViewModels
         {
             IFileManager fileManager = DependencyService.Resolve<IFileManager>();
 
-            return await fileManager.GetStreamToReadAsync(path);
+            return await fileManager.GetStreamToRead(path);
         }
     }
 }
