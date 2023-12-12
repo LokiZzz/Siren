@@ -2,6 +2,7 @@
 using Siren.UWP.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -90,7 +91,8 @@ namespace Siren.UWP.Services
         private MediaSource _source = null;
         public async Task LoadAsync(string path)
         {
-            StorageFile file = await StorageFile.GetFileFromPathAsync(path);
+            string fileName = Path.GetFileName(path);
+            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName);
             _source = MediaSource.CreateFromStorageFile(file);
             await _source.OpenAsync();
             _player.Source = _source;

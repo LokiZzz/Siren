@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace Siren.Services
 {
@@ -13,10 +14,10 @@ namespace Siren.Services
         Task CreateFolderIfNotExistsAsync(string folderPath, string folderName);
         Task DeleteFileAsync(string filePath);
         Task DeleteFolderAsync(string folderPath);
-        Task<bool> TestFileManagerAsync();
-        Task RequestFileSystemPermissionAsync();
         Task<string> ChoosePlaceToSaveFileAsync(string fileName = null);
-        void ClearAccessList();
+        
         Task OpenFolder(string folderPath);
+        Task<List<string>> ChooseAndCopyToAppData(string prefix = null);
+        Task DeleteFromAppData(string fileName);
     }
 }

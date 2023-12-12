@@ -8,6 +8,7 @@ using Siren.Views.Help;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
@@ -19,11 +20,13 @@ namespace Siren.ViewModels
     public class MainViewModel : BaseViewModel
     {
         private SceneManager SceneManager { get; }
+        private IFileManager FileManager { get; }
 
         public MainViewModel()
         {
             InitializeMessagingCenter();
             SceneManager = DependencyService.Get<SceneManager>();
+            FileManager = DependencyService.Get<IFileManager>();
             Task.Run(async () => { await IntializeCollections(); }).Wait();
         }
 
@@ -322,9 +325,7 @@ namespace Siren.ViewModels
         private int _maxElementsCount = 30;
         private async Task AddElements()
         {
-            ClearAccessList();
-
-            IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
+            IEnumerable<string> result = await FileManager.ChooseAndCopyToAppData();
 
             if (result.Count() + SelectedSetting.Elements.Count() > _maxElementsCount)
             {
@@ -333,11 +334,11 @@ namespace Siren.ViewModels
                 return;
             }
 
-            foreach (FileResult element in result)
+            foreach (string element in result)
             {
-                if (!SelectedSetting.Elements.Any(x => x.FilePath.Equals(element.FullPath)))
+                if (!SelectedSetting.Elements.Any(x => x.FilePath.Equals(element)))
                 {
-                    SceneComponentViewModel player = new SceneComponentViewModel { Loop = true, FilePath = element.FullPath };
+                    SceneComponentViewModel player = new SceneComponentViewModel { Loop = true, FilePath = element };
                     SelectedSetting.Elements.Add(player);
                 }
             }
@@ -354,10 +355,17 @@ namespace Siren.ViewModels
             );
         }
 
-        private void DeleteElement(SceneComponentViewModel component)
+        private async Task DeleteElement(SceneComponentViewModel component)
         {
             SelectedSetting.Elements.Remove(component);
             component.Dispose();
+
+            if (!SelectedSetting.Effects.Any(x => x.FilePath == component.FilePath)
+                && !SelectedSetting.Music.Any(x => x.FilePath == component.FilePath))
+            {
+                await FileManager.DeleteFromAppData(Path.GetFileName(component.FilePath));
+            }
+
             OnPropertyChanged(nameof(CurrentElementsCountString));
         }
 
@@ -381,9 +389,7 @@ namespace Siren.ViewModels
         private int _maxEffectsCount = 30;
         private async Task AddEffects()
         {
-            ClearAccessList();
-
-            IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
+            IEnumerable<string> result = await FileManager.ChooseAndCopyToAppData();
 
             if (result.Count() + SelectedSetting.Effects.Count() > _maxEffectsCount)
             {
@@ -392,11 +398,11 @@ namespace Siren.ViewModels
                 return;
             }
 
-            foreach (FileResult element in result)
+            foreach (string element in result)
             {
-                if (!SelectedSetting.Effects.Any(x => x.FilePath.Equals(element.FullPath)))
+                if (!SelectedSetting.Effects.Any(x => x.FilePath.Equals(element)))
                 {
-                    SceneComponentViewModel player = new SceneComponentViewModel { FilePath = element.FullPath };
+                    SceneComponentViewModel player = new SceneComponentViewModel { FilePath = element };
                     SelectedSetting.Effects.Add(player);
                 }
             }
@@ -413,10 +419,17 @@ namespace Siren.ViewModels
             );
         }
 
-        private void DeleteEffect(SceneComponentViewModel component)
+        private async Task DeleteEffect(SceneComponentViewModel component)
         {
             SelectedSetting.Effects.Remove(component);
             component.Dispose();
+
+            if (!SelectedSetting.Elements.Any(x => x.FilePath == component.FilePath)
+                && !SelectedSetting.Music.Any(x => x.FilePath == component.FilePath))
+            {
+                await FileManager.DeleteFromAppData(Path.GetFileName(component.FilePath));
+            }
+
             OnPropertyChanged(nameof(CurrentEffectsCountString));
         }
 
@@ -451,8 +464,6 @@ namespace Siren.ViewModels
         private int _maxMusicTracksCount = 100;
         private async Task AddMusic()
         {
-            ClearAccessList();
-
             IEnumerable<FileResult> result = await FilePicker.PickMultipleAsync(PickOptions.Default);
 
             if (result.Count() + SelectedSetting.Music.Count() > _maxMusicTracksCount)
@@ -601,10 +612,10 @@ namespace Siren.ViewModels
         public Command MoveSceneRightCommand { get => new Command<SceneViewModel>(async (scene) => await MoveScene(scene, false)); }
         public Command AddElementsCommand { get => new Command(async () => await AddElements()); }
         public Command EditElementCommand { get => new Command<SceneComponentViewModel>(async (element) => await GoToEditElement(element)); }
-        public Command DeleteElementCommand { get => new Command<SceneComponentViewModel>(DeleteElement); }
+        public Command DeleteElementCommand { get => new Command<SceneComponentViewModel>(async (element) => await DeleteElement(element)); }
         public Command AddEffectsCommand { get => new Command(async () => await AddEffects()); }
         public Command EditEffectCommand { get => new Command<SceneComponentViewModel>(async (effect) => await GoToEditEffect(effect)); }
-        public Command DeleteEffectCommand { get => new Command<SceneComponentViewModel>(DeleteEffect); }
+        public Command DeleteEffectCommand { get => new Command<SceneComponentViewModel>(async (effect) => await DeleteEffect(effect)); }
         public Command AddMusicCommand { get => new Command(async () => await AddMusic()); }
         public Command EditMusicCommand { get => new Command<SceneComponentViewModel>(async (music) => await GoToEditMusicTrack(music)); }
         public Command DeleteMusicCommand { get => new Command<SceneComponentViewModel>(DeleteMusicTrack); }
@@ -728,12 +739,6 @@ namespace Siren.ViewModels
                 $"You have selected too many files, split them into groups and put them in different settings.",
                 "Ok :("
             );
-        }
-
-        private void ClearAccessList()
-        {
-            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
-            fileManager.ClearAccessList();
         }
         #endregion
 

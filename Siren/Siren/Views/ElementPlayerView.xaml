@@ -4,7 +4,8 @@
              x:Class="Siren.Views.ElementPlayerView"
              xmlns:viewmodels="clr-namespace:Siren.ViewModels" 
              x:DataType="viewmodels:SceneComponentViewModel"
-             xmlns:icons="clr-namespace:Siren.Assets">
+             xmlns:icons="clr-namespace:Siren.Assets"
+             xmlns:flv="clr-namespace:DLToolkit.Forms.Controls;assembly=DLToolkit.Forms.Controls.FlowListView">
 
     <Grid Margin="5" RowDefinitions="auto" ColumnDefinitions="*">
         <Frame Padding="0" BackgroundColor="{StaticResource Light}" CornerRadius="{StaticResource CornerRadiusMedium}">            
@@ -48,7 +49,7 @@
 
                 <Button Grid.Row="0" Grid.Column="2"
                         Style="{StaticResource DeleteButton}"
-                        Command="{Binding BindingContext.DeleteElementCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                        Command="{Binding BindingContext.DeleteElementCommand,Source={RelativeSource AncestorType={x:Type flv:FlowListView}}}" 
                         CommandParameter="{Binding .}"/>
 
                 <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" TextColor="{StaticResource TextColor}" 
@@ -57,7 +58,7 @@
                         VerticalTextAlignment="Center"
                         LineBreakMode="TailTruncation"/>
                 <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource EditButton}"
-                        Command="{Binding BindingContext.EditElementCommand,Source={RelativeSource AncestorType={x:Type CollectionView}}}" 
+                        Command="{Binding BindingContext.EditElementCommand,Source={RelativeSource AncestorType={x:Type flv:FlowListView}}}" 
                         CommandParameter="{Binding .}"/>
 
 

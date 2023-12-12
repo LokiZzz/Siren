@@ -4,9 +4,11 @@ using Siren.UWP.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
+using Windows.Storage.Pickers;
 using Windows.System;
 using Xamarin.Forms;
 
@@ -31,10 +33,25 @@ namespace Siren.UWP.Services
             return result != null ? result.Path : null;
         }
 
-        public void ClearAccessList()
+        public async Task<List<string>> ChooseAndCopyToAppData(string prefix = null)
         {
-            StorageApplicationPermissions.FutureAccessList.Clear();
-            StorageApplicationPermissions.MostRecentlyUsedList.Clear();
+            List<string> copiedFiles = new List<string>();
+            FileOpenPicker picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".mp3");
+            picker.FileTypeFilter.Add(".wav");
+            IReadOnlyList<StorageFile> files = await picker.PickMultipleFilesAsync();
+
+            if (files.Count > 0)
+            {
+                foreach (StorageFile file in files)
+                {
+                    StorageFolder dstFolder = ApplicationData.Current.LocalFolder;
+                    StorageFile copy = await file.CopyAsync(dstFolder, file.Name, NameCollisionOption.ReplaceExisting);
+                    copiedFiles.Add(copy.Path);
+                }
+            }
+
+            return copiedFiles;
         }
 
         public async Task CreateFolderIfNotExistsAsync(string folderPath, string folderName)
@@ -121,6 +138,12 @@ namespace Siren.UWP.Services
             {
                 return false;
             }
+        }
+
+        public async Task DeleteFromAppData(string fileName)
+        {
+            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName);
+            await file.DeleteAsync();
         }
     }
 }
