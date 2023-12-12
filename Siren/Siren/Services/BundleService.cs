@@ -327,32 +327,6 @@ namespace Siren.Services
 
             return elements.Union(effects).Union(music).Union(settingsImages).Union(scenesImages).ToList();
         }
-
-        private async Task<string> GetProba(Stream stream, int from, int size)
-        {
-            byte[] bytes = await GetBytes(stream, from, size);
-            string output = string.Empty;
-
-            foreach(byte b in bytes)
-            {
-                output += b.ToString() + "\t";
-            }
-
-            return output;
-        }
-
-        private async Task<byte[]> GetBytes(Stream stream, int from, int size)
-        {
-            long initialPosition = stream.Position;
-
-            byte[] output = new byte[size];
-            stream.Position = from;
-            await stream.ReadAsync(output, 0, size);
-
-            stream.Position = initialPosition;
-
-            return output;
-        }
     }
 
     public class SirenFileMetaData
