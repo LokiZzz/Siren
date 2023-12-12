@@ -38,6 +38,8 @@ namespace Siren.ViewModels
                 .Where(x => x.Id != Guid.Empty)
                 .Select(x => new BundleViewModel(x))
                 .ToObservableCollection();
+
+            OnPropertyChanged(nameof(Bundles));
         }
 
         public ObservableCollection<BundleViewModel> Bundles { get; set; } = new ObservableCollection<BundleViewModel>();
@@ -151,31 +153,12 @@ namespace Siren.ViewModels
             Bundle bundleToRemove = bundles.FirstOrDefault(x => x.Id == bundleId);
             bundles.Remove(bundleToRemove);
             await SceneManager.SaveEnvironment(bundles);
-
-            MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
-
             await BundleService.DeleteBundleFilesAsync(bundleId);
-
             Bundles.Remove(Bundles.First(x => x.Bundle.Id == bundleId));
 
+            await InitializeInstalledBundles();
+            MessagingCenter.Send(this, Messages.NeedToUpdateEnvironment);
             IsBusy = false;
-        }
-
-        private PickOptions GetSirenFilePickOption()
-        {
-            FilePickerFileType customFileType =
-                new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-                {
-                    { DevicePlatform.Android, new[] { ".siren" } },
-                    { DevicePlatform.UWP, new[] { ".siren" } },
-                }
-            );
-
-            return new PickOptions
-            {
-                PickerTitle = "Please select a Siren file",
-                FileTypes = customFileType,
-            };
         }
 
         private string GetNewBundleFileName()
