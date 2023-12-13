@@ -9,14 +9,14 @@
   IgnorableNamespaces="uap uap3 mp">
 
   <Identity
-    Name="24A5919B-B795-4CAD-B938-3FB85A3E4EA2"
-    Publisher="CN=Igor"
-    Version="1.0.9.0" />
+    Name="29337LokitheGloomyDragon.180963C2199F7"
+    Publisher="CN=36235AE0-46F3-4839-A9D3-F5A13E6FEFE8"
+    Version="1.0.10.0" />
 
-  <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="e112371f-98a6-4451-9604-9eb5f40cb940" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Siren.UWP</DisplayName>
+    <DisplayName>Siren TTRPG player</DisplayName>
     <PublisherDisplayName>Loki the Gloomy Dragon</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
