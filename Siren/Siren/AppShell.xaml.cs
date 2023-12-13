@@ -18,6 +18,7 @@ namespace Siren
             Routing.RegisterRoute(nameof(AddOrEditComponentPage), typeof(AddOrEditComponentPage));
             Routing.RegisterRoute(nameof(BundlePage), typeof(BundlePage));
             Routing.RegisterRoute(nameof(HelpPage), typeof(HelpPage));
+            Routing.RegisterRoute(nameof(ThanksPage), typeof(ThanksPage));
         }
     }
 }

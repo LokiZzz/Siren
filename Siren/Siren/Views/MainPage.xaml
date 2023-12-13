@@ -71,7 +71,18 @@
             <Button Style="{StaticResource HelpButton}" Command="{Binding GoToHelpCommand}" CommandParameter="{x:Static help:EHelpTopic.Scene}"/>
         </StackLayout>
 
-        <StackLayout Grid.Row="0" Grid.Column="2" HorizontalOptions="End" Margin="0,0,10,0">
+        <StackLayout 
+            Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" 
+            HorizontalOptions="EndAndExpand" Orientation="Horizontal" 
+            Spacing="10"
+            Margin="0,0,10,0">
+            <Label Text="Give thanks" Style="{StaticResource Headliner}"/>
+            <Button 
+                Style="{StaticResource HelpButton}"
+                Text="{x:Static icons:FAFont.Heart}" 
+                Command="{Binding ThanksCommand}"
+                Margin="0,0,15,0"/>
+            <Label Text="Open data" Style="{StaticResource Headliner}"/>
             <Button 
                 Style="{StaticResource HelpButton}"
                 Text="{x:Static icons:FAFont.FolderOpen}" 

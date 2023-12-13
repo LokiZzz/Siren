@@ -764,6 +764,13 @@ namespace Siren.ViewModels
             await LocalDataHelper.OpenAppDataFolder();
         });}
 
+        public Command ThanksCommand
+        {
+            get => new Command(async () => {
+                await Shell.Current.GoToAsync(nameof(ThanksPage));
+            });
+        }
+
         #endregion
     }
 }

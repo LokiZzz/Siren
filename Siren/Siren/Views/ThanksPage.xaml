@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:local="clr-namespace:Siren;assembly=Siren"
+             xmlns:vm="clr-namespace:Siren.ViewModels"
+             xmlns:icons="clr-namespace:Siren.Assets" 
+             xmlns:converters="clr-namespace:Siren.Views.Converters"
+             x:Class="Siren.Views.ThanksPage"
+             BackgroundColor="{StaticResource VeryDark}">
+
+    <ContentPage.Content>
+        <Grid ColumnDefinitions="500" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="{Binding ShowMessage}" Margin="0,-40,0,0">
+            <Frame BackgroundColor="{StaticResource Medium}" CornerRadius="15" Padding="20">
+                <StackLayout Spacing="10">
+
+                    <Label Text="Give thanks" FontFamily="Lora" FontSize="Large" Margin="0,15,0,15"/>
+                    <Frame BackgroundColor="{StaticResource Medium}" CornerRadius="10" Padding="0">
+                        <Image Source="Assets/qrCode.png" Margin="-10"/>
+                    </Frame>
+                    <Button 
+                        Text="Or go to browser..." 
+                        Clicked="Button_Clicked" 
+                        CornerRadius="10" 
+                        Margin="-2"
+                        HeightRequest="50"
+                        BorderColor="White"/>
+
+                </StackLayout>
+            </Frame>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
