@@ -24,5 +24,13 @@ namespace Siren.Views
                 BrowserLaunchMode.SystemPreferred
             );
         }
+
+        private async void Button_Clicked_1(object sender, EventArgs e)
+        {
+            await Browser.OpenAsync(
+                "https://vk.com/loki_z",
+                BrowserLaunchMode.SystemPreferred
+            );
+        }
     }
 }

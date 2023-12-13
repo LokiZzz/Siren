@@ -24,7 +24,13 @@
                         Margin="-2"
                         HeightRequest="50"
                         BorderColor="White"/>
-
+                    <Button 
+                        Text="Contact author..." 
+                        Clicked="Button_Clicked_1" 
+                        CornerRadius="10" 
+                        Margin="-2"
+                        HeightRequest="50"
+                        BorderColor="White"/>
                 </StackLayout>
             </Frame>
         </Grid>
