@@ -771,6 +771,8 @@ namespace Siren.ViewModels
             });
         }
 
+        public string CurrentVersion => VersionTracking.CurrentVersion;
+
         #endregion
     }
 }
