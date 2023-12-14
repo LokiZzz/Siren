@@ -85,7 +85,7 @@ namespace Siren.ViewModels
             if (_imageFileResult != null)
             {
                 _imagePath = _imageFileResult;
-                Image = ImageSource.FromFile(_imageFileResult);
+                Image = ImageSource.FromStream(async (_) => await _imagePath.GetStream());
             }
 
             UpdateVisibility();

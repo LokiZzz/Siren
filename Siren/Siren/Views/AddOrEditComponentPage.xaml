@@ -29,7 +29,7 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <Grid ColumnDefinitions="500" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="{Binding ShowMessage}" Margin="0,-40,0,0">
+        <Grid ColumnDefinitions="500" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,-40,0,0">
             <Frame BackgroundColor="{StaticResource Medium}" CornerRadius="15" Padding="20">
                 <StackLayout Spacing="10">
 

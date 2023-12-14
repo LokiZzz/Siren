@@ -39,7 +39,7 @@ namespace Siren.ViewModels
                 if (!string.IsNullOrEmpty(_imagePath))
                 {
                     IFileManager fileManager = DependencyService.Resolve<IFileManager>();
-                    Image = ImageSource.FromStream(async (_) => await GetStream(_imagePath)); ;
+                    Image = ImageSource.FromStream(async (_) => await _imagePath.GetStream());
                 }
                 OnPropertyChanged(nameof(Image));
             }
@@ -47,28 +47,10 @@ namespace Siren.ViewModels
 
         public bool HasImage => Image != null;
 
-        public async Task DeleteImageFileAsync()
+        public void ClearImage()
         {
             Image?.Cancel();
             Image = null;
-
-            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
-            await fileManager.DeleteFileAsync(ImagePath);
-            ImagePath = null;
-        }
-
-        private async Task<Stream> GetStream(string path)
-        {
-            IFileManager fileManager = DependencyService.Resolve<IFileManager>();
-            MemoryStream memoryStream = new MemoryStream();
-
-            Stream sourceStream = await fileManager.GetStreamToRead(path);
-            sourceStream.CopyTo(memoryStream);
-            sourceStream.Close();
-            sourceStream.Dispose();
-            memoryStream.Position = 0;
-            
-            return memoryStream;
         }
     }
 }

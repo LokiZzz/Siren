@@ -1,4 +1,5 @@
 ﻿using Siren.Messaging;
+using Siren.Models;
 using Siren.Services;
 using Siren.Utility;
 using Siren.ViewModels.Help;
@@ -131,9 +132,13 @@ namespace Siren.ViewModels
                     setting.Elements.ForEach(x => x.Dispose());
                     setting.Effects.Clear();
                     setting.Effects.ForEach(x => x.Dispose());
-                    await setting.DeleteImageFileAsync();
+                    setting.ClearImage();
                     AddEvents();
                     Settings.Remove(setting);
+
+                    //Это важный костыль, без него лист требует фокуса на элементе, прежде чем
+                    //начнут работать бундинги команд на удаление, редактирование и прочее.
+                    Settings = new ObservableCollection<SettingViewModel>(Settings.ToList());
 
                     if (!Settings.Any())
                     {
@@ -286,6 +291,11 @@ namespace Siren.ViewModels
             if (wantToDelete)
             {
                 SelectedSetting.Scenes.Remove(scene);
+
+                if (Settings.CanDeleteSettingAsset(SelectedSetting, scene.ImagePath))
+                {
+                    await FileManager.DeleteFileAsync(scene.ImagePath);
+                }
             }
         }
 
@@ -379,11 +389,13 @@ namespace Siren.ViewModels
             SelectedSetting.Elements.Remove(component);
             component.Dispose();
 
-            if (!SelectedSetting.Effects.Any(x => x.FilePath == component.FilePath)
-                && !SelectedSetting.Music.Any(x => x.FilePath == component.FilePath))
+            if (Settings.CanDeleteSettingAsset(SelectedSetting, component.FilePath))
             {
                 await FileManager.DeleteFromAppData(Path.GetFileName(component.FilePath));
             }
+
+            //Важный костыль (см. похожие комментарии)
+            SelectedSetting.Elements = new ObservableCollection<SceneComponentViewModel>(SelectedSetting.Elements);
 
             OnPropertyChanged(nameof(CurrentElementsCountString));
         }
@@ -443,11 +455,13 @@ namespace Siren.ViewModels
             SelectedSetting.Effects.Remove(component);
             component.Dispose();
 
-            if (!SelectedSetting.Elements.Any(x => x.FilePath == component.FilePath)
-                && !SelectedSetting.Music.Any(x => x.FilePath == component.FilePath))
+            if (Settings.CanDeleteSettingAsset(SelectedSetting, component.FilePath))
             {
                 await FileManager.DeleteFromAppData(Path.GetFileName(component.FilePath));
             }
+
+            //Важный костыль (см. другие такие комменты)
+            SelectedSetting.Effects = new ObservableCollection<SceneComponentViewModel>(SelectedSetting.Effects);
 
             OnPropertyChanged(nameof(CurrentEffectsCountString));
         }
@@ -518,11 +532,12 @@ namespace Siren.ViewModels
             SelectedSetting.Music.Remove(component);
             component.Dispose();
 
-            if (!SelectedSetting.Elements.Any(x => x.FilePath == component.FilePath)
-                && !SelectedSetting.Effects.Any(x => x.FilePath == component.FilePath))
+            if (Settings.CanDeleteSettingAsset(SelectedSetting, component.FilePath))
             {
                 await FileManager.DeleteFromAppData(Path.GetFileName(component.FilePath));
             }
+
+            SelectedSetting.Music = new ObservableCollection<SceneComponentViewModel>(SelectedSetting.Music);
 
             OnPropertyChanged(nameof(CurrentMusicTracksCountString));
         }

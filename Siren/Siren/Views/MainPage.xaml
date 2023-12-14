@@ -97,14 +97,19 @@
             <flv:FlowListView 
                 Grid.Row="1"
                 FlowColumnCount="1" SeparatorVisibility="None" HasUnevenRows="false"
-	            FlowItemTappedCommand="{Binding SelectSettingCommand}" 
 	            FlowItemsSource="{Binding Settings}" 
                 FlowRowBackgroundColor="{StaticResource VeryDark}" 
                 FlowTappedBackgroundColor="{StaticResource VeryDark}"
                 SelectionMode="None">
                 <flv:FlowListView.FlowColumnTemplate>
                     <DataTemplate>
-                        <views:SettingCardView/>
+                        <views:SettingCardView>
+                            <views:SettingCardView.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding BindingContext.SelectSettingCommand,Source={RelativeSource AncestorType={x:Type flv:FlowListView}}}"
+                                    CommandParameter="{Binding .}"/>
+                            </views:SettingCardView.GestureRecognizers>
+                        </views:SettingCardView>
                     </DataTemplate>
                 </flv:FlowListView.FlowColumnTemplate>
             </flv:FlowListView>
