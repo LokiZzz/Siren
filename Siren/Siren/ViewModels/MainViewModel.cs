@@ -120,7 +120,17 @@ namespace Siren.ViewModels
                     IsBusy = true;
 
                     RemoveEvents();
-                    setting.Scenes.Clear();
+
+                    foreach (SceneViewModel scene in setting.Scenes.ToList())
+                    {
+                        if (Settings.CanDeleteSettingAsset(setting, scene.ImagePath))
+                        {
+                            await FileManager.DeleteFileAsync(scene.ImagePath);
+                        }
+
+                        setting.Scenes.Remove(scene);
+                    }
+
                     await ClearComponents(setting, setting.Elements);
                     await ClearComponents(setting, setting.Effects);
                     await ClearComponents(setting, setting.Music);
