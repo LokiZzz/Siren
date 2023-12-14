@@ -38,7 +38,8 @@ namespace Siren.ViewModels
                 _imagePath = value;
                 if (!string.IsNullOrEmpty(_imagePath))
                 {
-                    Image = ImageSource.FromStream(async (token) => await GetStream(token, _imagePath));
+                    IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+                    Image = ImageSource.FromStream(async (_) => await GetStream(_imagePath)); ;
                 }
                 OnPropertyChanged(nameof(Image));
             }
@@ -53,13 +54,21 @@ namespace Siren.ViewModels
 
             IFileManager fileManager = DependencyService.Resolve<IFileManager>();
             await fileManager.DeleteFileAsync(ImagePath);
+            ImagePath = null;
         }
 
-        private async Task<Stream> GetStream(CancellationToken cancelToken, string path)
+        private async Task<Stream> GetStream(string path)
         {
             IFileManager fileManager = DependencyService.Resolve<IFileManager>();
+            MemoryStream memoryStream = new MemoryStream();
 
-            return await fileManager.GetStreamToRead(path);
+            Stream sourceStream = await fileManager.GetStreamToRead(path);
+            sourceStream.CopyTo(memoryStream);
+            sourceStream.Close();
+            sourceStream.Dispose();
+            memoryStream.Position = 0;
+            
+            return memoryStream;
         }
     }
 }

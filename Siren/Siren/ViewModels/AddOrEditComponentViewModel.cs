@@ -93,7 +93,13 @@ namespace Siren.ViewModels
 
         private bool ValidateSave() => !string.IsNullOrWhiteSpace(_name);
 
-        private async void OnCancel() => await Shell.Current.GoToAsync("..");
+        private async void OnCancel()
+        {
+            await Shell.Current.GoToAsync("..");
+
+            Image?.Cancel();
+            Image = null;
+        }
 
         private async void OnSave()
         {
@@ -108,6 +114,9 @@ namespace Siren.ViewModels
                     break;
             }
 
+            Image?.Cancel();
+            Image = null;
+
             await Shell.Current.GoToAsync("..");
         }
 
@@ -116,7 +125,7 @@ namespace Siren.ViewModels
             switch (ComponentType)
             {
                 case EComponentType.Setting:
-                    SceneManager.AddSetting(new SettingViewModel { Name = this.Name, ImagePath = _imagePath,Image = this.Image });
+                    SceneManager.AddSetting(new SettingViewModel { Name = this.Name, ImagePath = _imagePath, Image = this.Image });
                     break;
                 case EComponentType.Scene:
                     SceneManager.AddScene(new SceneViewModel { Name = this.Name, ImagePath = _imagePath, Image = this.Image });

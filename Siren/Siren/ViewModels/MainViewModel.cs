@@ -8,6 +8,7 @@ using Siren.Views.Help;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -112,32 +113,50 @@ namespace Siren.ViewModels
 
             if (wantToDelete)
             {
-                RemoveEvents();
-                setting.Scenes.Clear();
-                setting.Elements.ForEach(x => x.Dispose());
-                setting.Elements.Clear();
-                setting.Effects.ForEach(x => x.Dispose());
-                setting.Effects.Clear();
-                AddEvents();
-                Settings.Remove(setting);
+                try
+                {
+                    IsBusy = true;
 
-                if (!Settings.Any())
-                {
-                    await SelectSetting(null);
-                    await SelectScene(null);
-                }
-                else
-                {
-                    if(SelectedSetting == setting)
+                    foreach (string file in setting.GetAllSettingsFiles())
                     {
-                        await SelectSetting(Settings.First());
+                        if (Settings.CanDeleteSettingAsset(setting, file))
+                        {
+                            await FileManager.DeleteFileAsync(file);
+                        }
                     }
-                }
 
-                OnPropertyChanged(nameof(CurrentElementsCountString));
-                OnPropertyChanged(nameof(CurrentEffectsCountString));
-                OnPropertyChanged(nameof(CurrentMusicTracksCountString));
-                OnPropertyChanged(nameof(SelectedSetting.Music));
+                    RemoveEvents();
+                    setting.Scenes.Clear();
+                    setting.Elements.Clear();
+                    setting.Elements.ForEach(x => x.Dispose());
+                    setting.Effects.Clear();
+                    setting.Effects.ForEach(x => x.Dispose());
+                    await setting.DeleteImageFileAsync();
+                    AddEvents();
+                    Settings.Remove(setting);
+
+                    if (!Settings.Any())
+                    {
+                        await SelectSetting(null);
+                        await SelectScene(null);
+                    }
+                    else
+                    {
+                        if (SelectedSetting == setting)
+                        {
+                            await SelectSetting(Settings.First());
+                        }
+                    }
+
+                    OnPropertyChanged(nameof(CurrentElementsCountString));
+                    OnPropertyChanged(nameof(CurrentEffectsCountString));
+                    OnPropertyChanged(nameof(CurrentMusicTracksCountString));
+                    OnPropertyChanged(nameof(SelectedSetting.Music));
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
             }
         }
 

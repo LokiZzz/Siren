@@ -91,8 +91,11 @@ namespace Siren.UWP.Services
         private MediaSource _source = null;
         public async Task LoadAsync(string path)
         {
-            string fileName = Path.GetFileName(path);
-            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName);
+            //string fileName = Path.GetFileName(path);
+            //StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName);
+
+            StorageFile file = await StorageFile.GetFileFromPathAsync(path);
+
             _source = MediaSource.CreateFromStorageFile(file);
             await _source.OpenAsync();
             _player.Source = _source;
