@@ -6,6 +6,7 @@ using Siren.ViewModels.Help;
 using Siren.ViewModels.Players;
 using Siren.Views;
 using Siren.Views.Help;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -118,26 +119,24 @@ namespace Siren.ViewModels
                 {
                     IsBusy = true;
 
-                    foreach (string file in setting.GetAllSettingsFiles())
-                    {
-                        if (Settings.CanDeleteSettingAsset(setting, file))
-                        {
-                            await FileManager.DeleteFileAsync(file);
-                        }
-                    }
-
                     RemoveEvents();
                     setting.Scenes.Clear();
-                    setting.Elements.Clear();
-                    setting.Elements.ForEach(x => x.Dispose());
-                    setting.Effects.Clear();
-                    setting.Effects.ForEach(x => x.Dispose());
+                    await ClearComponents(setting, setting.Elements);
+                    await ClearComponents(setting, setting.Effects);
+                    await ClearComponents(setting, setting.Music);
+
+                    if (!string.IsNullOrEmpty(setting.ImagePath) 
+                        && Settings.CanDeleteSettingAsset(setting, setting.ImagePath))
+                    {
+                        await FileManager.DeleteFileAsync(setting.ImagePath);
+                    }
+
                     setting.ClearImage();
                     AddEvents();
                     Settings.Remove(setting);
 
                     //Это важный костыль, без него лист требует фокуса на элементе, прежде чем
-                    //начнут работать бундинги команд на удаление, редактирование и прочее.
+                    //начнут работать биндинги команд на удаление, редактирование и прочее.
                     Settings = new ObservableCollection<SettingViewModel>(Settings.ToList());
 
                     if (!Settings.Any())
@@ -162,6 +161,22 @@ namespace Siren.ViewModels
                 {
                     IsBusy = false;
                 }
+            }
+        }
+
+        private async Task ClearComponents(
+            SettingViewModel setting, 
+            ObservableCollection<SceneComponentViewModel> components)
+        {
+            foreach (SceneComponentViewModel component in components.ToList())
+            {
+                if (Settings.CanDeleteSettingAsset(setting, component.FilePath))
+                {
+                    await FileManager.DeleteFileAsync(component.FilePath);
+                }
+
+                components.Remove(component);
+                component.Dispose();
             }
         }
 
@@ -290,12 +305,12 @@ namespace Siren.ViewModels
 
             if (wantToDelete)
             {
-                SelectedSetting.Scenes.Remove(scene);
-
                 if (Settings.CanDeleteSettingAsset(SelectedSetting, scene.ImagePath))
                 {
                     await FileManager.DeleteFileAsync(scene.ImagePath);
                 }
+
+                SelectedSetting.Scenes.Remove(scene);
             }
         }
 
@@ -386,13 +401,13 @@ namespace Siren.ViewModels
 
         private async Task DeleteElement(SceneComponentViewModel component)
         {
-            SelectedSetting.Elements.Remove(component);
-            component.Dispose();
-
             if (Settings.CanDeleteSettingAsset(SelectedSetting, component.FilePath))
             {
-                await FileManager.DeleteFromAppData(Path.GetFileName(component.FilePath));
+                await FileManager.DeleteFileAsync(component.FilePath);
             }
+
+            SelectedSetting.Elements.Remove(component);
+            component.Dispose();
 
             //Важный костыль (см. похожие комментарии)
             SelectedSetting.Elements = new ObservableCollection<SceneComponentViewModel>(SelectedSetting.Elements);
@@ -452,13 +467,13 @@ namespace Siren.ViewModels
 
         private async Task DeleteEffect(SceneComponentViewModel component)
         {
-            SelectedSetting.Effects.Remove(component);
-            component.Dispose();
-
             if (Settings.CanDeleteSettingAsset(SelectedSetting, component.FilePath))
             {
-                await FileManager.DeleteFromAppData(Path.GetFileName(component.FilePath));
+                await FileManager.DeleteFileAsync(component.FilePath);
             }
+
+            SelectedSetting.Effects.Remove(component);
+            component.Dispose();
 
             //Важный костыль (см. другие такие комменты)
             SelectedSetting.Effects = new ObservableCollection<SceneComponentViewModel>(SelectedSetting.Effects);
@@ -529,13 +544,13 @@ namespace Siren.ViewModels
 
         private async Task DeleteMusicTrack(SceneComponentViewModel component)
         {
-            SelectedSetting.Music.Remove(component);
-            component.Dispose();
-
             if (Settings.CanDeleteSettingAsset(SelectedSetting, component.FilePath))
             {
-                await FileManager.DeleteFromAppData(Path.GetFileName(component.FilePath));
+                await FileManager.DeleteFileAsync(component.FilePath);
             }
+
+            SelectedSetting.Music.Remove(component);
+            component.Dispose();
 
             SelectedSetting.Music = new ObservableCollection<SceneComponentViewModel>(SelectedSetting.Music);
 

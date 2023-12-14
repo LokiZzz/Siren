@@ -17,7 +17,7 @@ namespace Siren.ViewModels
             IEnumerable<SettingViewModel> otherSettings = allSettings.Where(x => x != settingDeleteFrom);
 
             bool settingHaveSameFileInDifferentCategories =
-                settingDeleteFrom.GetAllSettingsFiles().Where(x => x == fileToDeletePath).Count() > 0;
+                settingDeleteFrom.GetAllSettingsFiles().Where(x => x == fileToDeletePath).Count() > 1;
 
             return !otherSettings.Any(x => x.Elements.Any(y => y.FilePath == fileToDeletePath))
                 && !otherSettings.Any(x => x.Effects.Any(y => y.FilePath == fileToDeletePath))
