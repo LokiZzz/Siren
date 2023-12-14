@@ -379,25 +379,34 @@ namespace Siren.ViewModels
         private int _maxElementsCount = 30;
         private async Task AddElements()
         {
-            IEnumerable<string> result = await FileManager.ChooseAndCopySoundsToAppData();
-
-            if (result.Count() + SelectedSetting.Elements.Count() > _maxElementsCount)
+            try
             {
-                await AlertTooManyFiles();
+                IsBusy = true;
 
-                return;
-            }
+                IEnumerable<string> result = await FileManager.ChooseAndCopySoundsToAppData();
 
-            foreach (string element in result)
-            {
-                if (!SelectedSetting.Elements.Any(x => x.FilePath.Equals(element)))
+                if (result.Count() + SelectedSetting.Elements.Count() > _maxElementsCount)
                 {
-                    SceneComponentViewModel player = new SceneComponentViewModel { Loop = true, FilePath = element };
-                    SelectedSetting.Elements.Add(player);
-                }
-            }
+                    await AlertTooManyFiles();
 
-            OnPropertyChanged(nameof(CurrentElementsCountString));
+                    return;
+                }
+
+                foreach (string element in result)
+                {
+                    if (!SelectedSetting.Elements.Any(x => x.FilePath.Equals(element)))
+                    {
+                        SceneComponentViewModel player = new SceneComponentViewModel { Loop = true, FilePath = element };
+                        SelectedSetting.Elements.Add(player);
+                    }
+                }
+
+                OnPropertyChanged(nameof(CurrentElementsCountString));
+            }
+            finally
+            { 
+                IsBusy = false;
+            }
         }
 
         private async Task GoToEditElement(SceneComponentViewModel element)
@@ -445,25 +454,34 @@ namespace Siren.ViewModels
         private int _maxEffectsCount = 30;
         private async Task AddEffects()
         {
-            IEnumerable<string> result = await FileManager.ChooseAndCopySoundsToAppData();
-
-            if (result.Count() + SelectedSetting.Effects.Count() > _maxEffectsCount)
+            try
             {
-                await AlertTooManyFiles();
+                IsBusy = true;
 
-                return;
-            }
+                IEnumerable<string> result = await FileManager.ChooseAndCopySoundsToAppData();
 
-            foreach (string element in result)
-            {
-                if (!SelectedSetting.Effects.Any(x => x.FilePath.Equals(element)))
+                if (result.Count() + SelectedSetting.Effects.Count() > _maxEffectsCount)
                 {
-                    SceneComponentViewModel player = new SceneComponentViewModel { FilePath = element };
-                    SelectedSetting.Effects.Add(player);
-                }
-            }
+                    await AlertTooManyFiles();
 
-            OnPropertyChanged(nameof(CurrentEffectsCountString));
+                    return;
+                }
+
+                foreach (string element in result)
+                {
+                    if (!SelectedSetting.Effects.Any(x => x.FilePath.Equals(element)))
+                    {
+                        SceneComponentViewModel player = new SceneComponentViewModel { FilePath = element };
+                        SelectedSetting.Effects.Add(player);
+                    }
+                }
+
+                OnPropertyChanged(nameof(CurrentEffectsCountString));
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private async Task GoToEditEffect(SceneComponentViewModel effect)
@@ -522,25 +540,34 @@ namespace Siren.ViewModels
         private int _maxMusicTracksCount = 100;
         private async Task AddMusic()
         {
-            IEnumerable<string> result = await FileManager.ChooseAndCopySoundsToAppData();
-
-            if (result.Count() + SelectedSetting.Music.Count() > _maxMusicTracksCount)
+            try
             {
-                await AlertTooManyFiles();
+                IsBusy = true;
 
-                return;
-            }
+                IEnumerable<string> result = await FileManager.ChooseAndCopySoundsToAppData();
 
-            foreach (string element in result)
-            {
-                if (!SelectedSetting.Music.Any(x => x.FilePath.Equals(element)))
+                if (result.Count() + SelectedSetting.Music.Count() > _maxMusicTracksCount)
                 {
-                    SceneComponentViewModel track = new SceneComponentViewModel { FilePath = element };
-                    SelectedSetting.Music.Add(track);
-                }
-            }
+                    await AlertTooManyFiles();
 
-            OnPropertyChanged(nameof(CurrentMusicTracksCountString));
+                    return;
+                }
+
+                foreach (string element in result)
+                {
+                    if (!SelectedSetting.Music.Any(x => x.FilePath.Equals(element)))
+                    {
+                        SceneComponentViewModel track = new SceneComponentViewModel { FilePath = element };
+                        SelectedSetting.Music.Add(track);
+                    }
+                }
+
+                OnPropertyChanged(nameof(CurrentMusicTracksCountString));
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private async Task GoToEditMusicTrack(SceneComponentViewModel musicTrack)
