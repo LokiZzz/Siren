@@ -100,7 +100,8 @@
 	            FlowItemsSource="{Binding Settings}" 
                 FlowRowBackgroundColor="{StaticResource VeryDark}" 
                 FlowTappedBackgroundColor="{StaticResource VeryDark}"
-                SelectionMode="None">
+                SelectionMode="None"
+                VerticalScrollBarVisibility="Never">
                 <flv:FlowListView.FlowColumnTemplate>
                     <DataTemplate>
                         <views:SettingCardView>
@@ -162,7 +163,8 @@
                     FlowItemsSource="{Binding SelectedSetting.Elements}" 
                     FlowRowBackgroundColor="{StaticResource Dark}" 
                     FlowTappedBackgroundColor="{StaticResource Dark}"
-                    SelectionMode="None">
+                    SelectionMode="None"
+                    VerticalScrollBarVisibility="Never">
                     <flv:FlowListView.FlowColumnTemplate>
                         <DataTemplate>
                             <views:ElementPlayerView/>
@@ -207,7 +209,8 @@
                     FlowItemsSource="{Binding SelectedSetting.Effects}" 
                     FlowRowBackgroundColor="{StaticResource Dark}" 
                     FlowTappedBackgroundColor="{StaticResource Dark}"
-                    SelectionMode="None">
+                    SelectionMode="None"
+                    VerticalScrollBarVisibility="Never">
                     <flv:FlowListView.FlowColumnTemplate>
                         <DataTemplate>
                             <views:EffectPlayerView/>

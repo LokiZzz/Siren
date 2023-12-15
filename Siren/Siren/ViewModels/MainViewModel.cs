@@ -402,6 +402,7 @@ namespace Siren.ViewModels
                 }
 
                 OnPropertyChanged(nameof(CurrentElementsCountString));
+                await SaveCurrentEnvironment();
             }
             finally
             { 
@@ -476,6 +477,7 @@ namespace Siren.ViewModels
                     }
                 }
 
+                await SaveCurrentEnvironment();
                 OnPropertyChanged(nameof(CurrentEffectsCountString));
             }
             finally
@@ -562,6 +564,7 @@ namespace Siren.ViewModels
                     }
                 }
 
+                await SaveCurrentEnvironment();
                 OnPropertyChanged(nameof(CurrentMusicTracksCountString));
             }
             finally

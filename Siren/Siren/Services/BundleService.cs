@@ -1,7 +1,6 @@
 ﻿using Siren.Models;
 using System;
 using System.Collections.Generic;
-using System.IO.Compression;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,8 +8,6 @@ using System.Linq;
 using Xamarin.Forms;
 using Newtonsoft.Json;
 using Siren.Utility;
-using static System.Net.WebRequestMethods;
-using System.Diagnostics;
 using System.Threading;
 
 namespace Siren.Services
