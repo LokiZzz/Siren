@@ -1,10 +1,13 @@
 ﻿using Siren.Messaging;
+using Siren.Models;
 using Siren.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -78,17 +81,39 @@ namespace Siren.ViewModels
             OnPropertyChanged(nameof(ShowSceneTitle));
         }
 
+        private List<string> _imageCash = new List<string>();
+
         private async Task SelectImage()
         {
-            _imageFileResult = await FileManager.ChooseAndCopyImageToAppData();
+            string imageFileResult = await FileManager.ChooseAndCopyImageToAppData();
 
-            if (_imageFileResult != null)
+            if (imageFileResult != null)
             {
+                _imageCash.Add(imageFileResult);
+                _imageFileResult = imageFileResult;
                 _imagePath = _imageFileResult;
                 Image = ImageSource.FromStream(async (_) => await _imagePath.GetStream());
             }
 
             UpdateVisibility();
+        }
+
+        private async Task DeleteOldImageIfNeed(string oldImagePath)
+        {
+            if(string.IsNullOrEmpty(oldImagePath))
+            {
+                return;
+            }
+
+            ObservableCollection<SettingViewModel> settings = 
+                await SceneManager.GetVMFromCurrentEnvironment();
+            IEnumerable<string> files = settings.SelectMany(x => x.GetAllSettingsFiles());
+            bool canDelete = files.Where(x => x == oldImagePath).Count() <= 1;
+
+            if(canDelete)
+            {
+                await FileManager.DeleteFileAsync(oldImagePath);
+            }
         }
 
         private bool ValidateSave() => !string.IsNullOrWhiteSpace(_name);
@@ -99,6 +124,11 @@ namespace Siren.ViewModels
 
             Image?.Cancel();
             Image = null;
+
+            foreach (string image in _imageCash.Skip(1))
+            {
+                await DeleteOldImageIfNeed(image);
+            }
         }
 
         private async void OnSave()
@@ -116,6 +146,11 @@ namespace Siren.ViewModels
 
             Image?.Cancel();
             Image = null;
+            
+            foreach(string image in _imageCash.Take(_imageCash.Count - 1))
+            {
+                await DeleteOldImageIfNeed(image);
+            }
 
             await Shell.Current.GoToAsync("..");
         }
@@ -195,6 +230,13 @@ namespace Siren.ViewModels
             InitializeVisibilityProperties();
             InitializeActionTitle();
             UpdateVisibility();
+
+            _imageCash.Clear();
+
+            if (!string.IsNullOrEmpty(_imagePath))
+            {
+                _imageCash.Add(_imagePath);
+            }
         }
 
         private async Task<Stream> GetStream(CancellationToken cancelToken, string path)
