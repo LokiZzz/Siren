@@ -285,14 +285,14 @@ namespace Siren.ViewModels
                 {
                     if (element.IsPlaying)
                     {
-                        element.SmoothStop();
+                        await element.SmoothStop();
                     }
                 }
             }
 
             if (SelectedSetting != null)
             {
-                Settings.Where(x => x != SelectedSetting).ForEach(x => x.MusicPlayer.SmoothStop());
+                Settings.Where(x => x != SelectedSetting).ForEach(async x => await x.MusicPlayer.SmoothStop());
 
                 await SelectedSetting.MusicPlayer.AdjustPlayer(SelectedScene);
             }
@@ -315,7 +315,8 @@ namespace Siren.ViewModels
 
             if (wantToDelete)
             {
-                if (Settings.CanDeleteSettingAsset(SelectedSetting, scene.ImagePath))
+                if (!string.IsNullOrEmpty(scene.ImagePath) 
+                    && Settings.CanDeleteSettingAsset(SelectedSetting, scene.ImagePath))
                 {
                     await FileManager.DeleteFileAsync(scene.ImagePath);
                 }
@@ -615,7 +616,7 @@ namespace Siren.ViewModels
         {
             if (SelectedSetting.MusicPlayer.IsMusicPlaying)
             {
-                SelectedSetting.MusicPlayer.StopMusic();
+                await SelectedSetting.MusicPlayer.StopMusic();
             }
             else
             {
@@ -735,15 +736,15 @@ namespace Siren.ViewModels
 
                 Settings.SelectMany(x => x.Elements)
                     .Where(x => x.IsPlaying)
-                    .ForEach(x => x.SmoothStop());
+                    .ForEach(async x => await x.SmoothStop());
 
                 Settings.SelectMany(x => x.Effects)
                     .Where(x => x.IsPlaying)
-                    .ForEach(x => x.SmoothStop());
+                    .ForEach(async x => await x.SmoothStop());
 
                 Settings.Select(x => x.MusicPlayer)
                     .Where(x => x.IsMusicPlaying)
-                    .ForEach(x => x.StopMusic());
+                    .ForEach(async x => await x.StopMusic());
             }
             else
             {
