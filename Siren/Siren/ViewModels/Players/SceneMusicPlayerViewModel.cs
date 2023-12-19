@@ -86,12 +86,12 @@ namespace Siren.ViewModels.Players
             }
         }
 
-        public async Task StopMusic()
+        public void StopMusic()
         {
             if (IsMusicPlaying)
             {
                 ResetState();
-                await SmoothStop();
+                SmoothStop();
             }
         }
 
@@ -277,7 +277,7 @@ namespace Siren.ViewModels.Players
             
             if(IsMusicPlaying && IsOn)
             {
-                await StartAdjustingVolume(scene.MusicVolume);
+                StartAdjustingVolume(scene.MusicVolume);
             }
 
             if (IsOn && !IsMusicPlaying)
@@ -288,7 +288,7 @@ namespace Siren.ViewModels.Players
 
             if (!IsOn && IsMusicPlaying)
             {
-                await StopMusic();
+                StopMusic();
             }
         }
     }

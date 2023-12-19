@@ -76,7 +76,7 @@ namespace Siren.ViewModels
                 await PlayPause();
             }
 
-            await StartAdjustingVolume(targetVolume);
+            StartAdjustingVolume(targetVolume);
         }
 
         private bool _isManualStopped = false;
@@ -98,16 +98,16 @@ namespace Siren.ViewModels
             }
         }
 
-        public async Task SmoothStop()
+        public void SmoothStop()
         {
-            await StartAdjustingVolume(0);
+            StartAdjustingVolume(0);
         }
 
         private Task _adjustingVolumeTask;
         private SemaphoreSlim _semaphore = new SemaphoreSlim(1);
         private CancellationTokenSource _cancelCurrentAdjustingToken = new CancellationTokenSource();
 
-        public async Task StartAdjustingVolume(double targetVolume)
+        public void StartAdjustingVolume(double targetVolume)
         {
             try
             {
@@ -137,6 +137,8 @@ namespace Siren.ViewModels
                 _semaphore.Release();
             }
         }
+
+        private SemaphoreSlim _internalSemaphore = new SemaphoreSlim(1);
 
         private void StartAdjustingVolumeInternal(double targetVolume, CancellationToken cancellationToken)
         {

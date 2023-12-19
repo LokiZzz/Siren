@@ -285,14 +285,14 @@ namespace Siren.ViewModels
                 {
                     if (element.IsPlaying)
                     {
-                        await element.SmoothStop();
+                        element.SmoothStop();
                     }
                 }
             }
 
             if (SelectedSetting != null)
             {
-                Settings.Where(x => x != SelectedSetting).ForEach(async x => await x.MusicPlayer.SmoothStop());
+                Settings.Where(x => x != SelectedSetting).ForEach(x => x.MusicPlayer.SmoothStop());
 
                 await SelectedSetting.MusicPlayer.AdjustPlayer(SelectedScene);
             }
@@ -616,7 +616,7 @@ namespace Siren.ViewModels
         {
             if (SelectedSetting.MusicPlayer.IsMusicPlaying)
             {
-                await SelectedSetting.MusicPlayer.StopMusic();
+                SelectedSetting.MusicPlayer.StopMusic();
             }
             else
             {
@@ -736,15 +736,15 @@ namespace Siren.ViewModels
 
                 Settings.SelectMany(x => x.Elements)
                     .Where(x => x.IsPlaying)
-                    .ForEach(async x => await x.SmoothStop());
+                    .ForEach(x => x.SmoothStop());
 
                 Settings.SelectMany(x => x.Effects)
                     .Where(x => x.IsPlaying)
-                    .ForEach(async x => await x.SmoothStop());
+                    .ForEach(x => x.SmoothStop());
 
                 Settings.Select(x => x.MusicPlayer)
                     .Where(x => x.IsMusicPlaying)
-                    .ForEach(async x => await x.StopMusic());
+                    .ForEach(x => x.StopMusic());
             }
             else
             {
@@ -788,7 +788,7 @@ namespace Siren.ViewModels
                 }
                 else
                 {
-                    string setting = Settings.FirstOrDefault(x => x.Scenes.Contains(SelectedScene)).Name;
+                    string setting = Settings.FirstOrDefault(x => x.Scenes.Contains(SelectedScene))?.Name;
                     current = $"{setting} — { SelectedScene.Name}";
                 }
 
