@@ -90,9 +90,7 @@ namespace Siren.Services
                 {
                     try
                     {
-                        string fileName = Path.GetFileName(file);
-
-                        using (Stream sourceStream = await _fileManager.GetStreamToReadFromAppData(fileName))
+                        using (Stream sourceStream = await _fileManager.GetStreamToRead(file))
                         {
                             await sourceStream.CopyToAsync(targetStream, 81920, cancellationToken);
                             metadata.Bundle.Size = targetStream.Length;
