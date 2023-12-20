@@ -183,9 +183,6 @@ namespace Siren.ViewModels
 
                 if (Volume == targetVolume && targetVolume == 0)
                 {
-                    // Anti-clicksound
-                    Thread.Sleep(100);
-
                     Stop();
                     Volume = 100;
                     OnPropertyChanged(nameof(Volume));

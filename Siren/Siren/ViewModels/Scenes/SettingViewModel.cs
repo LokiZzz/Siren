@@ -22,8 +22,8 @@ namespace Siren.ViewModels
             set => SetProperty(ref _isSelected, value);
         }
 
-        public void UpdateHasSelectedScene() => OnPropertyChanged(nameof(HasSelectedScene));
-        public bool HasSelectedScene => Elements.Any(x => x.IsPlaying) || Effects.Any(x => x.IsPlaying) || Music.Any(x => x.IsPlaying);
+        public void UpdateHasActiveSounds() => OnPropertyChanged(nameof(HasActiveSounds));
+        public bool HasActiveSounds => Elements.Any(x => x.IsPlaying) || Effects.Any(x => x.IsPlaying) || MusicPlayer.IsPlaying;
 
         private ObservableCollection<SceneViewModel> _scenes = new ObservableCollection<SceneViewModel>();
         public ObservableCollection<SceneViewModel> Scenes

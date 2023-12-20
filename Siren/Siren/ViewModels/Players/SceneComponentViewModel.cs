@@ -38,13 +38,13 @@ namespace Siren.ViewModels
         public override async Task PlayPause()
         {
             await base.PlayPause();
-            MessagingCenter.Send(this, Messages.ElementPlayingStatusChanged);
+            MessagingCenter.Send(this, Messages.ComponentPlayingStatusChanged);
         }
 
         public override void Stop(bool isManual = true)
         {
             base.Stop(isManual);
-            MessagingCenter.Send(this, Messages.ElementPlayingStatusChanged);
+            MessagingCenter.Send(this, Messages.ComponentPlayingStatusChanged);
         }
     }
 }

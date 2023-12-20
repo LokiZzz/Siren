@@ -683,7 +683,7 @@ namespace Siren.ViewModels
 
         private void InitializeMessagingCenter()
         {
-            MessagingCenter.Subscribe<SceneComponentViewModel>(this, Messages.ElementPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsSomethingPlaying)));
+            MessagingCenter.Subscribe<SceneComponentViewModel>(this, Messages.ComponentPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsSomethingPlaying)));
             MessagingCenter.Subscribe<SceneMusicPlayerViewModel>(this, Messages.MusicTrackPlayingStatusChanged, vm => OnPropertyChanged(nameof(IsSomethingPlaying)));
 
             MessagingCenter.Subscribe<SceneManager>(this, Messages.SettingAdded, async (setting) => await AddSetting(setting));
@@ -770,7 +770,7 @@ namespace Siren.ViewModels
                     GlobalPlayActivityIndicatorIsVisible = false;
                 }
 
-                Settings.ForEach(x => x.UpdateHasSelectedScene());
+                Settings.ForEach(x => x.UpdateHasActiveSounds());
 
                 return isSomethingPlaying;
             }

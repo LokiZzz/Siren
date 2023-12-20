@@ -6,7 +6,7 @@ namespace Siren.Messaging
 {
     public static class Messages
     {
-        public static string ElementPlayingStatusChanged = nameof(ElementPlayingStatusChanged);
+        public static string ComponentPlayingStatusChanged = nameof(ComponentPlayingStatusChanged);
         public static string MusicTrackPlayingStatusChanged = nameof(MusicTrackPlayingStatusChanged);
 
         public static string SettingAdded = nameof(SettingAdded);

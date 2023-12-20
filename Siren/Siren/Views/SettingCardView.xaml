@@ -23,7 +23,7 @@
                 </Rectangle>
 
                 <Label Grid.Row="1" Grid.Column="0" 
-                       IsVisible="{Binding HasSelectedScene}"
+                       IsVisible="{Binding HasActiveSounds}"
                        FontSize="30" FontFamily="FA" Text="{x:Static icons:FAFont.CirclePlay}" TextColor="{StaticResource Green}"
                        VerticalOptions="Center" HorizontalOptions="Start"
                        VerticalTextAlignment="Center" HorizontalTextAlignment="Start"
