@@ -283,6 +283,7 @@ namespace Siren.ViewModels.Players
             if (IsOn && !IsMusicPlaying)
             {
                 Volume = scene.MusicVolume;
+                OnPropertyChanged(nameof(Volume));
                 await PlayMusic();
             }
 

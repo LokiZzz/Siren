@@ -1,6 +1,7 @@
 ﻿using Siren.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -64,6 +65,7 @@ namespace Siren.ViewModels
             if (!IsPlaying)
             {
                 Volume = volume;
+                OnPropertyChanged(nameof(Volume));
                 await PlayPause();
             }
         }
@@ -73,6 +75,7 @@ namespace Siren.ViewModels
             if (!IsPlaying)
             {
                 Volume = 0;
+                OnPropertyChanged(nameof(Volume));
                 await PlayPause();
             }
 
@@ -104,74 +107,88 @@ namespace Siren.ViewModels
         }
 
         private Task _adjustingVolumeTask;
-        private SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+        private SemaphoreSlim _taskSemaphore = new SemaphoreSlim(1);
         private CancellationTokenSource _cancelCurrentAdjustingToken = new CancellationTokenSource();
 
         public void StartAdjustingVolume(double targetVolume)
         {
             try
             {
-                _semaphore.Wait();
+                _taskSemaphore.Wait();
 
-                if(_adjustingVolumeTask != null)
+                if (_adjustingVolumeTask != null)
                 {
                     _cancelCurrentAdjustingToken.Cancel();
-                    _cancelCurrentAdjustingToken.Dispose();
                     _adjustingVolumeTask.Wait();
                     _adjustingVolumeTask.Dispose();
+                    _cancelCurrentAdjustingToken.Dispose();
                 }
 
-                if(_adjustingVolumeTask?.Status == TaskStatus.Running)
+                if (_adjustingVolumeTask?.Status == TaskStatus.Running)
                 {
                     throw new Exception("Here!");
                 }
 
                 _cancelCurrentAdjustingToken = new CancellationTokenSource();
                 _adjustingVolumeTask = Task.Run(
-                    () => StartAdjustingVolumeInternal(targetVolume, _cancelCurrentAdjustingToken.Token), 
+                    () => StartAdjustingVolumeInternal(targetVolume, _cancelCurrentAdjustingToken.Token),
                     _cancelCurrentAdjustingToken.Token
                 );
             }
             finally
-            { 
-                _semaphore.Release();
+            {
+                _taskSemaphore.Release();
             }
         }
 
-        private SemaphoreSlim _internalSemaphore = new SemaphoreSlim(1);
 
         private void StartAdjustingVolumeInternal(double targetVolume, CancellationToken cancellationToken)
         {
             double step = 0.5;
             int delay = 10;
 
-            while (Volume != targetVolume && !cancellationToken.IsCancellationRequested)
+            while (Volume != targetVolume)
             {
-                Task.Delay(delay).Wait();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                Thread.Sleep(delay);
 
                 double volume = Volume;
 
-                if(volume > targetVolume)
+                if (volume > targetVolume)
                 {
                     volume -= step;
+                    volume = volume < 0 ? 0 : volume;
                 }
 
-                if(volume < targetVolume)
+                if (volume < targetVolume)
                 {
                     volume += step;
+                    volume = volume > 100 ? 100 : volume;
                 }
 
-                volume = volume > 100 ? 100 : volume;
-                volume = volume < 0 ? 0 : volume;
-                Volume = volume;
+                if (Math.Abs(Volume - volume) < step)
+                {
+                    Volume = targetVolume;
+                    OnPropertyChanged(nameof(Volume));
+                }
+                else
+                {
+                    Volume = volume;
+                    OnPropertyChanged(nameof(Volume));
+                }
 
-                if(Volume == targetVolume && targetVolume == 0)
+                if (Volume == targetVolume && targetVolume == 0)
                 {
                     // Anti-clicksound
-                    Task.Delay(100).Wait();
+                    Thread.Sleep(100);
 
                     Stop();
                     Volume = 100;
+                    OnPropertyChanged(nameof(Volume));
 
                     break;
                 }
@@ -296,7 +313,6 @@ namespace Siren.ViewModels
             set
             {
                 Player.Volume = Math.Round(value / 100, 3);
-                OnPropertyChanged(nameof(Volume));
             }
         }
 
