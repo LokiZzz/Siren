@@ -375,6 +375,14 @@
                 
             </StackLayout>
         </Grid>
+
+        <!--Block input when waiting indicator is running-->
+        <Rectangle
+            Grid.RowSpan="5"
+            Grid.ColumnSpan="3"
+            BackgroundColor="Transparent"
+            IsVisible="{Binding GlobalPlayActivityIndicatorIsVisible}"
+            InputTransparent="False"/>
     </Grid>
 
 </ContentPage>
