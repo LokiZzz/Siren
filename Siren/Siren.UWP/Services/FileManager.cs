@@ -84,7 +84,7 @@ namespace Siren.UWP.Services
 
                 return true;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return false;
             }
@@ -141,6 +141,8 @@ namespace Siren.UWP.Services
             await Launcher.LaunchFolderAsync(storageFolder);
         }
 
+        private StorageFile _storageFileOpenedToWrite;
+
         public async ValueTask<Stream> PickAndGetStreamToWrite(string suggestedFileName)
         {
             FileSavePicker savePicker = new FileSavePicker();
@@ -150,14 +152,22 @@ namespace Siren.UWP.Services
             // Default file name if the user does not type one in or select a file to replace
             savePicker.SuggestedFileName = suggestedFileName;
 
-            StorageFile file = await savePicker.PickSaveFileAsync();
+            _storageFileOpenedToWrite = await savePicker.PickSaveFileAsync();
 
-            if (file != null)
+            if (_storageFileOpenedToWrite != null)
             {
-                return await file.OpenStreamForWriteAsync();
+                return await _storageFileOpenedToWrite.OpenStreamForWriteAsync();
             }
-            
+
             return null;
+        }
+
+        public async Task DeleteFileOpenedToWrite()
+        {
+            if (_storageFileOpenedToWrite != null)
+            {
+                await _storageFileOpenedToWrite.DeleteAsync();
+            }
         }
 
         public async ValueTask<Stream> PickAndGetStreamToRead()

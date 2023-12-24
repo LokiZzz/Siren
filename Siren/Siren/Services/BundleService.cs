@@ -45,7 +45,7 @@ namespace Siren.Services
             catch(OperationCanceledException)
             {
                 OnCreateProgressUpdate(this, new ProcessingProgress(0, "Creating cancelled..."));
-                await _fileManager.DeleteFileAsync(_sirenFilePath);
+                await _fileManager.DeleteFileOpenedToWrite();
 
                 return false;
             }

@@ -19,6 +19,7 @@ namespace Siren.Services
 
         Task DeleteFileAsync(string filePath);
         Task DeleteFolderAsync(string folderPath);
+        Task DeleteFileOpenedToWrite();
 
         Task OpenFolder(string folderPath);
 
